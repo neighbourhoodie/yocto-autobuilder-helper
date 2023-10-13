@@ -948,6 +948,10 @@
         "poky-tiny" : {
             "DISTRO" : "poky-tiny",
             "BBTARGETS" : "core-image-minimal",
+            "SANITYTARGETS" : "core-image-minimal:do_testimage",
+            "extravars" : [
+                "TEST_SUITES = '_qemutiny'"
+            ],
             "step1" : {
                 "MACHINE" : "qemux86",
                 "shortname" : "qemux86 poky-tiny"
