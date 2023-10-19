@@ -1309,7 +1309,7 @@
             },
             "step5" : {
                 "shortname" : "Prep #2 locked-sigs test",
-                "BBTARGETS" : "core-image-sato -S none",
+                "BBTARGETS" : "core-image-sato -S lockedsigs",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/../janitor/clobberdir ${BUILDDIR}/../build/tmp"]
             },
             "step6" : {
