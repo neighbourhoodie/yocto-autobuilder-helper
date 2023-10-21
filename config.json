@@ -1150,11 +1150,12 @@
         },
         "check-layer" : {
             "NEEDREPOS" : ["poky", "meta-mingw"],
+            "DISTRO" : "nodistro",
             "step1" : {
-                "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-poky"]
+                "EXTRACMDS" : ["bitbake-layers remove-layer ../meta-poky; yocto-check-layer ../meta-poky"]
             },
             "step2" : {
-                "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-yocto-bsp"]
+                "EXTRACMDS" : ["bitbake-layers remove-layer ../meta-yocto-bsp; yocto-check-layer ../meta-yocto-bsp"]
             },
             "step3" : {
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-mingw"]
