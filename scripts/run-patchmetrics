@@ -13,7 +13,9 @@ TIMESTAMP=`date +"%s"`
 #
 # Patch Metrics
 #
-git clone ssh://git@push.yoctoproject.org/yocto-metrics $PARENTDIR/yocto-metrics
+if [ ! -e $PARENTDIR/yocto-metrics ]; then
+    git clone ssh://git@push.yoctoproject.org/yocto-metrics $PARENTDIR/yocto-metrics
+fi
 $OURDIR/patchmetrics-update --repo $PARENTDIR --patchscript $PARENTDIR/scripts/contrib/patchreview.py --metadata $TARGETDIR --json $PARENTDIR/yocto-metrics/patch-status.json
 git -C $PARENTDIR/yocto-metrics commit -asm "Autobuilder adding new patch stats"
 git -C $PARENTDIR/yocto-metrics push
