@@ -22,34 +22,28 @@ if [ ! -d $RESULTSDIR ]; then
     mkdir $RESULTSDIR
 fi
 
-for branch in master mickledore langdale kirkstone dunfell; do
-    mkdir -p $PARENTDIR/yocto-metrics/cve-check/$branch/
-    git -C $PARENTDIR reset origin/$branch --hard
-    rm conf/local.conf
-    rm conf/bblayers.conf
-    rm -f conf/templateconf.cfg
-    rm tmp/ -rf
-    unset BB_ENV_PASSTHROUGH_ADDITIONS
-    unset BB_ENV_EXTRAWHITE
-    cd ..
-    . oe-init-build-env build
-    bitbake world --runall cve_check -R conf/distro/include/cve-extra-exclusions.inc
-    if [ -e tmp/log/cve/cve-summary.json ]; then
-        git -C $PARENTDIR/yocto-metrics rm cve-check/$branch/*.json
-        mkdir -p $PARENTDIR/yocto-metrics/cve-check/$branch
-        cp tmp/log/cve/cve-summary.json $PARENTDIR/yocto-metrics/cve-check/$branch/$TIMESTAMP.json
-        git -C $PARENTDIR/yocto-metrics add cve-check/$branch/$TIMESTAMP.json
-        git -C $PARENTDIR/yocto-metrics commit -asm "Autobuilder adding new CVE data for branch $branch"
-        git -C $PARENTDIR/yocto-metrics push
-        $OURDIR/cve-report.py tmp/log/cve/cve-summary.json > $RESULTSDIR/cve-status-$branch.txt
-    fi
-done
+mkdir -p $PARENTDIR/yocto-metrics/cve-check/$BRANCH/
+cd ..
+. oe-init-build-env build
+bitbake world --runall cve_check -R conf/distro/include/cve-extra-exclusions.inc
+if [ -e tmp/log/cve/cve-summary.json ]; then
+    git -C $PARENTDIR/yocto-metrics rm cve-check/$BRANCH/*.json
+    mkdir -p $PARENTDIR/yocto-metrics/cve-check/$BRANCH
+    cp tmp/log/cve/cve-summary.json $PARENTDIR/yocto-metrics/cve-check/$BRANCH/$TIMESTAMP.json
+    git -C $PARENTDIR/yocto-metrics add cve-check/$BRANCH/$TIMESTAMP.json
+    git -C $PARENTDIR/yocto-metrics commit -asm "Autobuilder adding new CVE data for branch $BRANCH"
+    git -C $PARENTDIR/yocto-metrics push
+    $OURDIR/cve-report.py tmp/log/cve/cve-summary.json > $RESULTSDIR/cve-status-$BRANCH.txt
+fi
 
-mkdir -p $PARENTDIR/yocto-metrics/cve-check/
-$OURDIR/cve-generate-chartdata --json $PARENTDIR/yocto-metrics/cve-count-byday.json --resultsdir $PARENTDIR/yocto-metrics/cve-check/
-git -C $PARENTDIR/yocto-metrics add cve-count-byday.json
-git -C $PARENTDIR/yocto-metrics commit -asm "Autobuilder updating CVE counts"
-git -C $PARENTDIR/yocto-metrics push
+if [ "$BRANCH" = "master" ]; then
+    mkdir -p $PARENTDIR/yocto-metrics/cve-check/
+    $OURDIR/cve-generate-chartdata --json $PARENTDIR/yocto-metrics/cve-count-byday.json --resultsdir $PARENTDIR/yocto-metrics/cve-check/
+    git -C $PARENTDIR/yocto-metrics add cve-count-byday.json
+    git -C $PARENTDIR/yocto-metrics commit -asm "Autobuilder updating CVE counts"
+    git -C $PARENTDIR/yocto-metrics push
 
-cp $PARENTDIR/yocto-metrics/cve-count-byday.json $RESULTSDIR
-cp $PARENTDIR/yocto-metrics/cve-count-byday-lastyear.json $RESULTSDIR
+    cp $PARENTDIR/yocto-metrics/cve-count-byday.json $RESULTSDIR
+    cp $PARENTDIR/yocto-metrics/cve-count-byday-lastyear.json $RESULTSDIR
+fi
+
