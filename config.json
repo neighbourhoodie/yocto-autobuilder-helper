@@ -1208,8 +1208,14 @@
                 "BB_SERVER_TIMEOUT = '0'"
             ],
             "step1" : {
+                "shortname" : "Generating patch metrics",
                 "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-patchmetrics ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics ."]
+            },
+            "step2" : {
+                "shortname" : "Running CVE checks",
+                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-cvecheck ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics ."]
             }
+
         },
         "meta-mingw" : {
             "NEEDREPOS" : ["poky", "meta-mingw"],
