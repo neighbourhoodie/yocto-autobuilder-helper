@@ -6,6 +6,7 @@ PARENTDIR=`realpath $1`
 TARGETDIR=`realpath $2`
 RESULTSDIR=`realpath -m $3`
 BUILDDIR=`realpath $4`
+BRANCH=$5
 OURDIR=`dirname $0`
 
 TIMESTAMP=`date +"%s"`

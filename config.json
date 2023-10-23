@@ -1209,11 +1209,11 @@
             ],
             "step1" : {
                 "shortname" : "Generating patch metrics",
-                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-patchmetrics ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics ."]
+                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-patchmetrics ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics . ${HELPERBRANCHNAME}"]
             },
             "step2" : {
                 "shortname" : "Running CVE checks",
-                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-cvecheck ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics ."]
+                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-cvecheck ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics . ${HELPERBRANCHNAME}"]
             }
 
         },
