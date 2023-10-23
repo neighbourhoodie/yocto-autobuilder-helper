@@ -11,6 +11,11 @@ OURDIR=`dirname $0`
 
 TIMESTAMP=`date +"%s"`
 
+# We only monitor patch metrics on the master branch
+if [ "$BRANCH" != "master" ]; then
+    exit 0
+fi
+
 #
 # Patch Metrics
 #
