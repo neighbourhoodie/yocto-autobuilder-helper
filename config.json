@@ -1451,6 +1451,12 @@
                 "${BUILDDIR}/../meta-openembedded/meta-initramfs",
                 "${BUILDDIR}/../meta-openembedded/meta-webserver"
             ],
+            "extravars" : [
+                "LICENSE_FLAGS_ACCEPTED = 'commercial'",
+                "DISTRO_FEATURES:append = ' pam systemd usrmerge'",
+                "FORTRAN:forcevariable = ',fortran'",
+                "RUNTIMETARGET:append:pn-gcc-runtime = ' libquadmath'"
+            ],
             "step1" : {
                 "shortname" : "Sources pre-fetching",
                 "BBTARGETS" : "universe -c fetch -k",
