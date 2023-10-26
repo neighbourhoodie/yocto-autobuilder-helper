@@ -1486,6 +1486,7 @@
             "MACHINE" : "qemux86-64",
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-patchtest",
+                "${BUILDDIR}/../meta-openembedded/meta-oe",
                 "${BUILDDIR}/../meta-openembedded/meta-python"
             ],
             "step1" : {
