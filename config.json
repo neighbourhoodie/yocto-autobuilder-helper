@@ -1480,6 +1480,14 @@
         },
         "a-full-posttrigger" : {
             "TEMPLATE" : "trigger-build-posttrigger"
+        },
+        "patchtest" : {
+            "NEEDREPOS" : ["poky", "meta-patchtest"],
+            "MACHINE" : "qemux86-64",
+            "ADDLAYER" : ["${BUILDDIR}/../meta-patchtest"],
+            "step1" : {
+                "BBTARGETS" : "core-image-patchtest"
+            }
         }
     },
     "repo-defaults" : {
@@ -1531,6 +1539,11 @@
         },
         "meta-gplv2" : {
             "url" : "ssh://git@push.yoctoproject.org/meta-gplv2",
+            "branch" : "master",
+            "revision" : "HEAD"
+        },
+        "meta-patchtest" : {
+            "url" : "ssh://git@push.yoctoproject.org/meta-patchtest",
             "branch" : "master",
             "revision" : "HEAD"
         },

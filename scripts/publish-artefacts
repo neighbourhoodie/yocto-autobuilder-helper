@@ -201,6 +201,11 @@ case "$target" in
         sha256sums $TMPDIR/deploy/images/qemux86
         cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/qemux86/*qemux86* $DEST/machines/qemu/qemu-tiny
         ;;
+    "patchtest")
+        mkdir -p $DEST/patchtest
+        sha256sums $TMPDIR/deploy/images/qemux86-64
+        cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/qemux86-64/*qemux86* $DEST/patchtest
+        ;;
     "eclipse-plugin-neon")
         DIR=$WORKDIR/../scripts
         # create sha256sums only for the zip files
