@@ -1482,9 +1482,12 @@
             "TEMPLATE" : "trigger-build-posttrigger"
         },
         "patchtest" : {
-            "NEEDREPOS" : ["poky", "meta-patchtest"],
+            "NEEDREPOS" : ["poky", "meta-patchtest", "meta-openembedded"],
             "MACHINE" : "qemux86-64",
-            "ADDLAYER" : ["${BUILDDIR}/../meta-patchtest"],
+            "ADDLAYER" : [
+                "${BUILDDIR}/../meta-patchtest",
+                "${BUILDDIR}/../meta-openembedded/meta-python"
+            ],
             "step1" : {
                 "BBTARGETS" : "core-image-patchtest"
             }
