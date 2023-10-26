@@ -1485,9 +1485,9 @@
             "NEEDREPOS" : ["poky", "meta-patchtest", "meta-openembedded"],
             "MACHINE" : "qemux86-64",
             "ADDLAYER" : [
-                "${BUILDDIR}/../meta-patchtest",
                 "${BUILDDIR}/../meta-openembedded/meta-oe",
-                "${BUILDDIR}/../meta-openembedded/meta-python"
+                "${BUILDDIR}/../meta-openembedded/meta-python",
+                "${BUILDDIR}/../meta-patchtest"
             ],
             "step1" : {
                 "BBTARGETS" : "core-image-patchtest"
@@ -1549,7 +1549,8 @@
         "meta-patchtest" : {
             "url" : "ssh://git@push.yoctoproject.org/meta-patchtest",
             "branch" : "master",
-            "revision" : "HEAD"
+            "revision" : "HEAD",
+            "no-layer-add" : true
         },
         "meta-virtualization" : {
             "url" : "ssh://git@push.yoctoproject.org/meta-virtualization",
