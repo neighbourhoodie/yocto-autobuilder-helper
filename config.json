@@ -1433,6 +1433,14 @@
                 "${SCRIPTSDIR}/setup-auh ${HELPERBUILDDIR}; ${SCRIPTSDIR}/run-auh ${HELPERBUILDDIR} ${WEBPUBLISH_DIR}/pub/auh/"
             ]
         },
+        "yocto-mirror" : {
+            "MACHINE" : "qemux86-64",
+            "step1" : {
+                "shortname" : "Yocto Mirror Selftest",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest -a -t yocto-mirrors -j 15"],
+                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+            }
+        },
         "meta-oe-mirror" : {
             "SDKMACHINE" : "x86_64",
             "MACHINE" : "qemux86-64",
