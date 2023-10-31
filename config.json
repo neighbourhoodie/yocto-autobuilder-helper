@@ -1198,7 +1198,7 @@
             }
         },
         "metrics" : {
-            "NEEDREPOS" : ["poky"],
+            "NEEDREPOS" : ["poky", "meta-openembedded"],
             "extravars" : [
                 "INHERIT += 'cve-check'",
                 "BB_DISKMON_DIRS = ''",
@@ -1210,18 +1210,37 @@
             "step1" : {
                 "shortname" : "Fetching metrics repositories",
                 "EXTRAPLAINCMDS" : [
-                    "git clone ssh://git@push.yoctoproject.org/yocto-metrics"
+                    "git clone ssh://git@push.yoctoproject.org/yocto-metrics && git clone ssh://git@push.yoctoproject.org/yocto-metrics-meta-oe"
                 ]
             },
             "step2" : {
-                "shortname" : "Generating patch metrics for Poky",
+                "shortname" : "Patch metrics for meta",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --poky ../ --metrics ../yocto-metrics --repo ../ --layer ../meta --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
             },
             "step3" : {
-                "shortname" : "Running CVE checks for Poky",
+                "shortname" : "CVE checks for meta",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/run-cvecheck --metrics ../yocto-metrics --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
+            },
+            "step4" : {
+                "shortname" : "Patch metrics for meta-oe",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --poky ../ --metrics ../yocto-metrics-meta-oe --repo ../meta-openembedded --layer ../meta-openembedded --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
+            },
+            "step5" : {
+                "shortname" : "CVE checks for meta-oe",
+                "ADDLAYER" : [
+                    "${BUILDDIR}/../meta-openembedded/meta-oe",
+                    "${BUILDDIR}/../meta-openembedded/meta-python",
+                    "${BUILDDIR}/../meta-openembedded/meta-perl",
+                    "${BUILDDIR}/../meta-openembedded/meta-networking",
+                    "${BUILDDIR}/../meta-openembedded/meta-multimedia",
+                    "${BUILDDIR}/../meta-openembedded/meta-gnome",
+                    "${BUILDDIR}/../meta-openembedded/meta-xfce",
+                    "${BUILDDIR}/../meta-openembedded/meta-filesystems",
+                    "${BUILDDIR}/../meta-openembedded/meta-initramfs",
+                    "${BUILDDIR}/../meta-openembedded/meta-webserver"
+                    ],
+                "EXTRACMDS" : ["echo 'do_cve_check:layer-core = \"\"' >> conf/auto.conf ; ${SCRIPTSDIR}/run-cvecheck --metrics ../yocto-metrics-meta-oe --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
             }
-
         },
         "meta-mingw" : {
             "NEEDREPOS" : ["poky", "meta-mingw"],
