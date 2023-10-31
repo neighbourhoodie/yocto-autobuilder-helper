@@ -2,34 +2,114 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
-PARENTDIR=`realpath $1`
-TARGETDIR=`realpath $2`
-RESULTSDIR=`realpath -m $3`
-BUILDDIR=`realpath $4`
-BRANCH=$5
-OURDIR=`dirname $0`
 
-TIMESTAMP=`date +"%s"`
+set -eu
+
+ARGS=$(getopt -o '' --long 'poky:,metrics:,repo:,layer:,branch:,results:,push' -n 'run-patchmetrics' -- "$@")
+if [ $? -ne 0 ]; then
+    echo 'Cannot parse arguments...' >&2
+    exit 1
+fi
+eval set -- "$ARGS"
+unset ARGS
+
+# Location of the yocto-autobuilder-helper scripts
+OURDIR=$(dirname $0)
+# Where Poky is (for patchreview.py)
+POKYDIR=""
+# The metrics repository to use
+METRICSDIR=""
+# Where to copy results to
+RESULTSDIR=""
+# The branch we're building
+BRANCH=""
+# The layer/repository to scan
+LAYERDIR=""
+# Whether to push the metrics
+PUSH=0
+
+while true; do
+    case "$1" in
+        '--poky')
+            POKYDIR=$(realpath $2)
+            shift 2
+            continue
+        ;;
+        '--metrics')
+            METRICSDIR=$(realpath $2)
+            shift 2
+            continue
+        ;;
+        '--layer')
+            LAYERDIR=$(realpath $2)
+            shift 2
+            continue
+        ;;
+        '--repo')
+            REPODIR=$(realpath $2)
+            shift 2
+            continue
+        ;;
+        '--branch')
+            BRANCH=$2
+            shift 2
+            continue
+        ;;
+        '--results')
+            RESULTSDIR=$(realpath -m $2)
+            shift 2
+            continue
+        ;;
+        '--push')
+            PUSH=1
+            shift
+            continue
+        ;;
+        '--')
+            shift
+            break
+        ;;
+        *)
+            echo "Unexpected value $1" >&2
+            exit 1
+        ;;
+    esac
+done
+
+if ! test "$POKYDIR" -a "$METRICSDIR" -a "$REPODIR" -a "$LAYERDIR" -a "$BRANCH" -a "$RESULTSDIR"; then
+    echo "Not all required options specified"
+    exit 1
+fi
 
 # We only monitor patch metrics on the master branch
 if [ "$BRANCH" != "master" ]; then
+    echo "Skipping, $BRANCH is not master"
     exit 0
 fi
 
 #
 # Patch Metrics
 #
-if [ ! -e $PARENTDIR/yocto-metrics ]; then
-    git clone ssh://git@push.yoctoproject.org/yocto-metrics $PARENTDIR/yocto-metrics
+
+set -x
+$OURDIR/patchmetrics-update --patchscript $POKYDIR/scripts/contrib/patchreview.py --json $METRICSDIR/patch-status.json --repo $REPODIR --layer $LAYERDIR
+set +x
+
+# Allow the commit to fail if there is nothing to commit
+git -C $METRICSDIR commit -asm "Autobuilder adding new patch stats" || true
+
+if [ "$PUSH" = "1" ]; then
+    git -C $METRICSDIR push
 fi
-$OURDIR/patchmetrics-update --repo $PARENTDIR --patchscript $PARENTDIR/scripts/contrib/patchreview.py --metadata $TARGETDIR --json $PARENTDIR/yocto-metrics/patch-status.json
-git -C $PARENTDIR/yocto-metrics commit -asm "Autobuilder adding new patch stats"
-git -C $PARENTDIR/yocto-metrics push
+
+#
+# Update the results
+#
 
 if [ ! -d $RESULTSDIR ]; then
     mkdir $RESULTSDIR
 fi
 
-$OURDIR/patchmetrics-generate-chartdata --json $PARENTDIR/yocto-metrics/patch-status.json --outputdir $RESULTSDIR
-cp $PARENTDIR/yocto-metrics/patch-status.json $RESULTSDIR
-cp $PARENTDIR/yocto-metrics/patch-status/* $RESULTSDIR
+$OURDIR/patchmetrics-generate-chartdata --json $METRICSDIR/patch-status.json --outputdir $RESULTSDIR
+cp $METRICSDIR/patch-status.json $RESULTSDIR
+cp $METRICSDIR/patch-status/* $RESULTSDIR

@@ -1208,12 +1208,18 @@
                 "BB_SERVER_TIMEOUT = '0'"
             ],
             "step1" : {
-                "shortname" : "Generating patch metrics",
-                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-patchmetrics ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics . ${HELPERBRANCHNAME}"]
+                "shortname" : "Fetching metrics repositories",
+                "EXTRAPLAINCMDS" : [
+                    "git clone ssh://git@push.yoctoproject.org/yocto-metrics"
+                ]
             },
             "step2" : {
-                "shortname" : "Running CVE checks",
-                "EXTRACMDS" : ["../../yocto-autobuilder-helper/scripts/run-cvecheck ../ ../meta/ ${HELPERRESULTSDIR}/../../patchmetrics . ${HELPERBRANCHNAME}"]
+                "shortname" : "Generating patch metrics for Poky",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --poky ../ --metrics ../yocto-metrics --repo ../ --layer ../meta --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
+            },
+            "step3" : {
+                "shortname" : "Running CVE checks for Poky",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-cvecheck --metrics ../yocto-metrics --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
             }
 
         },

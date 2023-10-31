@@ -1,65 +1,76 @@
 #!/usr/bin/env python3
-import json, os.path, collections
-import sys
+
+import json
+import pathlib
 import argparse
 import subprocess
 import tempfile
+import sys
+
+# Given a git repository and a base to search for layers (either a layer
+# directly, or a directory containing layers), run the patchscript and update
+# the specified JSON file.
 
 args = argparse.ArgumentParser(description="Update Patch Metrics")
-args.add_argument("-j", "--json", help="update JSON")
-args.add_argument("-m", "--metadata", help="metadata directry to scan")
-args.add_argument("-s", "--patchscript", help="review script to use")
-args.add_argument("-r", "--repo", help="repository to use")
+args.add_argument("-j", "--json", required=True, type=pathlib.Path, help="update specified JSON file")
+args.add_argument("-s", "--patchscript", required=True, type=pathlib.Path, help="patchreview script to run")
+args.add_argument("-r", "--repo", required=True, type=pathlib.Path, help="repository to use (e.g. path/to/poky)")
+args.add_argument("-l", "--layer", type=pathlib.Path, help="layer/repository to scan")
 args = args.parse_args()
 
-status_values = ["accepted", "pending", "inappropriate", "backport", "submitted", "denied", "inactive-upstream", "malformed-upstream-status", "malformed-sob"]
+if not args.repo.is_dir():
+    print(f"{args.repo} is not a directory")
+    sys.exit(1)
+
+if not args.layer.is_dir():
+    print(f"{args.layer} is not a directory")
+    sys.exit(1)
+
+if not args.patchscript.is_file():
+    print(f"{args.patchscript} is not a file")
+
 
 print("Running patchmetrics-update")
 
-with tempfile.TemporaryDirectory(prefix="patchmetrics-") as tempdir:
-    subprocess.check_call(["git", "clone", args.repo, tempdir])
-    repo_revisions = subprocess.check_output(["git", "rev-list", "--since", "1274625106", "origin/master"], universal_newlines=True, cwd=tempdir).strip().split()
+if "meta-openembedded" in args.layer.name:
+    # 2023-01-01, arbitarily chosen
+    epoch = "1672531200"
+else:
+    # 2011-04-25, Yocto 1.0 release.
+    epoch = "1301074853"
 
-    with open(args.json) as f:
-        data = json.load(f)
+with tempfile.TemporaryDirectory(prefix="patchmetrics-") as tempname:
+    tempdir = pathlib.Path(tempname)
+    layerdir = tempdir / args.layer.relative_to(args.repo)
 
-    seen = set()
-    for i in data:
-        if "commit" in i:
-            seen.add(i["commit"])
+    # Create a temporary clone of the repository as we'll be checking out different revisions
+    print(f"Making a temporary clone of {args.repo} to {tempdir}")
+    subprocess.check_call(["git", "clone", "--quiet", args.repo, tempdir])
 
-    needed_revisions = set(repo_revisions) - seen
+    # Identify what revisions need to be analysed. If we reverse the list, keep
+    # order, and remove in-place, then iterating through a large number of
+    # commits is faster.
+    repo_revisions = subprocess.check_output(["git", "rev-list", "--reverse", "--since", epoch, "origin/master"], universal_newlines=True, cwd=tempdir).strip().split()
+    revision_count = len(repo_revisions)
 
-    print("Need to scan revisions %s" % str(needed_revisions))
+    if args.json.exists():
+        with open(args.json) as f:
+            data = json.load(f)
 
-    print("Needed %s revisions (%s and %s in data sets)" % (len(needed_revisions), len(seen), len(repo_revisions)))
+        seen = set()
+        for i in data:
+            try:
+                repo_revisions.remove(i["commit"])
+            except ValueError:
+                pass
 
-    for rev in needed_revisions:
+    new_count = len(repo_revisions)
+    print("Found %s, need to scan %d revisions:\n%s" % (revision_count - new_count, new_count, str(repo_revisions)))
+
+    # Run the patchreview script for every revision
+    for rev in repo_revisions:
         print("Processing %s" % rev)
-        subprocess.check_output(["git", "reset", "--hard", rev], universal_newlines=True, cwd=tempdir).strip()
-        subprocess.check_call([args.patchscript, os.path.join(tempdir, os.path.relpath(args.metadata, args.repo)), "-j", args.json])
-
-    newdata = []
-    with open(args.json) as f:
-        data = json.load(f)
-
-    for i in data:
-        if "commit" not in i:
-            print("Ignoring data with no commit %s" % str(i))
-            continue
-
-        if "commit_count" not in i:
-            i['commit_count'] = subprocess.check_output(["git", "rev-list", "--count", i['commit']], universal_newlines=True, cwd=tempdir).strip()
-        if "recipe_count" not in i:
-            subprocess.check_output(["git", "reset", "--hard", i['commit']], universal_newlines=True, cwd=tempdir).strip()
-            i['recipe_count'] = subprocess.check_output(["find meta -type f -name *.bb  | wc -l"], shell=True, universal_newlines=True, cwd=tempdir).strip()
-
-        #print(i['commit_count'] + " " + i['recipe_count'])
-
-        newdata.append(i)
-
-    with open(args.json, "w") as f:
-        json.dump(newdata, f, sort_keys=True, indent="\t")
+        subprocess.check_call(["git", "checkout", "--detach", rev], cwd=tempdir)
+        subprocess.check_call([args.patchscript, "--json", args.json, layerdir])
 
 print("Finished patchmetrics-update")
-
