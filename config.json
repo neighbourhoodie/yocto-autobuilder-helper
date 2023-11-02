@@ -1478,6 +1478,132 @@
                 ]
             }
         },
+        "auh-meta-oe": {
+            "NEEDREPOS": ["poky", "auto-upgrade-helper", "meta-openembedded"],
+            "extravars": [
+                "INHERIT += 'buildhistory'",
+                "LICENSE_FLAGS_ACCEPTED = 'commercial'",
+                "DISTRO_FEATURES:append:libc-glibc = ' systemd usrmerge'",
+                "DISTRO_FEATURES:append = ' pam'"
+            ],
+            "ADDLAYER": [
+                "${BUILDDIR}/../meta-openembedded/meta-oe",
+                "${BUILDDIR}/../meta-openembedded/meta-python",
+                "${BUILDDIR}/../meta-openembedded/meta-perl",
+                "${BUILDDIR}/../meta-openembedded/meta-networking",
+                "${BUILDDIR}/../meta-openembedded/meta-multimedia",
+                "${BUILDDIR}/../meta-openembedded/meta-gnome",
+                "${BUILDDIR}/../meta-openembedded/meta-xfce",
+                "${BUILDDIR}/../meta-openembedded/meta-filesystems",
+                "${BUILDDIR}/../meta-openembedded/meta-initramfs",
+                "${BUILDDIR}/../meta-openembedded/meta-webserver"
+            ],
+            "step1": {
+                "shortname": "setup AUH for meta-oe layers",
+                "EXTRAPLAINCMDS": [
+                    "git -C ./meta-openembedded config user.email auh@yoctoproject.org",
+                    "git -C ./meta-openembedded config user.name 'Auto Upgrade Helper'",
+                    "git -C ./meta-openembedded switch -C tmp-auh-upgrades HEAD",
+                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./upgrade-helper/upgrade-helper.conf"
+                ]
+            },
+            "step2": {
+                "shortname": "run AUH for layer meta-oe",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-openembedded-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-oe"
+                ]
+            },
+            "step3": {
+                "shortname": "run AUH for layer meta-python",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-meta-python = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-python"
+                ]
+            },
+            "step4": {
+                "shortname": "run AUH for layer meta-perl",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-perl-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-perl"
+                ]
+            },
+            "step5": {
+                "shortname": "run AUH for layer meta-networking",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-networking-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-networking"
+                ]
+            },
+            "step6": {
+                "shortname": "run AUH for layer meta-multimedia",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-multimedia-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-multimedia"
+                ]
+            },
+            "step7": {
+                "shortname": "run AUH for layer meta-gnome",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-gnome-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-gnome"
+                ]
+            },
+            "step8": {
+                "shortname": "run AUH for layer meta-xfce",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-xfce-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-xfce"
+                ]
+            },
+            "step9": {
+                "shortname": "run AUH for layer meta-filesystems",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-filesystems-layer = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-filesystems"
+                ]
+            },
+            "step10": {
+                "shortname": "run AUH for layer meta-initramfs",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-meta-initramfs = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-initramfs"
+                ]
+            },
+            "step11": {
+                "shortname": "run AUH for layer meta-webserver",
+                "extravars": [
+                    "RECIPE_MAINTAINER:layer-webserver = 'Forced maintainer for AUH'"
+                ],
+                "EXTRACMDS": [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all --layer-dir ${BUILDDIR}/../meta-openembedded/ --layer-names meta-webserver"
+                ]
+            },
+            "step12": {
+                "shortname": "save AUH output for meta-oe layers",
+                "EXTRAPLAINCMDS": [
+                    "cp -rf ./build/upgrade-helper/* ${WEBPUBLISH_DIR}/pub/auh/"
+                ]
+            }
+        },
         "yocto-mirror" : {
             "MACHINE" : "qemux86-64",
             "step1" : {
