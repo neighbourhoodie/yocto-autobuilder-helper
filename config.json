@@ -1454,9 +1454,29 @@
             "TEMPLATE" : "buildperf"
         },
         "auh" : {
-            "EXTRAPLAINCMDS" : [
-                "${SCRIPTSDIR}/setup-auh ${HELPERBUILDDIR}; ${SCRIPTSDIR}/run-auh ${HELPERBUILDDIR} ${WEBPUBLISH_DIR}/pub/auh/"
-            ]
+            "NEEDREPOS" : ["poky", "auto-upgrade-helper"],
+            "extravars" :[
+                "INHERIT += 'buildhistory'",
+                "LICENSE_FLAGS_ACCEPTED = 'commercial'",
+                "DISTRO_FEATURES:append:libc-glibc = ' systemd usrmerge'",
+                "DISTRO_FEATURES:append = ' pam'"
+            ],
+            "step1" : {
+                "shortname" : "setup AUH",
+                "EXTRAPLAINCMDS" : [
+                    "git config user.email auh@yoctoproject.org",
+                    "git config user.name 'Auto Upgrade Helper'",
+                    "git switch -C tmp-auh-upgrades HEAD",
+                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./upgrade-helper/upgrade-helper.conf"
+                ]
+            },
+            "step2" : {
+                "shortname" : "run AUH",
+                "EXTRACMDS" : [
+                    "../auto-upgrade-helper/upgrade-helper.py -e all",
+                    "cp -rf ./upgrade-helper/* ${WEBPUBLISH_DIR}/pub/auh/"
+                ]
+            }
         },
         "yocto-mirror" : {
             "MACHINE" : "qemux86-64",

@@ -1,5 +1,0 @@
-
-INHERIT += "buildhistory"
-LICENSE_FLAGS_ACCEPTED = "commercial"
-DISTRO_FEATURES:append:libc-glibc = ' systemd usrmerge'
-DISTRO_FEATURES:append = ' pam'
