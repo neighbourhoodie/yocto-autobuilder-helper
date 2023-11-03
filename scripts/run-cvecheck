@@ -77,6 +77,12 @@ set +u
 set -u
 bitbake world --runall cve_check -R conf/distro/include/cve-extra-exclusions.inc
 
+# Do another pull to make sure we're as up to date as possible.  This is
+# preferable to committing and rebasing before pushing as it would be better to
+# waste some time repeating work than commit potentially corrupted files from a
+# git merge gone wrong.
+git -C $METRICSDIR pull
+
 if [ -e tmp/log/cve/cve-summary.json ]; then
     git -C $METRICSDIR rm --ignore-unmatch cve-check/$BRANCH/*.json
     mkdir -p $METRICSDIR/cve-check/$BRANCH/
