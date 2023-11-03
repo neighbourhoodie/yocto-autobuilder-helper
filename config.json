@@ -1631,6 +1631,12 @@
             "branch" : "master",
             "revision" : "HEAD",
             "no-layer-add" : true
+        },
+        "auto-upgrade-helper" : {
+            "url" : "git://git.yoctoproject.org/auto-upgrade-helper",
+            "branch" : "master",
+            "revision" : "HEAD",
+            "no-layer-add" : true
         }
     },
     "buildtools" : {
