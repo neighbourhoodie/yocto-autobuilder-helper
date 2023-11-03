@@ -1467,7 +1467,7 @@
                     "git config user.email auh@yoctoproject.org",
                     "git config user.name 'Auto Upgrade Helper'",
                     "git switch -C tmp-auh-upgrades HEAD",
-                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./upgrade-helper/upgrade-helper.conf"
+                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./build/upgrade-helper/upgrade-helper.conf"
                 ]
             },
             "step2" : {
@@ -1504,7 +1504,7 @@
                     "git -C ./meta-openembedded config user.email auh@yoctoproject.org",
                     "git -C ./meta-openembedded config user.name 'Auto Upgrade Helper'",
                     "git -C ./meta-openembedded switch -C tmp-auh-upgrades HEAD",
-                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper-meta-oe.conf ./upgrade-helper/upgrade-helper.conf"
+                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper-meta-oe.conf ./build/upgrade-helper/upgrade-helper.conf"
                 ]
             },
             "step2": {
