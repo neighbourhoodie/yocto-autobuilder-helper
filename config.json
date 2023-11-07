@@ -513,6 +513,10 @@
             "MACHINE" : "qemuarm",
             "TEMPLATE" : "altcfg-qemu"
         },
+        "qemuarmv5" : {
+            "MACHINE" : "qemuarmv5",
+            "TEMPLATE" : "arch-qemu-lite"
+        },
         "beaglebone" : {
             "MACHINE" : "beaglebone-yocto",
             "TEMPLATE" : "arch-hw",
