@@ -1684,6 +1684,9 @@
             "step1" : {
                 "BBTARGETS" : "core-image-patchtest"
             }
+        },
+        "toaster" : {
+            "EXTRACMDS" : ["${SCRIPTSDIR}/run-toaster-tests ${HELPERBUILDDIR} ${HELPERBUILDDIR}/.."]
         }
     },
     "repo-defaults" : {

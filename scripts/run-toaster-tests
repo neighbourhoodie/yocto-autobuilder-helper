@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Called with $1 as the build directory
+#             $2 as the path to poky
+
+set -e
+set -u
+set -o pipefail
+set -x
+
+builddir=$(realpath "$1")
+pokydir=$(realpath "$2")
+
+cd $builddir
+mkdir -p toaster_logs
+python3 -m venv venv --without-pip --system-site-packages
+source venv/bin/activate
+python3 -m pip install tox
+
+tox -c $pokydir/bitbake/lib/toaster/tox.ini
