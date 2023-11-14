@@ -1685,6 +1685,13 @@
                 "BBTARGETS" : "core-image-patchtest"
             }
         },
+	"patchtest-selftest" : {
+	    "NEEDREPOS" : ["poky"],
+	    "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchtest-selftest ${HELPERBUILDDIR}/.."],
+	    "ADDLAYER" : [
+	        "${BUILDDIR}/../meta-selftest"
+	    ]
+	},
         "toaster" : {
             "EXTRACMDS" : ["${SCRIPTSDIR}/run-toaster-tests ${HELPERBUILDDIR} ${HELPERBUILDDIR}/.."]
         }
