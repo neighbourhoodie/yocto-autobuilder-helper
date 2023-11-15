@@ -318,7 +318,8 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-networking'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'xfsprogs-doc zfs zfs-dbg zfs-dev'"
                 ]
             },
             "step2" : {
@@ -338,7 +339,8 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-networking'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'geary geary-dbg gegl-dev gimp gimp-dbg gnome-terminal-src grilo-src gtk-vnc-src ibus-doc'"
                 ]
             },
             "step3" : {
@@ -346,6 +348,12 @@
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; OEQA_DEBUGGING_SAVED_OUTPUT=${BASE_SHAREDDIR}/pub/repro-fail-openembedded/meta-initramfs/ DISPLAY=:1 BB_LOGCONFIG=$(readlink -f $BB_LOGCONFIG) oe-selftest --newbuilddir $BUILDDIR/build-st-meta-initramfs -r reproducible"],
                 "ADDLAYER" : [
                     "${BUILDDIR}/../meta-openembedded/meta-initramfs"
+                ],
+                "extravars" : [
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES =  'kexec-klibc kexec-tools-klibc-dbg'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'mtdinfo-klibc ubiattach-klibc ubiblock-klibc ubicrc32-klibc ubidetach-klibc ubiformat-klibc ubimkvol-klibc'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'ubinfo-klibc ubinize-klibc ubirename-klibc ubirmvol-klibc ubirsvol-klibc ubiupdatevol-klibc ubi-utils-klibc-dbg'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'vmcore-dmesg-klibc kexecboot-klibc kexecboot-klibc-dbg'"
                 ]
             },
             "step4" : {
@@ -403,7 +411,8 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-perl'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-perl'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'libencode-perl-src libhtml-tree-perl libhtml-tree-perl-doc libmodule-build-tiny-perl po4a po4a-doc'"
                 ]
             },
             "step8" : {
