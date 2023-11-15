@@ -423,7 +423,9 @@
                     "${BUILDDIR}/../meta-openembedded/meta-python"
                 ],
                 "extravars" : [
-                    "EXCLUDE_FROM_WORLD:layer-openembedded-layer = '1'"
+                    "EXCLUDE_FROM_WORLD:layer-openembedded-layer = '1'",
+                    "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step9" : {
@@ -457,7 +459,14 @@
                     "EXCLUDE_FROM_WORLD:layer-gnome-layer = '1'",
                     "EXCLUDE_FROM_WORLD:layer-multimedia-layer = '1'",
                     "EXCLUDE_FROM_WORLD:layer-meta-python = '1'",
-                    "EXCLUDE_FROM_WORLD:layer-networking-layer = '1'"
+                    "EXCLUDE_FROM_WORLD:layer-networking-layer = '1'",
+                    "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
+                    "USERADD_GID_TABLES:append = ' files/static-group-meta-networking'",
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
+                    "USERADD_GID_TABLES:append = ' files/static-group-meta-multimedia'",
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-multimedia'",
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-gnome'"
                 ]
             }
         },
