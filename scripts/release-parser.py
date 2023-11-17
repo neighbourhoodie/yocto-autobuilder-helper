@@ -8,6 +8,7 @@ from git import Repo
 import semver
 from collections import defaultdict
 import datetime
+import semver
 
 GIT_REPO = '~/git/poky'
 
@@ -45,12 +46,28 @@ def get_git_tags():
     for branch in old_branches + branches:
         tags = list(filter(lambda e: branch in e.name and not any( x in e.name for x in odd_commit_strings), repo.tags))
         
+
+        def parse(tag):
+            try:
+                return semver.VersionInfo.parse(tag)
+            except:
+                return semver.VersionInfo.parse(tag + ".0")
+        tag_names = [parse(re.sub(r"yocto-", "", e.name)) for e in tags]
+
+        if len(tag_names) == 1:
+            latest_tag = repo.tags["yocto-{}.{}".format(tag_names[0].major, tag_names[0].minor)]
+        else:
+            latest_tag = repo.tags["yocto-{}".format(max(tag_names))]
+
         download = ""
         release_notes = ""
+        # Only calculate for releases after standard tagging begain in yocto-1.4.1
         if tags[-1].commit.committed_datetime >= repo.commit("73f103bf9b2cdf985464dc53bf4f1cfd71d4531f").committed_datetime:
-            download = "https://downloads.yoctoproject.org/releases/yocto/{}".format(tags[-1].name)
-            release_notes = "https://downloads.yoctoproject.org/releases/yocto/{}/RELEASENOTES".format(tags[-1].name)
-
+            download = "https://downloads.yoctoproject.org/releases/yocto/{}".format(tags[0].name)
+            release_notes = "https://downloads.yoctoproject.org/releases/yocto/{}/RELEASENOTES".format(latest_tag.name)
+        else:
+            download = ""
+            release_notes = ""
         status  = "EOL"
         if branch == 'yocto-3.1':
             status = "LTS until Apr. 2024"
@@ -63,9 +80,9 @@ def get_git_tags():
         tag_dict = {
             'series_version': re.sub(r"[^\d\.]", "", tags[0].name),
             'original_release_date': tags[0].commit.committed_datetime.isoformat(),
-            'latest_release_date': tags[-1].commit.committed_datetime.isoformat(),
+            'latest_release_date': latest_tag.commit.committed_datetime.isoformat(),
             'release_codename': convert_name(tags[0]),
-            'latest_tag': re.sub(r"yocto-", "", tags[-1].name),
+            'latest_tag': str(max(tag_names)),
             'status': status,
             'download': download,
             'release_notes': release_notes
@@ -76,22 +93,14 @@ def get_git_tags():
 
 # Usage
 tags = sorted(get_git_tags(), key=lambda x: x['original_release_date'], reverse=False)
-tags.append({
-            'series_version': "4.3",
-            'original_release_date': "",
-            'latest_release_date': "",
-            'release_codename': "Nanbield",
-            'latest_tag': "",
-            'status': "Active Development",
-            'download': "",
-        })
+
 tags.append({
             'series_version': "5.0",
             'original_release_date': "",
             'latest_release_date': "",
             'release_codename': "Scarthgap",
             'latest_tag': "",
-            'status': "Announced",
+            'status': "Active Development",
             'download': "",
         })
 
