@@ -14,6 +14,12 @@ builddir=$(realpath "$1")
 pokydir=$(realpath "$2")
 
 cd $builddir
+
+bitbake -e > bbenv
+export SSTATE_DIR=$(grep '^SSTATE_DIR=' bbenv | cut -d "=" -f2-)
+export DL_DIR=$(grep '^DL_DIR=' bbenv | cut -d "=" -f2-)
+export TOASTER_DJANGO_TMPDIR=$builddir
+
 mkdir -p toaster_logs
 python3 -m venv venv --without-pip --system-site-packages
 source venv/bin/activate
