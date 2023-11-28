@@ -589,7 +589,7 @@
             "TEMPLATE" : "ltp-qemu"
         },
         "qemuriscv32" : {
-            "MACHINE" : "qemuriscv64",
+            "MACHINE" : "qemuriscv32",
             "TEMPLATE" : "arch-qemu"
         },
         "qemuriscv64" : {
@@ -597,7 +597,7 @@
             "TEMPLATE" : "arch-qemu"
         },
         "qemuriscv32-tc" : {
-            "MACHINE" : "qemuriscv64",
+            "MACHINE" : "qemuriscv32",
             "TEMPLATE" : "toolchain-qemu"
         },
         "qemuriscv64-tc" : {
