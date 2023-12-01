@@ -16,13 +16,15 @@ pokydir=$(realpath "$2")
 cd $builddir
 
 bitbake -e > bbenv
-export SSTATE_DIR=$(grep '^SSTATE_DIR=' bbenv | cut -d "=" -f2-)
-export DL_DIR=$(grep '^DL_DIR=' bbenv | cut -d "=" -f2-)
+export SSTATE_DIR=$(grep '^SSTATE_DIR=' bbenv | cut -d "=" -f2- | sed -e 's/^"//' -e 's/"$//')
+export DL_DIR=$(grep '^DL_DIR=' bbenv | cut -d "=" -f2- | sed -e 's/^"//' -e 's/"$//')
 export TOASTER_DJANGO_TMPDIR=$builddir
+export TOASTER_DIR=$builddir
 
 mkdir -p toaster_logs
+
 python3 -m venv venv --without-pip --system-site-packages
 source venv/bin/activate
-python3 -m pip install tox
+python3 -m pip install -r $pokydir/bitbake/toaster-requirements.txt -r $pokydir/bitbake/lib/toaster/tests/toaster-tests-requirements.txt
 
-tox -c $pokydir/bitbake/lib/toaster/tox.ini
+python3 -m pytest -c $pokydir/bitbake/lib/toaster/pytest.ini $pokydir/bitbake/lib/toaster/tests/
