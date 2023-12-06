@@ -12,9 +12,9 @@
 
     "BUILDTOOLS_URL_TEMPLOCAL3" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.1/buildtools/x86_64-buildtools-extended-nativesdk-standalone-4.1.sh",
     "BUILDTOOLS_ARM_URL_TEMPLOCAL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.1/buildtools/aarch64-buildtools-extended-nativesdk-standalone-4.1.sh",
-    "BUILDTOOLS_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/non-release/20230223-18/buildtools/x86_64-buildtools-extended-nativesdk-standalone-4.1+snapshot-9c07de0f20042c81496185293857284048d7912c.sh",
-    "BUILDTOOLS_ARM_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/non-release/20230223-18/buildtools/aarch64-buildtools-extended-nativesdk-standalone-4.1+snapshot-9c07de0f20042c81496185293857284048d7912c.sh",
-    "BUILDTOOLS_MAKE_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.1/buildtools/x86_64-buildtools-make-nativesdk-standalone-4.1.sh",
+    "BUILDTOOLS_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.3/buildtools/x86_64-buildtools-extended-nativesdk-standalone-4.3.sh",
+    "BUILDTOOLS_ARM_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.3/buildtools/aarch64-buildtools-extended-nativesdk-standalone-4.3.sh",
+    "BUILDTOOLS_MAKE_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.3/buildtools/x86_64-buildtools-make-nativesdk-standalone-4.3.sh",
 
     "REPO_STASH_DIR" : "${BASE_HOMEDIR}/git/mirror",
     "TRASH_DIR" : "${BASE_HOMEDIR}/git/trash",
