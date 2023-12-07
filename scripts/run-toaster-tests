@@ -20,6 +20,8 @@ export SSTATE_DIR=$(grep '^SSTATE_DIR=' bbenv | cut -d "=" -f2- | sed -e 's/^"//
 export DL_DIR=$(grep '^DL_DIR=' bbenv | cut -d "=" -f2- | sed -e 's/^"//' -e 's/"$//')
 export TOASTER_DJANGO_TMPDIR=$builddir
 export TOASTER_DIR=$builddir
+export TOASTER_TEST_USE_SSTATE_MIRROR=True
+export BUILDDIR=$builddir/
 
 mkdir -p toaster_logs
 
