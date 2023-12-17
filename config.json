@@ -966,6 +966,18 @@
                 "shortname" : "arm deb",
                 "MACHINE" : "qemuarm64",
                 "PACKAGE_CLASSES" : "package_deb"
+            },
+            "step5" : {
+                "shortname" : "x86 rpm (for CDN)",
+                "MACHINE" : "qemux86-64",
+                "PACKAGE_CLASSES" : "package_rpm",
+                "SANITYTARGETS" : ""
+            },
+            "step6" : {
+                "shortname" : "arm rpm (for CDN)",
+                "MACHINE" : "qemuarm64",
+                "PACKAGE_CLASSES" : "package_rpm",
+                "SANITYTARGETS" : ""
             }
         },
         "poky-tiny" : {
