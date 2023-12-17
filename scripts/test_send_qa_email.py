@@ -57,10 +57,10 @@ class TestVersion(unittest.TestCase):
 
     def test_versions(self):
         for data in self.test_data_get_version:
-            test_name = data["input"]["version"]
-            with self.subTest(f"Test {test_name} previous tag"):
-                self.assertEqual(send_qa_email.get_previous_tag(os.environ.get(
-                    "POKY_PATH"), data["input"]["version"]), data["expected"])
+            input_version = data["input"]["version"]
+            expected = data["expected"]
+            with self.subTest(f"Test {input_version} previous tag (expecting {expected})"):
+                self.assertEqual(send_qa_email.get_previous_tag(os.environ.get("POKY_PATH"), input_version), expected)
 
     def test_is_release_version(self):
         for data in self.test_data_is_release_version:
