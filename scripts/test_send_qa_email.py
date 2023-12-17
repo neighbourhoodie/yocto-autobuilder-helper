@@ -30,7 +30,10 @@ class TestVersion(unittest.TestCase):
         {"input": {"version": "4.1_M3.rc4"}, "expected": "4.1_M2"},
         {"input": {"version": "4.1_M1.rc1"}, "expected": "yocto-4.0"},
         {"input": {"version": "4.1_M1.rc4"}, "expected": "yocto-4.0"},
-        {"input": {"version": "4.1.rc4"}, "expected": "yocto-4.0"}
+        {"input": {"version": "4.1.rc4"}, "expected": "yocto-4.0"},
+        {"input": {"version": "yocto-5.0_M1.rc1"}, "expected": "yocto-4.3(\.\d)?"},
+        {"input": {"version": "yocto-5.0_M1.rc2"}, "expected": "yocto-4.3(\.\d)?"},
+        {"input": {"version": "yocto-5.0_M2.rc1"}, "expected": "5.0_M1"},
     ]
 
     test_data_is_release_version = [

@@ -42,10 +42,15 @@ def get_previous_tag(targetrepodir, version):
         # Process first milestone or release if not first in major release
         elif compareversionminor > 0:
             previousversion = compareversion[:-1] + [compareversion[-1] - 1]
-        # Otherwise : format it as tag (which must exist) and search previous tag
+        # Otherwise : compare against last release on previous major. This can
+        # not be computed: we need to retrieve the exact tag from remote
         else:
             comparetagstring = utils.get_tag_from_version(compareversion, comparemilestone)
-            return subprocess.check_output(["git", "describe", "--abbrev=0", comparetagstring + "^"], cwd=targetrepodir).decode('utf-8').strip()
+            previous_major = compareversion[0] - 1
+            tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", "origin", f"refs/tags/yocto-{previous_major}*"], cwd=targetrepodir).decode('utf-8').strip()
+            # Get last tag from list, pick only the tag part, and remove the
+            # "refs/tags/" part
+            return tags_list.splitlines()[-1].split()[1].split('/')[-1]
 
         return utils.get_tag_from_version(previousversion, previousmilestone)
 
