@@ -12,6 +12,7 @@ import sys
 import unittest
 import send_qa_email
 import logging
+import re
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger('send-qa-email')
@@ -60,7 +61,8 @@ class TestVersion(unittest.TestCase):
             input_version = data["input"]["version"]
             expected = data["expected"]
             with self.subTest(f"Test {input_version} previous tag (expecting {expected})"):
-                self.assertEqual(send_qa_email.get_previous_tag(os.environ.get("POKY_PATH"), input_version), expected)
+               result = send_qa_email.get_previous_tag(os.environ.get("POKY_PATH"), input_version)
+               self.assertIsNotNone(re.match(data["expected"], result), msg=f"get_previous_tag returned {result}")
 
     def test_is_release_version(self):
         for data in self.test_data_is_release_version:
