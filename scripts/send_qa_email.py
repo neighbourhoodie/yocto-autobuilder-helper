@@ -16,7 +16,6 @@ import logging
 import utils
 
 TEST_RESULTS_REPOSITORY_URL="git@push.yoctoproject.org:yocto-testresults"
-exitcode = 0
 
 def is_release_version(version):
     p = re.compile('\d{8}-\d+')
@@ -89,21 +88,16 @@ def get_regression_base_and_target(targetbranch, basebranch, release, targetrepo
 
 def generate_regression_report(querytool, targetrepodir, base, target, resultdir, outputdir, log):
     log.info(f"Comparing {target} to {base}")
-    global exitcode
 
-    try:
-        regreport = subprocess.check_output([querytool, "regression-report", base, target, '-t', resultdir])
-        with open(outputdir + "/testresult-regressions-report.txt", "wb") as f:
-           f.write(regreport)
-    except subprocess.CalledProcessError as e:
-        error = str(e)
-        exitcode = 1
-        log.error(f"Error while generating report between {target} and {base} : {error}")
+    regreport = subprocess.check_output([querytool, "regression-report", base, target, '-t', resultdir])
+    with open(outputdir + "/testresult-regressions-report.txt", "wb") as f:
+       f.write(regreport)
 
 def send_qa_email():
     # Setup logging
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     log = logging.getLogger('send-qa-email')
+    exitcode = 0
 
     parser = utils.ArgParser(description='Process test results and optionally send an email about the build to prompt QA to begin testing.')
 
@@ -194,9 +188,15 @@ def send_qa_email():
                 log.warning("Test results not published on release version. Faulty AB configuration ?")
 
             utils.printheader("Processing regression report")
-            regression_base, regression_target = get_regression_base_and_target(targetbranch, basebranch, args.release, targetrepodir, log)
-            if regression_base and regression_target:
+            try:
+                regression_base, regression_target = get_regression_base_and_target(targetbranch, basebranch, args.release, targetrepodir, log)
+                log.info(f"Generating regression report between {regression_base} and {regression_target}")
                 generate_regression_report(querytool, targetrepodir, regression_base, regression_target, tempdir, args.results_dir, log)
+            except subprocess.CalledProcessError as e:
+                error = str(e)
+                exitcode = 1
+                log.error(f"Error while generating regression report: {error}")
+
 
         finally:
             subprocess.check_call(["rm", "-rf",  tempdir])
