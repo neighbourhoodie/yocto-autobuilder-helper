@@ -16,6 +16,7 @@ import logging
 import utils
 
 TEST_RESULTS_REPOSITORY_URL="git@push.yoctoproject.org:yocto-testresults"
+TEST_RESULTS_DRY_RUN_REPOSITORY_URL="git://git.yoctoproject.org/yocto-testresults"
 
 def is_release_version(version):
     p = re.compile('\d{8}-\d+')
@@ -57,17 +58,17 @@ def get_previous_tag(targetrepodir, version):
     defaultbaseversion, _, _ = utils.get_version_from_string(subprocess.check_output(["git", "describe", "--abbrev=0"], cwd=targetrepodir).decode('utf-8').strip())
     return utils.get_tag_from_version(defaultbaseversion, None)
 
-def get_last_tested_rev_on_branch(branch, log):
+def get_last_tested_rev_on_branch(branch, test_results_url, log):
     # Fetch latest test results revision on corresponding branch in test
     # results repository
-    tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", TEST_RESULTS_REPOSITORY_URL, "refs/tags/" + branch + "/*"]).decode('utf-8').strip()
+    tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", test_results_url, "refs/tags/" + branch + "/*"]).decode('utf-8').strip()
     latest_test_tag=tags_list.splitlines()[-1].split()[1]
     # From test results tag, extract Poky revision
     tested_revision = re.match('refs\/tags\/.*\/\d+-g([a-f0-9]+)\/\d', latest_test_tag).group(1)
     log.info(f"Last tested revision on branch {branch} is {tested_revision}")
     return tested_revision
 
-def get_regression_base_and_target(targetbranch, basebranch, release, targetrepodir, log):
+def get_regression_base_and_target(targetbranch, basebranch, release, targetrepodir, test_results_url, log):
     if not targetbranch:
         # Targetbranch/basebranch is an arbitrary configuration (not defined in config.json): do not run regression reporting
         return None, None
@@ -80,7 +81,7 @@ def get_regression_base_and_target(targetbranch, basebranch, release, targetrepo
         # Basebranch/targetbranch are defined in config.json: regression
         # reporting must be done between latest test result available on base branch
         # and latest result on targetbranch
-        latest_tested_rev_on_basebranch = get_last_tested_rev_on_branch(basebranch, log)
+        latest_tested_rev_on_basebranch = get_last_tested_rev_on_branch(basebranch, test_results_url, log)
         return latest_tested_rev_on_basebranch, targetbranch
 
     #Default case: return previous tag as base
@@ -119,6 +120,9 @@ def send_qa_email():
     parser.add_argument('--url',
                         action='store',
                         help="The url for the build")
+    parser.add_argument('-d', '--dry-run',
+                        action='store_true',
+                        help="Do not generate any commit, tag or mail: just simulate the release process")
 
     args = parser.parse_args()
 
@@ -135,6 +139,12 @@ def send_qa_email():
         utils.enable_buildtools_tarball(buildtoolsdir)
 
     repodir = os.path.dirname(args.repojson) + "/build/repos"
+
+    if args.dry_run:
+        log.info("Running in dry-run mode")
+        test_results_url = TEST_RESULTS_DRY_RUN_REPOSITORY_URL
+    else:
+        test_results_url = TEST_RESULTS_REPOSITORY_URL
 
     if 'poky' in repos and os.path.exists(resulttool) and os.path.exists(querytool) and args.results_dir:
         utils.printheader("Processing test report")
@@ -158,10 +168,10 @@ def send_qa_email():
             elif targetbranch:
                 cloneopts = ["--branch", targetbranch]
             try:
-                subprocess.check_call(["git", "clone", TEST_RESULTS_REPOSITORY_URL, tempdir, "--depth", "1"] + cloneopts)
+                subprocess.check_call(["git", "clone", test_results_url, tempdir, "--depth", "1"] + cloneopts)
             except subprocess.CalledProcessError:
                 log.info("No comparision branch found, falling back to master")
-                subprocess.check_call(["git", "clone", TEST_RESULTS_REPOSITORY_URL, tempdir, "--depth", "1"])
+                subprocess.check_call(["git", "clone", test_results_url, tempdir, "--depth", "1"])
 
             # If the base comparision branch isn't present regression comparision won't work
             # at least until we can tell the tool to ignore internal branch information
@@ -177,19 +187,22 @@ def send_qa_email():
 
             utils.printheader("Storing results")
 
-            subprocess.check_call([resulttool, "store", args.results_dir, tempdir])
-            if basebranch:
-                subprocess.check_call(["git", "push", "--all", "--force"], cwd=tempdir)
-                subprocess.check_call(["git", "push", "--tags", "--force"], cwd=tempdir)
-            elif targetbranch:
-                subprocess.check_call(["git", "push", "--all"], cwd=tempdir)
-                subprocess.check_call(["git", "push", "--tags"], cwd=tempdir)
-            elif is_release_version(args.release) and not basebranch and not targetbranch:
-                log.warning("Test results not published on release version. Faulty AB configuration ?")
+            if not args.dry_run:
+                subprocess.check_call([resulttool, "store", args.results_dir, tempdir])
+                if basebranch:
+                    subprocess.check_call(["git", "push", "--all", "--force"], cwd=tempdir)
+                    subprocess.check_call(["git", "push", "--tags", "--force"], cwd=tempdir)
+                elif targetbranch:
+                    subprocess.check_call(["git", "push", "--all"], cwd=tempdir)
+                    subprocess.check_call(["git", "push", "--tags"], cwd=tempdir)
+                elif is_release_version(args.release) and not basebranch and not targetbranch:
+                    log.warning("Test results not published on release version. Faulty AB configuration ?")
+            else:
+                log.info(f"[SKIP] store results (base {basebranch}, compare {targetbranch})")
 
             utils.printheader("Processing regression report")
             try:
-                regression_base, regression_target = get_regression_base_and_target(targetbranch, basebranch, args.release, targetrepodir, log)
+                regression_base, regression_target = get_regression_base_and_target(targetbranch, basebranch, args.release, targetrepodir, test_results_url, log)
                 log.info(f"Generating regression report between {regression_base} and {regression_target}")
                 generate_regression_report(querytool, targetrepodir, regression_base, regression_target, tempdir, args.results_dir, log)
             except subprocess.CalledProcessError as e:
@@ -199,8 +212,10 @@ def send_qa_email():
 
 
         finally:
-            subprocess.check_call(["rm", "-rf",  tempdir])
-            pass
+            if not args.dry_run:
+                subprocess.check_call(["rm", "-rf",  tempdir])
+            else:
+                log.info(f"[SKIP] delete {tempdir}")
 
     if args.send.lower() != 'true' or not args.publish_dir or not args.release:
         utils.printheader("Not sending QA email")
@@ -247,6 +262,10 @@ def send_qa_email():
     # Store a copy of the email in case it doesn't reach the lists
     with open(os.path.join(args.publish_dir, "qa-email"), "wb") as qa_email:
         qa_email.write(email.encode('utf-8'))
+
+    if args.dry_run:
+        log.info("[SKIP] generate and send email")
+        sys.exit(exitcode)
 
     utils.printheader("Sending QA email")
     env = os.environ.copy()
