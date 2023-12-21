@@ -84,7 +84,7 @@ def get_git_tags():
             status = "LTS until Apr. 2024"
         if branch == "yocto-4.0":
             status = "LTS until Apr. 2026"
-        if branch == "yocto-4.2":
+        if branch == "yocto-4.3":
             status = "Stable Release"
 
         # Create a dictionary for the tag
