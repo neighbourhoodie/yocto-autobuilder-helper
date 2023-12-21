@@ -71,7 +71,7 @@ def get_git_tags():
             ).committed_datetime
         ):
             download = "https://downloads.yoctoproject.org/releases/yocto/{}".format(
-                tags[0].name
+                latest_tag.name
             )
             release_notes = "https://downloads.yoctoproject.org/releases/yocto/{}/RELEASENOTES".format(
                 latest_tag.name
