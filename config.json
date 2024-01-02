@@ -1107,9 +1107,8 @@
                 "shortname" : "Systemd weston",
                 "extravars" : [
                      "TEST_SUITES:append = ' systemd'",
-                     "DISTRO_FEATURES:append = ' pam systemd usrmerge'",
-                     "VIRTUAL-RUNTIME_init_manager = 'systemd'",
-                     "DISTRO_FEATURES_BACKFILL_CONSIDERED = 'sysvinit'"
+                     "INIT_MANAGER = 'systemd'",
+                     "DISTRO_FEATURES:append = ' pam'",
                 ]
             }
         },
@@ -1422,8 +1421,8 @@
                 "BBTARGETS" : "core-image-sato",
                 "SANITYTARGETS" : "core-image-sato:do_testimage",
                 "extravars" : [
-                    "DISTRO_FEATURES:append = ' systemd usrmerge'",
-                    "VIRTUAL-RUNTIME_init_manager = 'systemd'",
+                    "INIT_MANAGER = 'systemd'",
+                    "DISTRO_FEATURES_BACKFILL_CONSIDERED:remove = 'sysvinit'",
                     "TEST_SUITES:append = ' systemd'"
                 ]
             },
@@ -1442,9 +1441,7 @@
                 "SANITYTARGETS" : "core-image-sato:do_testimage",
                 "extravars" : [
                     "TEST_SUITES:append = ' systemd'",
-                    "DISTRO_FEATURES:append = ' systemd usrmerge'",
-                    "VIRTUAL-RUNTIME_init_manager = 'systemd'",
-                    "DISTRO_FEATURES_BACKFILL_CONSIDERED = 'sysvinit'"
+                    "INIT_MANAGER = 'systemd'",
                 ]
             },
             "step7" : {
