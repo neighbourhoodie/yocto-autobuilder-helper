@@ -1108,7 +1108,7 @@
                 "extravars" : [
                      "TEST_SUITES:append = ' systemd'",
                      "INIT_MANAGER = 'systemd'",
-                     "DISTRO_FEATURES:append = ' pam'",
+                     "DISTRO_FEATURES:append = ' pam'"
                 ]
             }
         },
@@ -1441,7 +1441,7 @@
                 "SANITYTARGETS" : "core-image-sato:do_testimage",
                 "extravars" : [
                     "TEST_SUITES:append = ' systemd'",
-                    "INIT_MANAGER = 'systemd'",
+                    "INIT_MANAGER = 'systemd'"
                 ]
             },
             "step7" : {
