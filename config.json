@@ -1432,6 +1432,7 @@
                 "SANITYTARGETS" : "core-image-sato:do_testimage",
                 "extravars" : [
                     "DISTRO_FEATURES:append = ' systemd usrmerge'",
+                    "ROOT_HOME = '/root'",
                     "VIRTUAL-RUNTIME_init_manager = 'sysvinit'"
                 ]
             },
