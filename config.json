@@ -969,12 +969,14 @@
             },
             "step5" : {
                 "shortname" : "x86 rpm (for CDN)",
+                "BBTARGETS" : "--runall build core-image-full-cmdline core-image-sato-sdk core-image-minimal",
                 "MACHINE" : "qemux86-64",
                 "PACKAGE_CLASSES" : "package_rpm",
                 "SANITYTARGETS" : ""
             },
             "step6" : {
                 "shortname" : "arm rpm (for CDN)",
+                "BBTARGETS" : "--runall build core-image-full-cmdline core-image-sato-sdk core-image-minimal",
                 "MACHINE" : "qemuarm64",
                 "PACKAGE_CLASSES" : "package_rpm",
                 "SANITYTARGETS" : ""
