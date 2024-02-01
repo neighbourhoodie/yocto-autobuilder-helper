@@ -57,6 +57,9 @@ for repo in needrepos:
     repo_basename = repo.split('/')[0]
     if repo_basename in repos and "no-layer-add" in repos[repo_basename] and repos[repo_basename]["no-layer-add"]:
         continue
+    nolayeradd = utils.getconfiglist("NOLAYERADD", ourconfig, args.target, None)
+    if repo_basename in nolayeradd:
+        continue
     try:
         bitbakecmd(args.abworkdir, "bitbake-layers add-layer %s" % (args.abworkdir + "/" + repo))
     except subprocess.CalledProcessError as e:
