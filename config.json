@@ -1199,7 +1199,7 @@
             }
         },
         "check-layer-nightly" : {
-            "NEEDREPOS" : ["poky", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang"],
+            "NEEDREPOS" : ["poky", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein"],
             "step1" : {
                 "shortname" : "Test meta-agl YP Compatibility",
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-agl/meta-agl-core ../meta-agl/meta-netboot --dependency ../meta-openembedded/meta-oe ../meta-openembedded/meta-networking ../meta-openembedded/meta-python --no-auto-dependency"]
@@ -1232,6 +1232,13 @@
             "step8" : {
                 "shortname" : "Test meta-clang YP Compatibility",
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-clang --no-auto-dependency"]
+            },
+            "step9" : {
+                "shortname" : "Test meta-exein YP Compatibility",
+                "extravars" : [
+                    "HOSTTOOLS:remove = 'clang llvm-strip'"
+                ],
+                "EXTRACMDS" : ["export PATH=$PATH:${SCRIPTSDIR}/exein-path-intercepts; yocto-check-layer-wrapper ../meta-exein --dependency ../meta-openembedded/meta-oe --no-auto-dependency"]
             }
         },
         "metrics" : {
@@ -1821,6 +1828,12 @@
         "meta-security" : {
             "url" : "ssh://git@push.yoctoproject.org/meta-security",
             "branch" : "master",
+            "revision" : "HEAD",
+            "no-layer-add" : true
+        },
+        "meta-exein" : {
+            "url" : "https://github.com/exein-io/meta-exein-official",
+            "branch" : "main",
             "revision" : "HEAD",
             "no-layer-add" : true
         },
