@@ -167,6 +167,19 @@ utils.mkdir(errordir)
 
 errorlogs = set()
 
+def log_file_contents(filename, builddir, stepnum, stepname):
+    logfile = logname(builddir, stepnum, stepname)
+    with open(logfile, "a") as outf, open(filename, "r") as f:
+        def log(s):
+            outf.write(s)
+            sys.stdout.write(s)
+
+        log("Contents of %s:\n" % filename)
+        for line in f:
+            log(line)
+        log("\n")
+
+
 def bitbakecmd(builddir, cmd, report, stepnum, stepname, oeenv=True):
     global finalret
     flush()
@@ -190,16 +203,6 @@ def bitbakecmd(builddir, cmd, report, stepnum, stepname, oeenv=True):
 
     with open(log, "a") as outf:
         writelog("Running '%s' with output to %s\n" % (cmd, log), outf, sys.stdout)
-
-        autoconf = builddir + "/conf/auto.conf"
-        if os.path.exists(autoconf):
-            with open(autoconf, "r") as inf, open(log, "a") as outf:
-                writelog("auto.conf settings:\n", outf, sys.stdout)
-                for line in inf.readlines():
-                    writelog(line, outf, sys.stdout)
-                writelog("\n", outf, sys.stdout)
-
-    flush()
 
     with subprocess.Popen(cmd, shell=True, cwd=builddir + "/..", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0) as p, open(log, 'ab') as f:
         for line in p.stdout:
@@ -259,6 +262,7 @@ def handle_stepnum(stepnum):
             addstepentry("write-config", "Write config", shortdesc, desc, None, str(stepnum))
         elif args.stepname == "write-config":
             runcmd([scriptsdir + "/setup-config", args.target, str(stepnum - 1), args.builddir, args.branchname, args.reponame, "-s", args.sstateprefix, "-b", args.buildappsrcrev])
+            log_file_contents(args.builddir + "/conf/auto.conf", args.builddir, stepnum, args.stepname)
 
     # Execute the targets for this configuration
     targets = utils.getconfigvar("BBTARGETS", ourconfig, args.target, stepnum)
