@@ -253,6 +253,7 @@ def handle_stepnum(stepnum):
     elif args.stepname == "add-layers":
         for layer in layers:
             bitbakecmd(args.builddir, "bitbake-layers add-layer %s" % layer, report, stepnum, args.stepname)
+        log_file_contents(args.builddir + "/conf/bblayers.conf", args.builddir, stepnum, args.stepname)
 
     flush()
 
@@ -308,6 +309,7 @@ def handle_stepnum(stepnum):
         # Remove any layers we added in a reverse order
         for layer in reversed(layers):
             bitbakecmd(args.builddir, "bitbake-layers remove-layer %s" % layer, report, stepnum, args.stepname)
+        log_file_contents(args.builddir + "/conf/bblayers.conf", args.builddir, stepnum, args.stepname)
 
     if not jcfg:
         sys.exit(finalret)
