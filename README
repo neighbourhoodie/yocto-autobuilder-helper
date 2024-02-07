@@ -34,3 +34,6 @@ with the following commands:
 
   git config  --local --add format.subjectprefix 'yocto-autobuilder-helper][PATCH'
   git config  --local --add sendemail.to yocto@lists.yoctoproject.org
+
+When sending single patches, please use something like:
+git send-email -M -1 --to=yocto@lists.yoctoproject.org --subject-prefix='yocto-autobuilder-helper][PATCH'
