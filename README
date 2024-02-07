@@ -32,5 +32,5 @@ Patches for this code should be sent to the yocto@lists.yoctoproject.org mailing
 with [yocto-autobuilder-helper] in the subject.  This can be configured automatically
 with the following commands:
 
-  git config  --local --add format.subjectprefix 'PATCH yocto-autobuilder-helper'
+  git config  --local --add format.subjectprefix 'yocto-autobuilder-helper][PATCH'
   git config  --local --add sendemail.to yocto@lists.yoctoproject.org
