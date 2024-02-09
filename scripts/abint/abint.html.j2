@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bug Age</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"></script>
+  <script src="sorttable.js"></script>
+  <style>
+    .chart-wrapper {
+      border-left: 1px solid lightgray;
+      border-right: 1px solid lightgray;
+      position: relative;
+      width: 100%;
+      height: 1lh;
+      contain: layout;
+    }
+
+    .week {
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      width: 1%;
+      height: fill;
+      background-color: rgba(var(--bs-primary-rgb), .3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="display-4">Autobuilder Issue Summary</h1>
+
+    <p>
+      This is a list of all open bugs which are tagged as <tt>AB-INT</tt>, that
+      is intermittent bugs that affect the reliability of the autobuilder.
+    </p>
+    <p>
+      The headings are clickable to change the sorting. The bars underneath each
+      row represent the frequency of occurances, from two years ago on the left
+      to the present on the right.  The darker the bar, the more instances.
+    </p>
+
+    <table id="bug-table" class="table sortable">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col" class="sorttable_nosort">Summary</th>
+          <th scope="col">Count</th>
+          <th scope="col">Last Seen</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bug in bugs|sort(attribute="seen", reverse=True) %}
+        <tr>
+          <th scope="row"><a href="http://bugzilla.yoctoproject.org/{{bug.id}}">{{bug.id}}</a></th>
+          <td>
+            {{bug.summary}}
+            <div class="chart-wrapper">
+              <!-- treat this div as holding 100 week long blocks. Floor each date to the week then work out how many weeks since. -->
+              {% for d in bug.seen if d > start %}
+              {% set weeks = (d.floor('week') - start).days / 7 %}
+              <span class="week" style="left: {{ weeks }}%" title="{{d}}">&nbsp;</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td>{{bug.count}}</td>
+          <td sorttable_customkey="{{bug.latest.timestamp()}}">{{bug.since|humanize_naturaldelta}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>

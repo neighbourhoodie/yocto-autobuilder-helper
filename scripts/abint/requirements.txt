@@ -1,0 +1,5 @@
+arrow
+requests
+python-bugzilla
+Jinja2
+jinja2-humanize-extension

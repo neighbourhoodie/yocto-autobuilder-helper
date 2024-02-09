@@ -1284,6 +1284,10 @@
                     "${BUILDDIR}/../meta-openembedded/meta-webserver"
                     ],
                 "EXTRACMDS" : ["echo 'do_cve_check:layer-core = \"\"' >> conf/auto.conf ; ${SCRIPTSDIR}/run-cvecheck --metrics ../yocto-metrics-meta-oe --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
+            },
+            "step6": {
+                "shortname": "AB-INT report",
+                "EXTRACMDS": [ "${SCRIPTSDIR}/run-abint ${HELPERRESULTSDIR}/../../abint/"]
             }
         },
         "meta-mingw" : {

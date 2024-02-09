@@ -1,0 +1,23 @@
+#! /bin/bash
+
+set -e -u
+
+OURDIR=$(dirname $0)
+RESULTSDIR=$1
+
+cd $OURDIR/abint
+
+echo Building venv...
+
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip --disable-pip-version-check install --requirement requirements.txt
+
+echo Generating report...
+
+./abint.py
+
+echo Publishing report to ${RESULTSDIR}
+
+mkdir --parents ${RESULTSDIR}/
+cp --verbose *.html *.js ${RESULTSDIR}/
