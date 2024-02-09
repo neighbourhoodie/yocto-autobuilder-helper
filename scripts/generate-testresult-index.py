@@ -9,6 +9,7 @@ import argparse
 import os
 import glob
 import json
+import re
 import subprocess
 from jinja2 import Template
 
@@ -105,10 +106,12 @@ def get_build_branch(p):
 
 # Pad so 20190601-1 becomes 20190601-000001 and sorts correctly
 def keygen(k):
-    if "-" not in k:
-         return k
-    k1, k2 = k.split("-")
-    return k1 + "-" + k2.rjust(6, '0')
+    m = re.match(r"(\d+)-(\d+)", k)
+    if m:
+        k1, k2 = m.groups()
+        return k1 + "-" + k2.rjust(6, '0')
+    else:
+        return k
 
 for build in sorted(os.listdir(path), key=keygen, reverse=True):
     buildpath = os.path.join(path, build, "testresults")
