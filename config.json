@@ -371,7 +371,8 @@
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-multimedia'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'crossguid'"
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'crossguid libcamera libcamera-dbg libcamera-src libgssdp-1.6-src libgupnp-1.6-src libsquish-staticdev'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'oscam oscam-dbg oscam-src rtmpdump-staticdev'"
                 ]
             },
             "step5" : {
@@ -426,7 +427,9 @@
                 "extravars" : [
                     "EXCLUDE_FROM_WORLD:layer-openembedded-layer = '1'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'python3-frozenlist python3-frozenlist-dbg python3-kivy-src python3-pycocotools-src python3-pydantic-core'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'python3-pyproj python3-pyproj-dbg python3-pyproj-src python3-pyzmq python3-yarl python3-yarl-dbg'"
                 ]
             },
             "step9" : {
@@ -441,7 +444,8 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-webserver'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-webserver'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'netdata-dbg netdata php-phar'"
                 ]
             },
             "step10" : {
@@ -467,7 +471,8 @@
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-multimedia'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-multimedia'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-gnome'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-gnome'",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = 'catfish libsamba-util0 samba-dbg'"
                 ]
             }
         },
