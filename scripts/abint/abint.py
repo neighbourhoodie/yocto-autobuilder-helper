@@ -125,7 +125,7 @@ def last_seen_report(data):
     template = env.get_template("abint.html.j2")
     with open("index.html", "w") as f:
         start = arrow.utcnow().shift(weeks=-100).floor("week")
-        f.write(template.render(bugs=data, start=start))
+        f.write(template.render(bugs=data, start=start, now=arrow.now()))
 
 
 data = get_data()
