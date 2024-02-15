@@ -1841,7 +1841,7 @@
             "no-layer-add" : true
         },
         "meta-exein" : {
-            "url" : "https://github.com/exein-io/meta-exein-official",
+            "url" : "https://github.com/exein-io/meta-exein",
             "branch" : "main",
             "revision" : "HEAD",
             "no-layer-add" : true
