@@ -125,7 +125,7 @@ if args.json_outputfile:
 def addentry(name, description, phase):
     jsonconfig.append({"name" : name, "bbname" : description[:46], "phase" : phase, "description" : description})
 
-def addstepentry(name, taskdesc, shortname, description, detail, phase):
+def addstepentry(name, taskdesc, shortname, description, detail, phase, usepty=False):
     bbname = taskdesc
     if shortname:
         bbname = shortname + ": " + taskdesc
@@ -134,7 +134,7 @@ def addstepentry(name, taskdesc, shortname, description, detail, phase):
         bbdesc = description
     if detail:
         bbdesc = bbdesc + ": " + detail
-    jsonconfig.append({"name" : name, "bbname" : bbname[:46], "phase" : phase, "description" : bbdesc})
+    jsonconfig.append({"name" : name, "bbname" : bbname[:46], "phase" : phase, "description" : bbdesc, "usepty" : usepty})
 
 if jcfg:
     buildtools = utils.setup_buildtools_tarball(ourconfig, args.workername, None, checkonly=True)
@@ -287,7 +287,10 @@ def handle_stepnum(stepnum):
     cmds = utils.getconfiglist("EXTRACMDS", ourconfig, args.target, stepnum)
     if jcfg:
         if cmds:
-            addstepentry("cmds", "Run cmds", shortdesc, desc, str(cmds), str(stepnum))
+            usepty = False
+            if utils.getconfigvar("USEPTY", ourconfig, args.target, stepnum):
+                usepty = True
+            addstepentry("cmds", "Run cmds", shortdesc, desc, str(cmds), str(stepnum), usepty=usepty)
     elif args.stepname == "cmds":
         for cmd in cmds:
             hp.printheader("Step %s/%s: Running command %s" % (stepnum, maxsteps, cmd))

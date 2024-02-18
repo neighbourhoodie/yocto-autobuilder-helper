@@ -276,6 +276,10 @@
             "step4" : {
                 "shortname" : "OEQA core tests",
                 "EXTRACMDS" : ["oe-test core"]
+            },
+            "step5" : {
+                "shortname" : "Bitbake extra tests",
+                "EXTRACMDS" : ["DISPLAY=:1 xterm -geometry 90x30 -e ${SCRIPTSDIR}/bitbake-extra-tests; exit $(cat bbextratests-exitcode)"]
             }
         },
         "reproducible" : {

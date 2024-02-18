@@ -1,0 +1,20 @@
+#!/bin/bash
+. ./oe-init-build-env
+TERM=xterm-256color
+TASK_EXP_UNIT_TEST=1 bitbake -g -u taskexp_ncurses zlib acl
+if [ $? -ne 0 ]; then
+    echo 1 > bbextratests-exitcode
+    exit 1
+fi
+TASK_EXP_UNIT_TEST=1 bitbake -g -u taskexp_ncurses zlib acl foo
+if [ $? -ne 1 ]; then
+    echo 1 > bbextratests-exitcode
+    exit 1
+fi
+TASK_EXP_UNIT_TEST_NOTERM=1 bitbake -g -u taskexp_ncurses quilt
+if [ $? -ne 0 ]; then
+    echo 1 > bbextratests-exitcode
+    exit 1
+fi
+echo $? > bbextratests-exitcode
+exit 0
