@@ -74,7 +74,8 @@
             "BB_LOG_HOST_STAT_ON_FAILURE = '1'",
             "BB_LOG_HOST_STAT_CMDS_FAILURE = 'oe-time-dd-test.sh -l'",
             "SDK_TOOLCHAIN_LANGS += 'rust'",
-            "BB_SERVER_TIMEOUT = '60'"
+            "BB_SERVER_TIMEOUT = '60'",
+            "BB_LOADFACTOR_MAX = '1.5'"
         ]
     },
     "templates" : {
