@@ -774,6 +774,14 @@
             "MACHINE" : "qemux86",
             "TEMPLATE" : "ptest-qemu-fast"
         },
+        "genericarm64" : {
+            "MACHINE" : "genericarm64",
+            "TEMPLATE" : "arch-hw"
+        },
+        "genericarm64-alt" : {
+            "MACHINE" : "genericarm64",
+            "TEMPLATE" : "altcfg-hw"
+        },
         "genericx86" : {
             "MACHINE" : "genericx86",
             "TEMPLATE" : "arch-hw",
