@@ -16,6 +16,8 @@
     "BUILDTOOLS_ARM_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.3/buildtools/aarch64-buildtools-extended-nativesdk-standalone-4.3.sh",
     "BUILDTOOLS_MAKE_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.3/buildtools/x86_64-buildtools-make-nativesdk-standalone-4.3.sh",
 
+    "EXTRATOOLS_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/extratools/x86_64-buildtools-imagemagick-nativesdk-standalone-4.3+snapshot-5f2ba20f203114db9a3b11264467f8c23a05041d.sh",
+
     "REPO_STASH_DIR" : "${BASE_HOMEDIR}/git/mirror",
     "TRASH_DIR" : "${BASE_HOMEDIR}/git/trash",
 
@@ -85,6 +87,7 @@
             "extravars" : [
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
+            "extratools" : "${EXTRATOOLS_URL}",
             "step1" : {
                 "SDKMACHINE" : "x86_64",
                 "BBTARGETS" : "core-image-sato core-image-sato-sdk core-image-minimal core-image-minimal-dev core-image-full-cmdline core-image-sato:do_populate_sdk core-image-minimal:do_populate_sdk_ext core-image-sato:do_populate_sdk_ext",
@@ -102,6 +105,7 @@
             "extravars" : [
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
+            "extratools" : "${EXTRATOOLS_URL}",
             "step1" : {
                 "BBTARGETS" : "core-image-sato core-image-minimal core-image-sato:do_populate_sdk core-image-minimal:do_populate_sdk_ext core-image-sato:do_populate_sdk_ext",
                 "SANITYTARGETS" : "core-image-minimal:do_testimage core-image-sato:do_testimage core-image-sato:do_testsdk core-image-minimal:do_testsdkext core-image-sato:do_testsdkext"
@@ -127,6 +131,7 @@
                 "IMAGE_ROOTFS_EXTRA_SPACE:append = '${@bb.utils.contains('IMAGE_FEATURES', 'package-management', ' + 262144', '', d)}'",
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
+            "extratools" : "${EXTRATOOLS_URL}",
             "step1" : {
                 "BBTARGETS" : "core-image-full-cmdline core-image-sato core-image-sato-sdk",
                 "SANITYTARGETS" : "core-image-full-cmdline:do_testimage core-image-sato:do_testimage core-image-sato-sdk:do_testimage"
@@ -141,6 +146,7 @@
                 "IMAGE_ROOTFS_EXTRA_SPACE:append = '${@bb.utils.contains('IMAGE_FEATURES', 'package-management', ' + 262144', '', d)}'",
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
+            "extratools" : "${EXTRATOOLS_URL}",
             "step1" : {
                 "BBTARGETS" : "core-image-full-cmdline core-image-sato",
                 "SANITYTARGETS" : "core-image-full-cmdline:do_testimage core-image-sato:do_testimage"

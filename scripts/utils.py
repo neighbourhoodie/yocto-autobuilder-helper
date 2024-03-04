@@ -424,9 +424,9 @@ def sha256_file(filename):
             pass
     return method.hexdigest()
 
-def enable_buildtools_tarball(btdir):
+def enable_tools_tarball(btdir, name):
     btenv = glob.glob(btdir + "/environment-setup*")
-    print("Using buildtools %s" % btenv)
+    print("Using %s %s" % (name, btenv))
     # We either parse or wrap all our execution calls, rock and a hard place :(
     with open(btenv[0], "r") as f:
         for line in f.readlines():
@@ -454,6 +454,10 @@ def setup_buildtools_tarball(ourconfig, workername, btdir, checkonly=False):
     if checkonly:
         return bttarball
 
+    setup_tools_tarball(ourconfig, btdir, bttarball)
+
+def setup_tools_tarball(ourconfig, btdir, bttarball, name="buildtools"):
+
     btenv = None
     if bttarball:
         sha256 = None
@@ -461,8 +465,8 @@ def setup_buildtools_tarball(ourconfig, workername, btdir, checkonly=False):
             bttarball, sha256 = bttarball.split(";")
         btdir = os.path.abspath(btdir)
         if not os.path.exists(btdir):
-            btdlpath = getconfig("BASE_SHAREDDIR", ourconfig) + "/buildtools/" + os.path.basename(bttarball)
-            print("Extracting buildtools %s" % bttarball)
+            btdlpath = getconfig("BASE_SHAREDDIR", ourconfig) + "/" + name + "/" + os.path.basename(bttarball)
+            print("Extracting %s %s" % (name, bttarball))
             btlock = btdlpath + ".lock"
             if not os.path.exists(os.path.dirname(btdlpath)):
                 os.makedirs(os.path.dirname(btdlpath), exist_ok=True)
@@ -486,7 +490,7 @@ def setup_buildtools_tarball(ourconfig, workername, btdir, checkonly=False):
                     # We raced with someone else, try again
                     pass
             subprocess.check_call(["bash", btdlpath, "-d", btdir, "-y"])
-        enable_buildtools_tarball(btdir)
+        enable_tools_tarball(btdir, name)
 
 def get_string_from_version(version, milestone=None, rc=None):
     """ Point releases finishing by 0 (e.g 4.0.0, 4.1.0) do no exists,

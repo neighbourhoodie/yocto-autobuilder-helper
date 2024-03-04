@@ -145,6 +145,15 @@ else:
     if args.phase == "init" and args.stepname == "buildtools":
         sys.exit(0)
 
+extratools = utils.getconfigvar("extratools", ourconfig, args.target)
+if jcfg:
+    if extratools:
+        addentry("extratools", "Setup extratools tarball", "init")
+elif extratools:
+    utils.setup_tools_tarball(ourconfig, args.builddir + "/../extratools", extratools, "extratools")
+    if args.phase == "init" and args.stepname == "extratools":
+        sys.exit(0)
+
 logconfig = args.builddir + "/../bitbake/contrib/autobuilderlog.json"
 print("Using BB_LOGCONFIG=%s" % logconfig)
 os.environ["BB_LOGCONFIG"] = logconfig

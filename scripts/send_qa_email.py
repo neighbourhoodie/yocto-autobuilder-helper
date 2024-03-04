@@ -136,7 +136,7 @@ def send_qa_email():
 
     buildtoolsdir = os.path.dirname(args.repojson) + "/build/buildtools"
     if os.path.exists(buildtoolsdir):
-        utils.enable_buildtools_tarball(buildtoolsdir)
+        utils.enable_tools_tarball(buildtoolsdir, "buildtools")
 
     repodir = os.path.dirname(args.repojson) + "/build/repos"
 
