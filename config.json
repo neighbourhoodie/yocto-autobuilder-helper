@@ -123,6 +123,8 @@
             "BUILDINFO" : true,
             "BUILDHISTORY" : true,
             "extravars" : [
+                "PACKAGE_CLASSES = 'package_ipk package_rpm package_deb'",
+                "IMAGE_ROOTFS_EXTRA_SPACE:append = '${@bb.utils.contains('IMAGE_FEATURES', 'package-management', ' + 262144', '', d)}'",
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
             "step1" : {
@@ -135,6 +137,8 @@
             "BUILDINFO" : true,
             "BUILDHISTORY" : true,
             "extravars" : [
+                "PACKAGE_CLASSES = 'package_ipk package_rpm package_deb'",
+                "IMAGE_ROOTFS_EXTRA_SPACE:append = '${@bb.utils.contains('IMAGE_FEATURES', 'package-management', ' + 262144', '', d)}'",
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
             "step1" : {
@@ -192,6 +196,10 @@
         "altcfg-hw" : {
             "DISTRO" : "poky-altcfg",
             "BUILDINFO" : true,
+            "extravars" : [
+                "PACKAGE_CLASSES = 'package_ipk package_rpm package_deb'",
+                "IMAGE_ROOTFS_EXTRA_SPACE:append = '${@bb.utils.contains('IMAGE_FEATURES', 'package-management', ' + 262144', '', d)}'"
+            ],
             "step1" : {
                 "BBTARGETS" : "core-image-full-cmdline core-image-sato core-image-sato-sdk"
             }
