@@ -143,6 +143,16 @@ case "$target" in
         sha256sums $TMPDIR/deploy/images/qemux86-64
         cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/qemux86-64/*qemux86-64* $DEST/machines/qemu/qemux86-64
         ;;
+    "genericarm64")
+        mkdir -p $DEST/machines/genericarm64
+        sha256sums $TMPDIR/deploy/images/genericarm64
+        cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/genericarm64/*genericarm64* $DEST/machines/genericarm64
+        ;;
+    "genericarm64-alt")
+        mkdir -p $DEST/machines/genericarm64-alt
+        sha256sums $TMPDIR/deploy/images/genericarm64
+        cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/genericarm64/*genericarm64* $DEST/machines/genericarm64-alt
+        ;;
     "genericx86-64")
         mkdir -p $DEST/machines/genericx86-64
         sha256sums $TMPDIR/deploy/images/genericx86-64
