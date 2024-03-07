@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import argparse
 import collections
 import dataclasses
 import logging
@@ -10,19 +11,6 @@ import re
 import arrow
 import bugzilla
 import requests
-
-MOCK = False
-# logging.basicConfig(level=logging.DEBUG)
-
-
-def save_pickle(name, data):
-    with open(name, "wb") as f:
-        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
-
-
-def load_pickle(name):
-    with open(name, "rb") as f:
-        return pickle.load(f)
 
 
 http = requests.Session()
@@ -104,14 +92,8 @@ def get_data():
                 except requests.exceptions.HTTPError as e:
                     logging.debug(f"Couldn't find build for {builder=} {build=}")
 
-    save_pickle("bugs.data", bugs)
     return bugs
 
-
-if MOCK:
-
-    def get_data():
-        return load_pickle("bugs.data")
 
 
 def last_seen_report(data):
@@ -129,5 +111,26 @@ def last_seen_report(data):
         f.write(template.render(bugs=data, start=start, now=arrow.now()))
 
 
-data = get_data()
-last_seen_report(data)
+CACHE_NAME = "bugs.data"
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("--cached", action="store_true", help="Use the local cached data instead of fetching")
+    args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+
+    if args.cached:
+        logging.debug(f"Loading cached data from {CACHE_NAME}")
+        with open(CACHE_NAME, "rb") as f:
+            data = pickle.load(f)
+    else:
+        data = get_data()
+        # Always save a cache because it's quick
+        logging.debug(f"Saving data to cache {CACHE_NAME}")
+        with open(CACHE_NAME, "wb") as f:
+            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+
+    last_seen_report(data)
