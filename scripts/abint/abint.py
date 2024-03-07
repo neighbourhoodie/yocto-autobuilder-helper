@@ -1,14 +1,15 @@
 #! /usr/bin/env python3
 
-import re
 import collections
-from pprint import pprint
-import bugzilla
-import pickle
-import requests
 import dataclasses
-import arrow
 import logging
+import pickle
+import pprint
+import re
+
+import arrow
+import bugzilla
+import requests
 
 MOCK = False
 # logging.basicConfig(level=logging.DEBUG)
@@ -83,7 +84,7 @@ def get_data():
         for bug in bugs
     ]
 
-    pprint(bugs)
+    pprint.pprint(bugs)
     print(f"Found {len(bugs)} AB-INT bugs")
 
     comments_data = bz.get_comments([bug.id for bug in bugs])["bugs"]
