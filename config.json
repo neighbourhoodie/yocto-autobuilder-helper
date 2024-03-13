@@ -1307,6 +1307,7 @@
                 "CVE_CHECK_FORMAT_JSON = '1'",
                 "CVE_CHECK_SHOW_WARNINGS = '0'",
                 "CVE_DB_UPDATE_INTERVAL = '21600'",
+                "CVE_DB_INCR_UPDATE_AGE_THRES = '21600'",
                 "BB_SERVER_TIMEOUT = '0'"
             ],
             "step1" : {
