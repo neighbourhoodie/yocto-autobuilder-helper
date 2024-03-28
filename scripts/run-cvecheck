@@ -105,5 +105,4 @@ if [ "$BRANCH" = "master" ]; then
     fi
 
     cp $METRICSDIR/cve-count-byday.json $RESULTSDIR
-    cp $METRICSDIR/cve-count-byday-lastyear.json $RESULTSDIR
 fi
