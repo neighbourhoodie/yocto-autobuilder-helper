@@ -1,0 +1,23 @@
+From 8b29150d370348320189110e3111b0026f8989cf Mon Sep 17 00:00:00 2001
+Message-ID: <cover.1712072937.git.13760198+ninetteadhikari@users.noreply.github.com>
+From: Ninette Adhikari <13760198+ninetteadhikari@users.noreply.github.com>
+Date: Tue, 2 Apr 2024 17:48:57 +0200
+Subject: [PATCH 0/2] *** SUBJECT HERE ***
+
+*** BLURB HERE ***
+
+Ninette Adhikari (1):
+  cve-report: Generate json recipe list per branch
+
+hulkoba (1):
+  generate-chartdata: do not create lastyear json files
+
+ scripts/cve-generate-chartdata          | 16 +---------------
+ scripts/cve-report.py                   | 24 ++++++++----------------
+ scripts/patchmetrics-generate-chartdata |  8 +-------
+ scripts/run-cvecheck                    |  3 +--
+ 4 files changed, 11 insertions(+), 40 deletions(-)
+
+-- 
+2.44.0
+
