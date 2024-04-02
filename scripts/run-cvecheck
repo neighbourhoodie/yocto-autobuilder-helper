@@ -92,7 +92,7 @@ if [ -e tmp/log/cve/cve-summary.json ]; then
     if [ "$PUSH" = "1" ]; then
         git -C $METRICSDIR push
     fi
-    $OURDIR/cve-report.py tmp/log/cve/cve-summary.json > $RESULTSDIR/cve-status-$BRANCH.txt
+    $OURDIR/cve-report.py tmp/log/cve/cve-summary.json > $RESULTSDIR/cve-status-$BRANCH.json
 fi
 
 if [ "$BRANCH" = "master" ]; then
