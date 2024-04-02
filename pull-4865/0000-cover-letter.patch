@@ -4,7 +4,32 @@ From: Ninette Adhikari <13760198+ninetteadhikari@users.noreply.github.com>
 Date: Tue, 2 Apr 2024 17:48:57 +0200
 Subject: [PATCH 0/2] M10 and M11: Merge metric views contrib
 
-*** BLURB HERE ***
+## M10: Metrics view: CVEs per branch section and 
+## M11: Unify metrics views
+
+- Don't create chartdata-lastyear.sjon files because they are not needed anymore
+- Change format for generated cve-per-branch-report so it can be interpreted by the metrics view:
+
+```
+...
+"bluez5": {
+  "count": 1,
+  "cves": [
+    "https://web.nvd.nist.gov/view/vuln/detail?vulnId=https://github.com/advisories/GHSA-fm4c-gvmr-hvgr"
+  ]
+},
+"busybox": {
+  "count": 4,
+  "cves": [
+    "https://web.nvd.nist.gov/view/vuln/detail?vulnId=https://github.com/advisories/GHSA-wm78-9prw-c5h4",
+    "https://web.nvd.nist.gov/view/vuln/detail?vulnId=https://github.com/advisories/GHSA-qqqj-6rp2-5pw4",
+    "https://web.nvd.nist.gov/view/vuln/detail?vulnId=https://github.com/advisories/GHSA-j44g-3846-7q49",
+    "https://web.nvd.nist.gov/view/vuln/detail?vulnId=https://github.com/advisories/GHSA-2vjj-r39q-gvxr"
+  ]
+},
+...
+}
+```
 
 Ninette Adhikari (1):
   cve-report: Generate json recipe list per branch
