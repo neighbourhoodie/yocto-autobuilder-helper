@@ -46,7 +46,7 @@ header["branches"] = "Branches"
 header["desc"] = "Description"
 header["maintainers"] = ["Maintainer(s)"]
 header["url"] = "Source Code"
-parsed_layers = {"header": header}
+parsed_layers = {}
 
 for layer in layers:
     name = layer["layer"]["name"]
@@ -63,6 +63,11 @@ for layer in layers:
             output["desc"] = layer["layer"]["summary"]
         else:
             output["desc"] = layer["layer"]["description"]
+        for maintainer in layer["maintainers"]:
+            if "name" not in maintainer:
+                maintainer["name"] = maintainer["email"]
+            if "email" not in maintainer:
+                maintainer["email"] = "NA"
         output["maintainers"] = set([e["name"] for e in layer["maintainers"]])
         output["url"] = '<a href="{u}">{u}</a>'.format(u=layer["layer"]["vcs_web_url"])
         parsed_layers[name] = output
@@ -72,11 +77,16 @@ for layer in parsed_layers:
     maintainers = list(parsed_layers[layer]["maintainers"])
     if len(maintainers) == 1:
         parsed_layers[layer]["maintainers"] = maintainers.pop()
+    elif len(maintainers) == 0:
+        print("No maintainers for ", layer)
+        parsed_layers[layer]["maintainers"] = "Awaiting Maintainers"
     else:
         print(maintainers)
         parsed_layers[layer]["maintainers"] = "{} and {}".format(
             ", ".join(maintainers[:-1]), maintainers[-1]
         )
-
+sorted_parsed_layers = {"header": header} 
+for layername in sorted(parsed_layers.keys()):
+    sorted_parsed_layers[layername] = parsed_layers[layername]
 with open("parsed-layers.json", "w") as file:
-    json.dump(parsed_layers, file)
+    json.dump(sorted_parsed_layers, file)
