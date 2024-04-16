@@ -12,8 +12,8 @@
 
     "BUILDTOOLS_URL_TEMPLOCAL3" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.1/buildtools/x86_64-buildtools-extended-nativesdk-standalone-4.1.sh",
     "BUILDTOOLS_ARM_URL_TEMPLOCAL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.1/buildtools/aarch64-buildtools-extended-nativesdk-standalone-4.1.sh",
-    "BUILDTOOLS_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/non-release/20240413-14/buildtools/x86_64-buildtools-extended-nativesdk-standalone-4.3+snapshot-9717d17e4359e876078d98adcb85d9c395106d64.sh",
-    "BUILDTOOLS_ARM_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/non-release/20240413-14/buildtools/aarch64-buildtools-extended-nativesdk-standalone-4.3+snapshot-9717d17e4359e876078d98adcb85d9c395106d64.sh",
+    "BUILDTOOLS_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/buildtools/x86_64-buildtools-extended-nativesdk-standalone-5.0.sh",
+    "BUILDTOOLS_ARM_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/buildtools/aarch64-buildtools-extended-nativesdk-standalone-5.0.sh",
     "BUILDTOOLS_MAKE_URL" : "https://downloads.yoctoproject.org/releases/yocto/yocto-4.3/buildtools/x86_64-buildtools-make-nativesdk-standalone-4.3.sh",
 
     "EXTRATOOLS_URL" : "/srv/autobuilder/autobuilder.yocto.io/pub/extratools/x86_64-buildtools-imagemagick-nativesdk-standalone-4.3+snapshot-5f2ba20f203114db9a3b11264467f8c23a05041d.sh",
