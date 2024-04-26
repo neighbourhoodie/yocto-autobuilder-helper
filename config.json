@@ -681,19 +681,6 @@
                 "MACHINE": "fvp-base",
                 "BBTARGETS": "core-image-minimal core-image-sato core-image-sato:do_populate_sdk",
                 "SANITYTARGETS" : "core-image-sato:do_testsdk"
-                },
-            "step2": {
-                "shortname": "Build for generic-arm64 (poky)",
-                "MACHINE": "generic-arm64",
-                "BBTARGETS": "core-image-minimal core-image-sato core-image-sato:do_populate_sdk",
-                "SANITYTARGETS" : "core-image-sato:do_testsdk"
-            },
-            "step3": {
-                "shortname": "Build for generic-arm64 (poky-altcfg)",
-                "DISTRO": "poky-altcfg",
-                "MACHINE": "generic-arm64",
-                "BBTARGETS": "core-image-minimal core-image-sato core-image-sato:do_populate_sdk",
-                "SANITYTARGETS" : "core-image-sato:do_testsdk"
             }
         },
         "meta-agl-core" : {
