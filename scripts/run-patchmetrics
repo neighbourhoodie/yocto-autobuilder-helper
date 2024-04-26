@@ -118,4 +118,4 @@ fi
 
 $OURDIR/patchmetrics-generate-chartdata --json $METRICSDIR/patch-status.json --outputdir $RESULTSDIR
 cp $METRICSDIR/patch-status.json $RESULTSDIR
-cp $METRICSDIR/patch-status/* $RESULTSDIR
+cp -r $METRICSDIR/patch-status/* $RESULTSDIR
