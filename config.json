@@ -665,6 +665,27 @@
                 "shortname": "Build for fvp-base",
                 "MACHINE": "fvp-base",
                 "BBTARGETS": "core-image-minimal core-image-sato"
+            },
+            "step2": {
+                "shortname": "Build for sbsa-ref (poky)",
+                "MACHINE": "sbsa-ref",
+                "extravars" : [
+                    "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'",
+                    "TEST_RUNQEMUPARAMS += 'slirp'"
+                ],
+                "BBTARGETS" : "core-image-minimal core-image-sato core-image-weston",
+                "SANITYTARGETS" : "core-image-minimal:do_testimage core-image-sato:do_testimage core-image-weston:do_testimage"
+            },
+            "step3": {
+                "shortname": "Build for sbsa-ref (poky-altcfg)",
+                "DISTRO": "poky-altcfg",
+                "MACHINE": "sbsa-ref",
+                "extravars" : [
+                    "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'",
+                    "TEST_RUNQEMUPARAMS += 'slirp'"
+                ],
+                "BBTARGETS" : "core-image-minimal core-image-sato core-image-weston",
+                "SANITYTARGETS" : "core-image-minimal:do_testimage core-image-sato:do_testimage core-image-weston:do_testimage"
             }
         },
         "meta-agl-core" : {
