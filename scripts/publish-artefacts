@@ -201,11 +201,6 @@ case "$target" in
         sha256sums $TMPDIR/deploy/images/genericx86
         cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/genericx86/*genericx86* $DEST/machines/genericx86-alt
         ;;
-    "meta-arm")
-        mkdir -p $DEST/machines/meta-arm/generic-arm64
-        sha256sums $TMPDIR/deploy/images/generic-arm64
-        cp -R --no-dereference --preserve=links $TMPDIR/deploy/images/generic-arm64/*generic-arm64* $DEST/machines/meta-arm/generic-arm64
-        ;;
     "poky-tiny")
         mkdir -p $DEST/machines/qemu/qemu-tiny
         sha256sums $TMPDIR/deploy/images/qemux86
