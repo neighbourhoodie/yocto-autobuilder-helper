@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Index of autobuilder test results</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <style>
+      :root {
+        font-size: 16px;
+      }
+      .no-wrap {
+        white-space: nowrap;
+      }
+      .type-select {
+        align-items: center;
+        background-color: white;
+        display: flex;
+        position: sticky;
+        top: 0px;
+      }
+      .type-select label {
+        margin-right: 20px;
+        flex-shrink: 0;
+      }
+      .type-select select {
+        max-width: 300px;
+      }
+      table tr:nth-child(even) td {
+        background-color: rgba(111, 120, 135, 0.0375);
+      }
+      table tr td:not(:last-child) {
+        border-right: 0.0625rem solid #e7eaf0;
+      }
+      a {
+        cursor: pointer;
+      }
+      .hide {
+        visibility: hidden;
+      }
+    </style>
+  </head>
+
+  <body onload="mount()">
+    <header class="container">
+      <h1>Index of autobuilder test results</h1>
+      <p>The table below lists the test results of all the builds and branch from the yocto autobuilder repository.</p>
+      <p>The filters for showing build types and branch helps to navigate the table.</p>
+    </header>
+    <main class="container">
+    <nav class="type-select">
+      <ul>
+        <li>
+          <label for="build-type-select">Filter by type:</label>
+            <select id="build-type-select" class="hide" onchange="setFilterParams()">
+              <option value="all">Type (all)</option>
+              {% for type in filter_items.build_types %}
+                <option value="{{type}}">{{type}}</option>
+              {% endfor %}
+            </select>
+        </li>
+        <li>
+          <label for="branch-select">Filter by branch:</label>
+          <select id="branch-select" class="hide" onchange="setFilterParams()">
+            <option value="all">Branch (all)</option>
+            {% for branch in filter_items.branch_list %}
+              <option value="{{branch}}">{{branch}}</option>
+            {% endfor %}
+          </select>
+        </li>
+        <li>
+          <label for="date-filter">Filter by date:</label>
+          <input id="date-filter" type="date" name="date" aria-label="Date" onchange="setFilterParams()" />
+        </li>
+      </ul>
+      <ul class="pagination-nav"></ul>
+    </nav>
+
+    <table class="test-table hide">
+      <thead>
+      <tr>
+        <th>Build</th>
+        <th>Type</th>
+        <th>Branch</th>
+        <th>Test Results Report</th>
+        <th>Performance Reports</th>
+        <th>ptest Logs</th>
+        <th>Buildhistory</th>
+        <th>Host Data</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p id="error-message"></p>
+  </main>
+</body>
+</html>
+
+<script type="text/javascript">
+  let entries = []
+  let rowsPerPage = 50
+  let currentPage = 0
+  const pageWidth = 6
+  const tbody = document.getElementsByTagName('tbody')[0]
+  let params
+
+  async function loadEntries() {
+    try {
+      const response = await fetch('data.json')
+      const data = await response.json()
+      if (areFiltersSet()) {
+        entries = setFilteredData(data)
+      } else {
+        entries = data
+      }
+    } catch (error) {
+      console.error('Error loading entries', error)
+    }
+  }
+
+  function setFilteredData(data) {
+    const { type, branch, date } = getParams()
+
+    return data.filter(entry => {
+      return (entry.btype === type || !type) && (entry.branch === branch || !branch) && (!date || areDatesEqual(entry.build, date))
+    })
+  }
+
+  function getParams() {
+    let params = new URL(document.location.toString()).searchParams
+    let page = params.get('page')
+    let type = params.get('type')
+    let branch = params.get('branch')
+    let date = params.get('date')
+    if (!page) {
+      page = 0
+    }
+    currentPage = parseInt(page)
+    return { page, type, branch, date }
+  }
+
+  function areFiltersSet() {
+    const { type, branch, date } = getParams()
+    if (!type && !branch && !date) {
+      return false
+    }
+    return true
+  }
+
+  async function setFilterParams() {
+    const build_type_value = document.getElementById('build-type-select').value
+    const branch_value = document.getElementById('branch-select').value
+    const date_value = document.getElementById('date-filter').value
+
+    if (build_type_value) {
+      if (build_type_value === 'all') {
+        params.delete('type')
+      } else {
+        params.set('type', build_type_value)
+      }
+    }
+    if (branch_value) {
+      if (branch_value === 'all') {
+        params.delete('branch')
+      } else {
+        params.set('branch', branch_value)
+      }
+    }
+    if (date_value) {
+      params.set('date', date_value)
+    } else {
+      params.delete('date')
+    }
+
+    window.location.search = params
+  }
+
+  function areDatesEqual(build, inputDate) {
+    if (!inputDate) {
+      return false
+    }
+    const buildDate = build.substring(0, build.indexOf('-'))
+    const date = inputDate.replaceAll('-', '')
+
+    if (buildDate === date) {
+      return true
+    }
+
+    return false
+  }
+
+  function displayTable() {
+    // delete current rows
+    let tbody = document.getElementsByTagName('tbody')[0]
+    while (tbody.rows.length > 0) {
+      tbody.deleteRow(0)
+    }
+
+    if (entries.length === 0) {
+      const p = document.getElementById('error-message')
+      p.innerHTML = 'No entries available'
+  
+      const paginationNav = document.querySelector('.pagination-nav')
+      paginationNav.classList.add('hide')
+    }
+
+    const start = currentPage * rowsPerPage
+    let end = (currentPage + 1) * rowsPerPage
+    end = end <= entries.length ? end : entries.length
+
+    for (var i = start; i < end; i++) {
+      insertRow(tbody, entries[i])
+    }
+  }
+
+  function insertRow(tbody, entry, index) {
+    const row = tbody.insertRow()
+
+    let html = '<tr>'
+    html += `<td><a class="no-wrap" href="${entry['reldir']}">${entry['build']}</a></td>`
+    html += '</tr>'
+    html += `<td class="no-wrap">`
+    if (entry['btype']) {
+        html += `${entry['btype']}`
+    }
+    html += `<td class="no-wrap">`
+    if (entry['branch']) {
+        html += `${entry['branch']}`
+    }
+    html += `</td>`
+    html += `<td>`
+    if (entry['testreport']) {
+        html += `<a href="${entry['testreport']}">Report</a>`
+    }
+    if (entry['regressionreport']) {
+        html += `<br><a href="${entry['regressionreport']}">Regressions</a>`
+    }
+    html += `</td>`
+
+    html += `<td>`
+    if (entry['perfreports']) {
+      entry['perfreports'].forEach((r) => {
+        html += `<a href="${r[0]}">${r[1]}</a> `
+      })
+    }
+    html += `</td>`
+
+    html += `<td>`
+    if (entry['ptestlogs']) {
+      entry['ptestlogs'].forEach((r) => {
+        html += `<a href="${r[0]}">${r[1]}</a> `
+      })
+    }
+    html += `</td>`
+
+    html += `<td>`
+    if (entry['buildhistory']){
+      entry['buildhistory'].forEach((bh) => {
+        html += `<a href="${bh[0]}">${bh[1]}</a> `
+      })
+    }
+    html += `</td>`
+
+    html += `<td>`
+    if(entry['hd']) {
+      entry['hd'].forEach((hd) => {
+        html += `<small><a href="${hd[0]}">${hd[1]}</a></small> `
+      })
+    }
+    html += `</td>`
+
+    html += `</tr>`
+    row.innerHTML = html
+  }
+
+  function updateActiveButtonStates() {
+    const pageButtons = document.querySelectorAll('.pagination-nav button')
+    pageButtons.forEach(button => {
+      if (button.textContent == currentPage+1) {
+        button.classList.remove('outline')
+      } else {
+        button.classList.add('outline')
+      }
+    })
+  }
+
+  function setCurrentPage(page) {
+    params.set('page', page)
+    setFilterParams()
+  }
+
+  function generatePageItems(totalPages, current, pageWidth) {
+    // See https://gist.github.com/kottenator/9d936eb3e4e3c3e02598
+    if (totalPages < pageWidth) {
+      return [...new Array(totalPages).keys()];
+    }
+    const left = Math.max(0, Math.min(totalPages - pageWidth, current - Math.floor(pageWidth / 2)));
+    const items = new Array(pageWidth);
+    for (let i = 0; i < pageWidth; i += 1) {
+      items[i] = i + left;
+    }
+    // replace non-ending items with placeholders
+    if (items[0] > 0) {
+      items[0] = 0;
+      items[1] = 'prev-more';
+    }
+    if (items[items.length - 1] < totalPages - 1) {
+      items[items.length - 1] = totalPages - 1;
+      items[items.length - 2] = 'next-more';
+    }
+    return items;
+  }
+
+  function createPageButtons() {
+    const totalPages = Math.ceil(entries.length / rowsPerPage)
+    const paginationNav = document.querySelector('.pagination-nav')
+
+    // Add page navigation buttons
+    const previousLi = document.createElement('li')
+    const previousBtn = document.createElement('a')
+    previousBtn.textContent = '<'
+    previousLi.appendChild(previousBtn)
+    paginationNav.appendChild(previousLi)
+    previousBtn.addEventListener('click', () => {
+      if (currentPage > 0) {
+        setCurrentPage(currentPage - 1)
+      }
+    })
+
+    const nextLi = document.createElement('li')
+    const nextBtn = document.createElement('a')
+    nextBtn.textContent = '>'
+    nextLi.appendChild(nextBtn)
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < totalPages - 1) {
+        setCurrentPage(currentPage + 1)
+      }
+    })
+
+    const pageItems = generatePageItems(totalPages, currentPage, pageWidth)
+
+    // Add page buttons
+    pageItems.forEach(item => {
+      const pageLi = document.createElement('li')
+      if(typeof item === 'number') {
+        const pageButton = document.createElement('button')
+        pageButton.classList.add('outline')
+        pageButton.textContent = item + 1
+        pageButton.addEventListener('click', () => {
+          currentPage = item
+          setCurrentPage(currentPage)
+        })
+        pageLi.appendChild(pageButton)
+      } else {
+        const pageEllipsis = document.createElement('span')
+        pageEllipsis.textContent = '...'
+        pageLi.appendChild(pageEllipsis)
+      }
+      paginationNav.appendChild(pageLi)
+    })
+    paginationNav.appendChild(nextLi)
+  }
+
+  function showPage() {
+    createPageButtons()
+    updateActiveButtonStates()
+    displayTable()
+  }
+
+  async function mount() {
+    const url = window.location.href
+    params = new URLSearchParams(url.search)
+
+    await loadEntries()
+
+    // Call this function to create the page buttons initially
+    showPage(currentPage)
+
+    const hiddenItem = document.querySelector('.test-table')
+    hiddenItem.classList.remove('hide')
+
+    // Set the select value in the dropdown
+    let { type, branch, date } = getParams()
+
+    const buildType = document.getElementById('build-type-select')
+    const branchSelect = document.getElementById('branch-select')
+    const dateFilter = document.getElementById('date-filter')
+    if (type) {
+      buildType.value = type
+    }
+    if (branch) {
+      branchSelect.value = branch
+    }
+    if (date) {
+      dateFilter.value = date
+    }
+    buildType.classList.remove('hide')
+    branchSelect.classList.remove('hide')
+  }
+</script>

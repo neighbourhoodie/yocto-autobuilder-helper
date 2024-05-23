@@ -13,68 +13,6 @@ import re
 import subprocess
 from jinja2 import Template
 
-index_template = """
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Index of autobuilder test results</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-</head>
-<body>
- 
-<table class="table is-narrow is-striped">
-<thead>
-<tr>
-  <th>Build</th>
-  <th>Type</th>
-  <th>Branch</th>
-  <th>Test Results Report</th>
-  <th>Performance Reports</th>
-  <th>ptest Logs</th>
-  <th>Buildhistory</th>
-  <th>Host Data</th>
-</tr>
-</thead>
-<tdata>
-{% for entry in entries %}
-<tr>
-   <td><a href="{{entry[1]}}">{{entry[0]}}</a></td>
-   <td>{% if entry[2] %} {{entry[2]}}{% endif %}</td>
-   <td>{% if entry[4] %} {{entry[4]}}{% endif %}</td>
-   <td>
-     {% if entry[3] %}<a href="{{entry[3]}}">Report</a>{% endif -%}
-     {% if entry[9] %}<br><a href="{{entry[9]}}">Regressions</a>{% endif %}
-   </td>
-   <td>
-   {% for perfrep in entry[6] %}
-     <a href="{{perfrep[0]}}">{{perfrep[1]}}</a>
-   {% endfor %}
-   </td>
-   <td>
-   {% for ptest in entry[7] %}
-     <a href="{{ptest[0]}}">{{ptest[1]}}</a>
-   {% endfor %}
-   </td>
-   <td>
-   {% for bh in entry[5] %}
-     <a href="{{bh[0]}}">{{bh[1]}}</a>
-   {% endfor %}
-   </td>
-   <td>
-   {% for hd in entry[8] %}
-     <a href="{{hd[0]}}">{{hd[1]}}</a>
-   {% endfor %}
-   </td>
-</tr>
-{% endfor %}
-</tdata>
-</table>
-</body>
-</html>
-"""
-
 def parse_args(argv=None):
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
@@ -88,6 +26,9 @@ def parse_args(argv=None):
 args = parse_args()
 path = os.path.abspath(args.path)
 entries = []
+filter_items = dict()
+build_types = set()
+branch_list= set()
 
 def get_build_branch(p):
     for root, dirs, files in os.walk(p):
@@ -175,7 +116,34 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
 
     branch = get_build_branch(buildpath)
 
-    entries.append((build, reldir, btype, testreport, branch, buildhistory, perfreports, ptestlogs, hd, regressionreport))
+    build_types.add(btype)
+    if branch: branch_list.add(branch)
+    # Creates a dictionary of items to be filtered for build types and branch
+    filter_items["build_types"] = build_types
+    filter_items["branch_list"] = branch_list
+
+    entry = {
+        'build': build, 
+        'btype': btype,
+        'reldir': reldir 
+    }
+
+    if testreport:
+        entry['testreport'] = testreport
+    if branch:
+        entry['branch'] = branch
+    if buildhistory:
+        entry['buildhistory'] = buildhistory
+    if perfreports:
+        entry['perfreports'] = perfreports
+    if ptestlogs:
+        entry['ptestlogs'] = ptestlogs
+    if hd:
+        entry['hd'] = hd
+    if regressionreport:
+        entry['regressionreport'] = regressionreport
+
+    entries.append(entry)
 
     # Also ensure we have saved out log data for ptest runs to aid debugging
     if "ptest" in btype or btype in ["full", "quick"]:
@@ -191,6 +159,11 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
                     with open(f + "/resulttool-done.log", "a+") as tf:
                         tf.write("\n")
 
-t = Template(index_template)
+with open("./index-table.html") as file_:
+    t = Template(file_.read())
+
+with open(os.path.join(path, "data.json"), 'w') as f:
+    json.dump(entries, f)
+
 with open(os.path.join(path, "index.html"), 'w') as f:
-    f.write(t.render(entries = entries))
+    f.write(t.render(entries = entries, filter_items = filter_items))
