@@ -19,7 +19,7 @@ TEST_RESULTS_REPOSITORY_URL="git@push.yoctoproject.org:yocto-testresults"
 TEST_RESULTS_DRY_RUN_REPOSITORY_URL="git://git.yoctoproject.org/yocto-testresults"
 
 def is_release_version(version):
-    p = re.compile('\d{8}-\d+')
+    p = re.compile(r'\d{8}-\d+')
     return version is not None and p.match(version) is None
 
 def get_previous_tag(targetrepodir, version):
@@ -64,7 +64,7 @@ def get_last_tested_rev_on_branch(branch, test_results_url, log):
     tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", test_results_url, "refs/tags/" + branch + "/*"]).decode('utf-8').strip()
     latest_test_tag=tags_list.splitlines()[-1].split()[1]
     # From test results tag, extract Poky revision
-    tested_revision = re.match('refs\/tags\/.*\/\d+-g([a-f0-9]+)\/\d', latest_test_tag).group(1)
+    tested_revision = re.match(r'refs\/tags\/.*\/\d+-g([a-f0-9]+)\/\d', latest_test_tag).group(1)
     log.info(f"Last tested revision on branch {branch} is {tested_revision}")
     return tested_revision
 
