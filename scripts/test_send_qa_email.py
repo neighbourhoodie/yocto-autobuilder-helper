@@ -42,6 +42,8 @@ class TestVersion(unittest.TestCase):
         {"input": None, "expected":False}
     ]
 
+    test_results_url = "git://git.yoctoproject.org/yocto-testresults"
+
     # This data represent real data returned by utils.getcomparisonbranch
     # and the release argument passed to send-qa-email script
     regression_inputs = [
@@ -76,7 +78,12 @@ class TestVersion(unittest.TestCase):
         for data in self.regression_inputs:
             with self.subTest(data['name']):
                 base, target = send_qa_email.get_regression_base_and_target(
-                    data['input']['targetbranch'], data['input']['basebranch'], data['input']['release'], os.environ.get("POKY_PATH"), log)
+                    data['input']['targetbranch'],
+                    data['input']['basebranch'],
+                    data['input']['release'],
+                    os.environ.get("POKY_PATH"),
+                    self.test_results_url,
+                    log)
                 expected_base, expected_target = data["expected"]
                 # The comparison base can not be set statically in tests when it is supposed to be the previous tag,
                 # since the result will depend on current tags
