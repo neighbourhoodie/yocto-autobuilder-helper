@@ -203,8 +203,11 @@ def send_qa_email():
             utils.printheader("Processing regression report")
             try:
                 regression_base, regression_target = get_regression_base_and_target(targetbranch, basebranch, args.release, targetrepodir, test_results_url, log)
-                log.info(f"Generating regression report between {regression_base} and {regression_target}")
-                generate_regression_report(querytool, targetrepodir, regression_base, regression_target, tempdir, args.results_dir, log)
+                if regression_base and regression_target:
+                    log.info(f"Generating regression report between {regression_base} and {regression_target}")
+                    generate_regression_report(querytool, targetrepodir, regression_base, regression_target, tempdir, args.results_dir, log)
+                else:
+                    log.info("Can not guess regression base and/or target, skip regression report")
             except subprocess.CalledProcessError as e:
                 error = str(e)
                 exitcode = 1
