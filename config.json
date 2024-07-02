@@ -1554,6 +1554,7 @@
         "auh" : {
             "NEEDREPOS" : ["poky", "auto-upgrade-helper"],
             "extravars" :[
+                "DL_DIR = '${TOPDIR}/downloads'",
                 "INHERIT += 'buildhistory'",
                 "LICENSE_FLAGS_ACCEPTED = 'commercial'",
                 "DISTRO_FEATURES:append:libc-glibc = ' systemd usrmerge'",
@@ -1579,6 +1580,7 @@
         "auh-meta-oe": {
             "NEEDREPOS": ["poky", "auto-upgrade-helper", "meta-openembedded"],
             "extravars": [
+                "DL_DIR = '${TOPDIR}/downloads'",
                 "INHERIT += 'buildhistory'",
                 "LICENSE_FLAGS_ACCEPTED = 'commercial'",
                 "DISTRO_FEATURES:append:libc-glibc = ' systemd usrmerge'",
