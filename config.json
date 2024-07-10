@@ -1938,6 +1938,8 @@
         "alma8*"       : "${BUILDTOOLS_URL}",
         "stream8*"     : "${BUILDTOOLS_URL}",
         "opensuse154*" : "${BUILDTOOLS_URL}",
+        "opensuse155*" : "${BUILDTOOLS_URL}",
+        "opensuse156*" : "${BUILDTOOLS_URL}",
         "perf-alma8*"  : "${BUILDTOOLS_URL}",
         "perf-ubuntu1804-ty-*" : "${BUILDTOOLS_URL}"
     }
