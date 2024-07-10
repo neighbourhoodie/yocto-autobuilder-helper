@@ -1748,6 +1748,32 @@
                     "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest -r buildoptions.SourceMirroring.test_yocto_source_mirror"]
             }
         },
+        "meta-webosose" : {
+            "NEEDREPOS" : ["poky", "meta-webosose", "meta-clang", "meta-openembedded", "meta-qt6"],
+            "DISTRO": "webos",
+            "MACHINE": "qemux86-64",
+            "NOLAYERADD": ["meta-clang", "meta-qt6", "meta-webosose", "meta-openembedded"],
+            "extravars" : [
+                "WEBOS_TARGET_DISTRO_VARIANT = 'minimal'",
+                "PACKAGE_CLASSES = 'package_ipk'",
+                "IMAGE_FEATURES:remove = 'webos-extract-ls2-api'",
+                "BBFILE_PRIORITY_openembedded-layer:forcevariable = '10'",
+                "BBFILE_PRIORITY_multimedia-layer:forcevariable = '11'",
+                "BBFILE_PRIORITY_networking-layer:forcevariable = '12'",
+                "BBFILE_PRIORITY_meta-python:forcevariable = '13'",
+                "BBFILE_PRIORITY_filesystems-layer:forcevariable = '14'",
+                "BBFILE_PRIORITY_clang-layer:forcevariable = '15'",
+                "BBFILE_PRIORITY_qt6-layer:forcevariable = '20'"
+            ],
+            "step1": {
+                "shortname": "Fix bblayers.conf",
+                "EXTRACMDS": ["echo 'BBLAYERS = \" \\' >> conf/bblayers.conf; for i in meta-poky meta-yocto-bsp meta-webosose/meta-webos meta-webosose/meta-webos-backports/meta-webos-backports-5.0 meta-webosose/meta-webos-backports/meta-webos-backports-4.3 meta-webosose/meta-webos-backports/meta-webos-backports-4.2 meta-webosose/meta-webos-backports/meta-webos-backports-4.1 meta-qt6 meta-clang meta-openembedded/meta-filesystems meta-openembedded/meta-python meta-openembedded/meta-networking meta-openembedded/meta-multimedia meta-openembedded/meta-oe meta; do echo \" ${HELPERBUILDDIR}/../$i \\ \" >> conf/bblayers.conf; done; echo '\"' >> conf/bblayers.conf"]
+            },
+            "step2" : {
+                "shortname" : "Build webos-image",
+                "BBTARGETS" : "webos-image"
+            }
+        },
         "a-quick" : {
             "TEMPLATE" : "trigger-build"
         },
@@ -1891,6 +1917,12 @@
         "meta-exein" : {
             "url" : "https://github.com/exein-io/meta-exein",
             "branch" : "main",
+            "revision" : "HEAD",
+            "no-layer-add" : true
+        },
+        "meta-webosose" : {
+            "url" : "https://github.com/webosose/meta-webosose.git",
+            "branch" : "master",
             "revision" : "HEAD",
             "no-layer-add" : true
         },
