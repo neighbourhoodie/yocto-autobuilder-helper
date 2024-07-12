@@ -180,6 +180,9 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
 with open(sys.path[0] + "/index-table.html") as file_:
     t = Template(file_.read())
 
+with open(os.path.join(path, "data.json"), 'w') as f:
+    json.dump(entries, f)
+
 with open(os.path.join(path, "index.html"), 'w') as f:
     f.write(t.render(entries = entries, filter_items = filter_items))
 
