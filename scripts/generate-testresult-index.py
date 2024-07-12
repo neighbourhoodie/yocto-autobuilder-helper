@@ -11,6 +11,9 @@ import glob
 import json
 import re
 import subprocess
+import sys
+import fcntl
+import time
 from jinja2 import Template
 
 def parse_args(argv=None):
@@ -30,6 +33,21 @@ filter_items = dict()
 build_types = set()
 branch_list= set()
 
+current_time = time.time()
+
+# number of seconds in 2 days
+days = 2 * 24 * 60 * 60
+
+lockname = path + "/indexing.lock"
+cachefile = path + "/indexing.json"
+try:
+    lockfile = open(lockname, 'a+')
+    fileno = lockfile.fileno()
+    fcntl.flock(fileno, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except OSError as e:
+    print("Couldn't obtain the lock %s: %s" % (lockname, str(e)))
+    sys.exit(1)
+
 def get_build_branch(p):
     for root, dirs, files in os.walk(p):
         for name in files:
@@ -41,9 +59,14 @@ def get_build_branch(p):
                     try:
                         return data[build]['configuration']['LAYERS']['meta']['branch']
                     except KeyError:
-                        continue 
+                        continue
 
     return ""
+
+cache = {}
+if os.path.exists(cachefile):
+    with open(cachefile, "r") as f:
+        cache = json.load(f)
 
 # Pad so 20190601-1 becomes 20190601-000001 and sorts correctly
 def keygen(k):
@@ -59,6 +82,14 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
     if not os.path.exists(buildpath):
         # No test results
         continue
+
+    modified_time = os.stat(buildpath).st_mtime
+
+    # Show cached entries for older directories
+    if build in cache and (modified_time < (current_time - days)):
+        entries.append(cache[build])
+        continue
+
     reldir = "./" + build + "/"
 
     btype = "other"
@@ -123,9 +154,9 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
     filter_items["branch_list"] = branch_list
 
     entry = {
-        'build': build, 
+        'build': build,
         'btype': btype,
-        'reldir': reldir 
+        'reldir': reldir
     }
 
     if testreport:
@@ -144,12 +175,14 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
         entry['regressionreport'] = regressionreport
 
     entries.append(entry)
+    cache[build] = entry
 
-with open("./index-table.html") as file_:
+with open(sys.path[0] + "/index-table.html") as file_:
     t = Template(file_.read())
-
-with open(os.path.join(path, "data.json"), 'w') as f:
-    json.dump(entries, f)
 
 with open(os.path.join(path, "index.html"), 'w') as f:
     f.write(t.render(entries = entries, filter_items = filter_items))
+
+with open(cachefile, "w") as f:
+    json.dump(cache, f)
+
