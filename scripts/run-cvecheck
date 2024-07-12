@@ -90,6 +90,10 @@ if [ -e tmp/log/cve/cve-summary.json ]; then
     git -C $METRICSDIR add cve-check/$BRANCH/$TIMESTAMP.json
     git -C $METRICSDIR commit -asm "Autobuilder adding new CVE data for branch $BRANCH" || true
     if [ "$PUSH" = "1" ]; then
+        if ! git -C $METRICSDIR pull --rebase; then
+            echo "Aborting push, metrics repo has updated and cannot rebase cleanly"
+            exit 1
+        fi
         git -C $METRICSDIR push
     fi
     $OURDIR/cve-report.py tmp/log/cve/cve-summary.json > $RESULTSDIR/cve-status-$BRANCH.txt

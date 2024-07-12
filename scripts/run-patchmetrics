@@ -105,6 +105,10 @@ set +x
 git -C $METRICSDIR commit -asm "Autobuilder adding new patch stats" || true
 
 if [ "$PUSH" = "1" ]; then
+    if ! git -C $METRICSDIR pull --rebase; then
+        echo "Aborting push, metrics repo has updated and cannot rebase cleanly"
+        exit 1
+    fi
     git -C $METRICSDIR push
 fi
 
