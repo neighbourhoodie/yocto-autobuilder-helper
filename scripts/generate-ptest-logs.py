@@ -48,7 +48,7 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
     modified_time = os.stat(buildpath).st_mtime
 
     # Only consider things in the last X days
-    if (modified_time < (current_time - days):
+    if (modified_time < (current_time - days)):
         continue
 
     btype = "other"
