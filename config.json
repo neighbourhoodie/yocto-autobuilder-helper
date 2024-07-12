@@ -1343,6 +1343,12 @@
                 "EXTRACMDS": [ "${SCRIPTSDIR}/run-abint ${HELPERRESULTSDIR}/../../abint/"]
             }
         },
+        "indexing" : {
+            "step1" : {
+                "shortname" : "Extract ptest logs",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/generate-ptest-logs.py /srv/autobuilder/autobuilder.yocto.io/pub/non-release/"]
+            }
+        },
         "meta-mingw" : {
             "NEEDREPOS" : ["poky", "meta-mingw"],
             "MACHINE" : "qemux86-64",

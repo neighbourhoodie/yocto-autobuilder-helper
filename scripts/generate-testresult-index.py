@@ -145,20 +145,6 @@ for build in sorted(os.listdir(path), key=keygen, reverse=True):
 
     entries.append(entry)
 
-    # Also ensure we have saved out log data for ptest runs to aid debugging
-    if "ptest" in btype or btype in ["full", "quick"]:
-        for root, dirs, files in os.walk(buildpath):
-            for name in dirs:
-                if "ptest" in name:
-                    f = os.path.join(root, name)
-                    logs = glob.glob(f + "/*.log")
-                    if logs:
-                        continue
-                    subprocess.check_call(["resulttool", "log", f, "--dump-ptest", f])
-                    # Ensure we don't rerun every time with a dummy log
-                    with open(f + "/resulttool-done.log", "a+") as tf:
-                        tf.write("\n")
-
 with open("./index-table.html") as file_:
     t = Template(file_.read())
 
