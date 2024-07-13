@@ -28,22 +28,22 @@ d="intermittent_failure_host_data"
 step_i=1
 step_f=1
 for f in $HSFILE; do
+    if [ -e $f ]; then
         if [ ! -e $DEST/$target/$d ]; then
             mkdir -p $DEST/$target/$d
         fi
-	if [ -e $f ]; then
-	    cp $f $DEST/$target/$d
+	cp $f $DEST/$target/$d
         if [[ "$f" == *"failure"* ]] ; then
             mv $DEST/$target/$d/`basename $f` $DEST/$target/$d/`basename $f`_${step_f}.txt
             step_f=$((step_f+1))
             continue
         fi
-	    grep -m 1 "^top -" $f
-	    if [ $? -eq 0 ]; then
-		    mv $DEST/$target/$d/`basename $f` $DEST/$target/$d/`basename $f`_${step_i}_top.txt
-	    else
-		    mv $DEST/$target/$d/`basename $f` $DEST/$target/$d/`basename $f`_${step_i}.txt
-	    fi
-	    step_i=$((step_i+1))
-	fi
+        grep -m 1 "^top -" $f
+	if [ $? -eq 0 ]; then
+	    mv $DEST/$target/$d/`basename $f` $DEST/$target/$d/`basename $f`_${step_i}_top.txt
+	else
+	    mv $DEST/$target/$d/`basename $f` $DEST/$target/$d/`basename $f`_${step_i}.txt
+        fi
+        step_i=$((step_i+1))
+    fi
 done
