@@ -84,8 +84,10 @@ def get_git_tags():
             status = "LTS until Apr. 2024"
         if branch == "yocto-4.0":
             status = "LTS until Apr. 2026"
-        if branch == "yocto-4.3":
-            status = "Stable Release"
+        if branch == "yocto-5.0":
+            status = "LTS until Apr. 2028"
+#        if branch == "yocto-5.1":
+#            status = "Stable Release"
 
         # Create a dictionary for the tag
         tag_dict = {
@@ -108,10 +110,10 @@ tags = sorted(get_git_tags(), key=lambda x: x["original_release_date"], reverse=
 
 tags.append(
     {
-        "series_version": "5.0",
+        "series_version": "5.1",
         "original_release_date": "",
         "latest_release_date": "",
-        "release_codename": "Scarthgap",
+        "release_codename": "Styhead",
         "latest_tag": "",
         "status": "Active Development",
         "download": "",
