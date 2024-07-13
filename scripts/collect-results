@@ -25,11 +25,12 @@ fi
 HSFILE=$WORKDIR/tmp/buildstats/*/host_stats*
 d="intermittent_failure_host_data"
 
-mkdir -p $DEST/$target/$d
-
 step_i=1
 step_f=1
 for f in $HSFILE; do
+        if [ ! -e $DEST/$target/$d ]; then
+            mkdir -p $DEST/$target/$d
+        fi
 	if [ -e $f ]; then
 	    cp $f $DEST/$target/$d
         if [[ "$f" == *"failure"* ]] ; then
