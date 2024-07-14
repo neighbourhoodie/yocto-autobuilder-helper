@@ -1345,6 +1345,10 @@
         },
         "indexing" : {
             "step1" : {
+                "shortname" : "Generate non-release index",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/generate-testresult-index.py /srv/autobuilder/autobuilder.yocto.io/pub/non-release/"]
+            },
+            "step2" : {
                 "shortname" : "Extract ptest logs",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/generate-ptest-logs.py /srv/autobuilder/autobuilder.yocto.io/pub/non-release/"]
             }
