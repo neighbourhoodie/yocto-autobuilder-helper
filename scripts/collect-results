@@ -9,8 +9,8 @@ WORKDIR=$1
 DEST=$2
 target=$3
 
-mkdir -p $DEST
-if [ -e $WORKDIR/tmp/log/oeqa/ ]; then
+if [ -e $WORKDIR/tmp/log/oeqa/ ] && [ -n "$(ls -A "$WORKDIR/tmp/log/oeqa/")" ]; then
+    mkdir -p $DEST
     cp -Lrf $WORKDIR/tmp/log/oeqa/ $DEST/$target
 fi
 
