@@ -21,7 +21,6 @@ def main():
     if not os.path.exists(build_bsdir):
         sys.exit(0)
 
-    subprocess.run(["mkdir", "-p", dest_bsdir])
     hostname = socket.gethostname()
     os.chdir(build_bsdir)
     fail_path = os.path.join(dest, target, "intermittent_failure_host_data")
@@ -29,6 +28,7 @@ def main():
 
     #archive the buildstats of failures and 1% of random builds
     if fail_output or random.randint(1,100)%100 == 0:
+        subprocess.run(["mkdir", "-p", dest_bsdir])
         for timestamp in os.listdir(build_bsdir):
             if hostname:
                 output = hostname + "-" + timestamp + ".tar.zst"
