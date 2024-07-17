@@ -14,6 +14,12 @@ if [ -e $WORKDIR/tmp/log/oeqa/ ] && [ -n "$(ls -A "$WORKDIR/tmp/log/oeqa/")" ]; 
     cp -Lrf $WORKDIR/tmp/log/oeqa/ $DEST/$target
 fi
 
+
+if [ -e $WORKDIR/tmp/log/oeqa-artefacts/ ] && [ -n "$(ls -A "$WORKDIR/tmp/log/oeqa-artefacts/")" ]; then
+    mkdir -p $DEST/../artefacts/
+    cp -Lrf $WORKDIR/tmp/log/oeqa-artefacts/ $DEST/../artefacts/$target
+fi
+
 if [ -e $WORKDIR/buildhistory ]; then
     # ab-fetchrev tag set in buildhistory-init
     if [ $(git -C $WORKDIR/buildhistory tag -l "ab-fetchrev") ]; then
