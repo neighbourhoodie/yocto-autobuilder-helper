@@ -7,9 +7,9 @@
 #             $3 as the path to bitbake
 #
 # Environment variables:
-#   - docs_buildtools as the path to buildtools script for the docs.
+#   - buildtools_url as the path to buildtools script for the docs.
 #                     Can be found here: https://autobuilder.yocto.io/pub/buildtools/
-#   - docbookarchive as the path to old (pre 3.1.5 and Sphinx migration) docs tarball
+#   - docbookarchive_url as the path to old (pre 3.1.5 and Sphinx migration) docs tarball
 #                     Can be found here: https://downloads.yoctoproject.org/mirror/docbook-mirror/docbook-archives-20201105.tar.xz
 #   - PUBLISH (0/1) for whether the files should be rsync'ed to docs.yoctoproject.org
 
@@ -21,24 +21,38 @@ set -x
 builddir=$(realpath "$1")
 ypdocs=$(realpath "$2/documentation/")
 bbdocs=$(realpath "$3/doc/")
-docs_buildtools=${docs_buildtools:-/srv/autobuilder/autobuilder.yocto.io/pub/buildtools/x86_64-buildtools-docs-nativesdk-standalone-4.1.2.sh}
 outputdir=$builddir/output
 scriptdir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 PUBLISH=${PUBLISH:-1}
+sharedir=`jq -r '.["BASE_SHAREDDIR"]' < $HOME/config-local.json`
+buildtools_url=${buildtools_url:-https://downloads.yoctoproject.org/releases/yocto/yocto-4.1.2/buildtools/x86_64-buildtools-docs-nativesdk-standalone-4.1.2.sh}
+docbookarchive_url=${docbookarchive_url:-https://downloads.yoctoproject.org/mirror/docbook-mirror/docbook-archives-20201105.tar.xz}
 
+buildtools_name=`basename $buildtools_url`
+buildtools_localpath=${sharedir}/cluster-downloads-cache/${buildtools_name}
+
+if [ ! -e ${buildtools_localpath} ]; then
+    mkdir -p `dirname ${buildtools_localpath}`
+    wget ${buildtools_url} -O ${buildtools_localpath}
+    chmod a+x ${buildtools_localpath}
+fi
 
 cd $builddir
 mkdir buildtools
-$docs_buildtools -y -d $builddir/buildtools
+${buildtools_localpath} -y -d $builddir/buildtools
 . $builddir/buildtools/environment-setup*
 
 # Getting the old docbook built docs from an archive. Not rebuilding them.
-#wget https://downloads.yoctoproject.org/mirror/docbook-mirror/docbook-archives-20201105.tar.xz
-docbookarchive=${docbookarchive:-/srv/autobuilder/autobuilder.yocto.io/pub/docbook-mirror/docbook-archives-20201105.tar.xz}
+docbookarchive_localpath=${sharedir}/cluster-downloads-cache/`basename ${docbookarchive_url}`
+if [ ! -e ${docbookarchive_localpath} ]; then
+    mkdir -p `dirname ${docbookarchive_localpath}`
+    wget ${docbookarchive_url} -O ${docbookarchive_localpath}
+fi
+
 mkdir $outputdir
 cd $outputdir
 echo Extracing old content from archive
-tar --exclude=eclipse -xJf $docbookarchive
+tar --exclude=eclipse -xJf ${docbookarchive_localpath}
 
 $scriptdir/docs_add_banner.py
 
