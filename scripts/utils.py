@@ -465,7 +465,7 @@ def setup_tools_tarball(ourconfig, btdir, bttarball, name="buildtools"):
             bttarball, sha256 = bttarball.split(";")
         btdir = os.path.abspath(btdir)
         if not os.path.exists(btdir):
-            btdlpath = getconfig("BASE_SHAREDDIR", ourconfig) + "/" + name + "/" + os.path.basename(bttarball)
+            btdlpath = getconfig("BASE_SHAREDDIR", ourconfig) + "/cluster-downloads-cache/" + os.path.basename(bttarball)
             print("Extracting %s %s" % (name, bttarball))
             btlock = btdlpath + ".lock"
             if not os.path.exists(os.path.dirname(btdlpath)):
