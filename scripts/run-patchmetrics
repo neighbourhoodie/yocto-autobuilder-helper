@@ -117,7 +117,7 @@ fi
 #
 
 if [ ! -d $RESULTSDIR ]; then
-    mkdir $RESULTSDIR
+    mkdir -p $RESULTSDIR
 fi
 
 $OURDIR/patchmetrics-generate-chartdata --json $METRICSDIR/patch-status.json --outputdir $RESULTSDIR
