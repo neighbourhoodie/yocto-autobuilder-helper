@@ -1579,6 +1579,7 @@
                 "shortname" : "run AUH",
                 "EXTRACMDS" : [
                     "../auto-upgrade-helper/upgrade-helper.py -e all",
+                    "mkdir -p ${WEBPUBLISH_DIR}/pub/auh/",
                     "cp -rf ./upgrade-helper/* ${WEBPUBLISH_DIR}/pub/auh/"
                 ]
             }
