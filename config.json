@@ -1123,6 +1123,29 @@
                 "BBTARGETS" : "buildtools-tarball buildtools-docs-tarball buildtools-make-tarball buildtools-extended-tarball uninative-tarball"
             }
         },
+        "buildtools-docs" : {
+            "MACHINE" : "qemux86-64",
+            "NEEDREPOS" : ["poky", "meta-openembedded"],
+            "ADDLAYER" : [
+                    "${BUILDDIR}/../meta-openembedded/meta-oe",
+                    "${BUILDDIR}/../meta-openembedded/meta-python",
+                    "${BUILDDIR}/../meta-openembedded/meta-networking",
+                    "${BUILDDIR}/../meta-openembedded/meta-filesystems"
+            ],
+            "extravars" : [
+                "PACKAGECONFIG:pn-nativesdk-python3:append = ' pgo'"
+            ],
+            "step1" : {
+                "SDKMACHINE" : "x86_64",
+                "shortname" : "x86_64 tools",
+                "BBTARGETS" : "buildtools-docs-tarball"
+            },
+            "step2" : {
+                "SDKMACHINE" : "aarch64",
+                "shortname" : "aarch64 tools",
+                "BBTARGETS" : "buildtools-docs-tarball"
+            }
+        },
         "build-appliance" : {
             "MACHINE" : "qemux86-64",
             "DLDIR" : "DL_DIR ?= '${TOPDIR}/downloads'",
