@@ -54,8 +54,8 @@ def trash_processor(trashdir):
                 time.sleep(120*60) # 30 minutes
         except Exception as e:
             print("Exception %s in trash cleaner" % str(e))
-            time.sleep(60) # 1 minute timeout to prevent crazy looping
             pass
+        time.sleep(60) # 1 minute timeout to prevent crazy looping (particularly in age is only)
     return
 
 def mirror_processor(mirrordir):
