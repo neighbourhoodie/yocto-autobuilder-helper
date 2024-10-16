@@ -114,20 +114,27 @@ cd $ypdocs
 first_sphinx_commit=01dd5af7954e24552aca022917669b27bb0541ed
 first_dunfell_sphinx_commit=c25fe058b88b893b0d146f3ed27320b47cdec236
 
+ypdocsbranch=$(git symbolic-ref -q --short HEAD || git rev-parse HEAD)
+
 git checkout origin/master set_versions.py
 #latest_tag=$(git tag --contains "$first_sphinx_commit" --contains "$first_dunfell_sphinx_commit" --sort="version:refname" 'yocto-*' | tail -1 | sed 's/yocto-//')
 latest_tag=$(./set_versions.py getlatest)
 git reset --hard
 git clean -ffdx
 
-for branch in dunfell $(git branch --remote --contains "$first_sphinx_commit" --format '%(refname:lstrip=3)') $(git tag --contains "$first_sphinx_commit" --contains "$first_dunfell_sphinx_commit" 'yocto-*') transition; do
+for branch in "$ypdocsbranch" dunfell $(git branch --remote --contains "$first_sphinx_commit" --format '%(refname:lstrip=3)') $(git tag --contains "$first_sphinx_commit" --contains "$first_dunfell_sphinx_commit" 'yocto-*') transition; do
     if [ "$branch" = "HEAD" ]; then
         continue
     fi
 
     # Do not build <release>-next branches as they are development branches only
-    # Do build master-next branch though!
-    if echo "$branch" | grep -v "master-next" | grep -q -E "-next$"; then
+    # Do build master-next branch and request branch though!
+    if echo "$branch" | grep -v "master-next\|$ypdocsbranch" | grep -q -E "-next$"; then
+        continue
+    fi
+    # Do not build contrib/ branches as they are development branches only
+    # Do build request branch though!
+    if echo "$branch" | grep -v "$ypdocsbranch" | grep -q -E "^contrib/"; then
         continue
     fi
 
