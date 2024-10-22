@@ -54,7 +54,7 @@ class Bug:
 
 
 def get_data():
-    url_re = r"(?P<server>https?://autobuilder.yoctoproject.org/typhoon/)#/?builders/(?P<builder>\d+)/builds/(?P<build>\d+)"
+    url_re = r"(?P<server>https?://.+yocto.+/)#/?builders/(?P<builder>\d+)/builds/(?P<build>\d+)"
 
     logging.debug("Searching bugzilla for AB-INT bugs...")
     bz = bugzilla.Bugzilla("https://bugzilla.yoctoproject.org/rest")
