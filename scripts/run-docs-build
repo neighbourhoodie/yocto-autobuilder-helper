@@ -25,22 +25,36 @@ outputdir=$builddir/output
 scriptdir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 PUBLISH=${PUBLISH:-1}
 sharedir=`jq -r '.["BASE_SHAREDDIR"]' < $HOME/config-local.json`
-buildtools_url=${buildtools_url:-https://downloads.yoctoproject.org/releases/yocto/yocto-4.1.2/buildtools/x86_64-buildtools-docs-nativesdk-standalone-4.1.2.sh}
+# Modified 5.1 tools image to include rsvg, switch to next released version
+buildtools_url=${buildtools_url:-https://downloads.yoctoproject.org/releases/yocto/yocto-4.1.2/buildtools/x86_64-buildtools-docs-nativesdk-standalone-5.1-modified.sh}
+buildtools_url_old=${buildtools_url_old:-https://downloads.yoctoproject.org/releases/yocto/yocto-4.1.2/buildtools/x86_64-buildtools-docs-nativesdk-standalone-4.1.2.sh}
 docbookarchive_url=${docbookarchive_url:-https://downloads.yoctoproject.org/mirror/docbook-mirror/docbook-archives-20201105.tar.xz}
+
 
 buildtools_name=`basename $buildtools_url`
 buildtools_localpath=${sharedir}/cluster-downloads-cache/${buildtools_name}
-
 if [ ! -e ${buildtools_localpath} ]; then
     mkdir -p `dirname ${buildtools_localpath}`
     wget ${buildtools_url} -O ${buildtools_localpath}
     chmod a+x ${buildtools_localpath}
 fi
-
 cd $builddir
 mkdir buildtools
 ${buildtools_localpath} -y -d $builddir/buildtools
-. $builddir/buildtools/environment-setup*
+
+
+buildtools_name_old=`basename $buildtools_url_old`
+buildtools_localpath_old=${sharedir}/cluster-downloads-cache/${buildtools_name_old}
+if [ ! -e ${buildtools_localpath_old} ]; then
+    mkdir -p `dirname ${buildtools_localpath_old}`
+    wget ${buildtools_url_old} -O ${buildtools_localpath_old}
+    chmod a+x ${buildtools_localpath_old}
+fi
+
+cd $builddir
+mkdir buildtools-old
+${buildtools_localpath_old} -y -d $builddir/buildtools-old
+
 
 # To build the latexpdf output we need Xetex (which can handle international characters)
 # Rather than require it on all autobuilder workers, along with dependencies, we install
@@ -99,8 +113,12 @@ for branch in 1.46 $(git branch --remote --contains "$first_sphinx_commit" --for
     git reset --hard
     git clean -ffdx
     git checkout origin/master releases.rst
-    make clean
-    SPHINXOPTS="-j auto" make publish
+
+    (
+        . $builddir/buildtools/environment-setup*
+        make clean
+        SPHINXOPTS="-j auto" make publish
+    )
 
     if [ "$branch" = "master-next" ]; then
         branch="next"
@@ -182,8 +200,16 @@ for branch in "$ypdocsbranch" dunfell $(git branch --remote --contains "$first_s
         esac
     fi
 
-    make clean
-    SPHINXOPTS="-j auto" make publish
+    (
+        # Anything older than scarthgap needs the older buildtools
+        if git merge-base --is-ancestor 0cdc0afd3332459d30cfc8f4c2e62bdcc23f5ed5 HEAD; then
+            . $builddir/buildtools/environment-setup*
+        else
+            . $builddir/buildtools-old/environment-setup*
+        fi
+        make clean
+        SPHINXOPTS="-j auto" make publish
+    )
 
     # Strip yocto- from tag names
     branch=$(echo "$branch" | sed 's/yocto-//')
