@@ -42,6 +42,26 @@ mkdir buildtools
 ${buildtools_localpath} -y -d $builddir/buildtools
 . $builddir/buildtools/environment-setup*
 
+# To build the latexpdf output we need Xetex (which can handle international characters)
+# Rather than require it on all autobuilder workers, along with dependencies, we install
+# a copy onto NFS which the workers can use. The full install is 6GB so just install
+# the pieces we've found we need via tlmgr on top of a small install. This script 
+# creates the install if it isn't present.
+# For local docs builds, we assume the user has the tools available.
+if [ -e /srv/autobuilder/valkyrie.yocto.io/ ]; then
+    textooldir=/srv/autobuilder/valkyrie.yocto.io/docs-build-tex-tools
+    if [ ! -e ${textooldir} ]; then
+        mkdir -p /tmp/textemp
+        pushd /tmp/textemp
+        wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+        zcat < install-tl-unx.tar.gz | tar xf -
+        cd install-tl-*/
+        ./install-tl --scheme=small --texdir=${textooldir} --no-interaction
+        PATH=$PATH:${textooldir}/bin/x86_64-linux tlmgr install titlesec varwidth tabulary needspace upquote framed capt-of wrapfig fncychap gnu-freefont ctex
+        popd
+    PATH=$PATH:${textooldir}/bin/x86_64-linux
+fi
+
 # Getting the old docbook built docs from an archive. Not rebuilding them.
 docbookarchive_localpath=${sharedir}/cluster-downloads-cache/`basename ${docbookarchive_url}`
 if [ ! -e ${docbookarchive_localpath} ]; then
