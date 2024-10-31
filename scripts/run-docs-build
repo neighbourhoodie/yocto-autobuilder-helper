@@ -57,7 +57,7 @@ if [ -e /srv/autobuilder/valkyrie.yocto.io/ ]; then
         zcat < install-tl-unx.tar.gz | tar xf -
         cd install-tl-*/
         ./install-tl --scheme=small --texdir=${textooldir} --no-interaction
-        PATH=$PATH:${textooldir}/bin/x86_64-linux tlmgr install titlesec varwidth tabulary needspace upquote framed capt-of wrapfig fncychap gnu-freefont ctex
+        PATH=$PATH:${textooldir}/bin/x86_64-linux tlmgr install titlesec varwidth tabulary needspace upquote framed capt-of wrapfig fncychap gnu-freefont ctex latexmk
         popd
     fi
     PATH=$PATH:${textooldir}/bin/x86_64-linux
