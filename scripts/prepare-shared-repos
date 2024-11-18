@@ -16,6 +16,7 @@ import tempfile
 
 import utils
 
+poky_tag_remote = "git@push.yoctoproject.org:poky-ci-archive"
 
 parser = utils.ArgParser(description='Iterates over a set of repositories in a json file and sets up a shared directory containing them.')
 
@@ -26,6 +27,9 @@ parser.add_argument('sharedsrcdir',
 parser.add_argument('-p', '--publish-dir',
                     action='store',
                     help="Where to publish artefacts to (optional)")
+parser.add_argument('-t', '--tag',
+                    action='store',
+                    help="Git tag to create (optional)")
 
 args = parser.parse_args()
 
@@ -49,6 +53,8 @@ with tempfile.TemporaryDirectory(prefix="shared-repo-temp-", dir="/home/pokybuil
             utils.fetchgitrepo(tempdir, repo, repos[repo], stashdir, depth=1)
         if args.publish_dir:
             utils.publishrepo(tempdir, repo, args.publish_dir)
+        if repo == "poky" and args.tag:
+            utils.taggitrepo(tempdir, repo, repos[repo], poky_tag_remote, args.tag)
 
     utils.printheader("Creating shared src tarball")
     subprocess.check_call("tar -I zstd -cf " + args.sharedsrcdir.rstrip("/") + ".tar.zst ./*", shell=True, cwd=tempdir)
