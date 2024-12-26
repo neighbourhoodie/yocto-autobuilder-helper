@@ -80,8 +80,6 @@ def get_git_tags():
             download = ""
             release_notes = ""
         status = "EOL"
-        if branch == "yocto-3.1":
-            status = "LTS until Apr. 2024"
         if branch == "yocto-4.0":
             status = "LTS until Apr. 2026"
         if branch == "yocto-5.0":
