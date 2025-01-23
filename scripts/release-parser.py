@@ -120,14 +120,9 @@ tags.append(
 
 tags.reverse()
 
-previous_release_series = 3
 for tag in tags:
     if tag["status"] == "EOL":
-        if previous_release_series > 0:
-            tag["series"] = "previous"
-            previous_release_series -= 1
-        else:
-            tag["series"] = "full"
+        tag["series"] = "previous"
     else:
         tag["series"] = "current"
 
