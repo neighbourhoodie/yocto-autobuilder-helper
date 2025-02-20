@@ -71,11 +71,17 @@ if [ -e /srv/autobuilder/valkyrie.yocto.io/ ]; then
         zcat < install-tl-unx.tar.gz | tar xf -
         cd install-tl-*/
         ./install-tl --scheme=small --texdir=${textooldir} --no-interaction
-        PATH=$PATH:${textooldir}/bin/x86_64-linux tlmgr install titlesec varwidth tabulary needspace upquote framed capt-of wrapfig fncychap gnu-freefont ctex latexmk
+        PATH=$PATH:${textooldir}/bin/x86_64-linux tlmgr install titlesec varwidth tabulary needspace upquote framed capt-of wrapfig fncychap gnu-freefont ctex latexmk nimbus15
         popd
     fi
     PATH=$PATH:${textooldir}/bin/x86_64-linux
 fi
+
+# Provide our own fonts.conf path to make fonts installed with tlmgr available
+# system-wide. It will pick up the fonts.conf file in this directory.
+# This is then used by rsvg-convert to pick up the Nimbus font when converting
+# files.
+export FONTCONFIG_PATH="$scriptdir/docsfontconfig"
 
 # Getting the old docbook built docs from an archive. Not rebuilding them.
 docbookarchive_localpath=${sharedir}/cluster-downloads-cache/`basename ${docbookarchive_url}`
