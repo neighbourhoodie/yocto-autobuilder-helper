@@ -1319,6 +1319,7 @@
                 "CVE_CHECK_SHOW_WARNINGS = '0'",
                 "CVE_DB_UPDATE_INTERVAL = '21600'",
                 "CVE_DB_INCR_UPDATE_AGE_THRES = '21600'",
+                "LICENSE_FLAGS_ACCEPTED = 'commercial'",
                 "BB_SERVER_TIMEOUT = '0'"
             ],
             "step1" : {
