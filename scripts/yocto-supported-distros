@@ -1,0 +1,299 @@
+#!/usr/bin/env python3
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Read config.py from yocto-autobuilder2 and print the list of supported releases
+# for each release.
+#
+# Usage:
+#
+#   ./tools/supported-distros --config /path/to/config.py --releases release1 [release2 ...]
+#
+# Example:
+#
+#   ./tools/supported-distros --config yocto-autobuilder2/config.py --releases master styhead scarthgap kirkstone
+#
+# If run with --compare the script with try to run `bitbake-getvar` to obtain the
+# value of SANITY_TESTED_DISTROS, and compare that (with some mangling) to the
+# configured workers and return 1 in case of difference. Only one release must be
+# passed in this mode.
+#
+# Usage:
+#
+#    ./tools/supported-distros --config /path/to/config.py --releases master --compare
+#
+# The opts --release-from-env and --config-from-web can also be used to get
+# these info using respectively the METADATA_BRANCH variable and the config.py
+# from the git web interface.
+#
+# Example:
+#
+#    ./tools/supported-distros --config-from-web --release-from-env --compare
+#
+# Will get the current branch from METADATA_BRANCH, fetch config.py from
+# git.yoctoproject.org/yocto-autobuilder2, compare and output the differences.
+#
+# The script will return 1 in case of difference, 0 if the distros match.
+# With one exception: if the branch returned by --release-from-env is not
+# present in the autobuilder config, just return 0, because this might by run
+# from a custom branch.
+
+import argparse
+import os
+import re
+import requests
+import sys
+import subprocess
+import tempfile
+
+from pathlib import Path
+from typing import List, Dict, Set
+
+
+CONFIG_REMOTE_URL = "https://git.yoctoproject.org/yocto-autobuilder2/plain/config.py"
+
+
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Print supported distributions")
+
+    parser.add_argument("--releases",
+                        type=str,
+                        nargs='+',
+                        default=[],
+                        help="Yocto releases")
+
+    parser.add_argument("--config",
+                        type=Path,
+                        default=None,
+                        help="Autobuilder config.py input file")
+
+    parser.add_argument("--release-from-env",
+                        action="store_true",
+                        help="Get release from METADATA_BRANCH bitbake var")
+
+    parser.add_argument("--compare",
+                        action="store_true",
+                        help="Compare to poky.conf releases")
+
+    parser.add_argument("--config-from-web",
+                        action="store_true",
+                        help="Get config.py from yoctoproject's git web interface")
+
+    return parser.parse_args()
+
+
+def _possible_workers(all_workers: List[str],
+                      match_workers: List[str]) -> List[str]:
+    """
+    Return workers in match_workers that match the workers in all_workers.
+    A match is a worker in all_workers that starts with a worker in
+    match_workers.
+    This is because workers_prev_releases is defined like so in config.py.
+    """
+
+    possible_workers = []
+    for distro_name in all_workers:
+        for worker in match_workers:
+            if worker.startswith(distro_name):
+                possible_workers.append(worker)
+    return possible_workers
+
+
+def _print_worker_list(worker_list: List, indent=2):
+    """
+    Helper to print a set nicely.
+    """
+    for w in worker_list:
+        print(" " * indent + w)
+
+
+def _print_workers(possible_workers: Dict[str, List]):
+    """
+    Helper to print the workers nicely.
+    """
+    for release in possible_workers:
+        print(f"{release}:\n")
+        _print_worker_list(sorted(possible_workers[release]))
+        print("")
+
+
+def _get_poky_distros() -> Set[str]:
+    poky_distros = set()
+
+    tested_distros = subprocess.check_output(
+        ["bitbake-getvar", "--value", "SANITY_TESTED_DISTROS"],
+        encoding="utf-8")
+    tested_distros = tested_distros.replace("\\n", "")
+
+    for distro in tested_distros.split():
+        if "poky" in distro:
+            continue
+
+        if "almalinux" in distro:
+            # remove the minor version string
+            r = re.compile(r"^(almalinux-\d+)\.\d+")
+            m = re.match(r, distro)
+            if m:
+                distro = m.group(1)
+
+        poky_distros.add(distro.strip())
+
+    return poky_distros
+
+
+def _get_metadata_branch() -> str:
+    branch = subprocess.check_output(
+        ["bitbake-getvar", "--value", "METADATA_BRANCH"],
+        encoding="utf-8")
+    return branch.strip()
+
+
+def _mangle_worker(worker: str) -> str:
+    """
+    Mangle the worker name to convert it to an lsb_release type of string.
+    """
+
+    r = re.compile(r"^alma(\d+)")
+    m = re.match(r, worker)
+    if m:
+        return f"almalinux-{m.group(1)}"
+
+    r = re.compile(r"^debian(\d+)")
+    m = re.match(r, worker)
+    if m:
+        return f"debian-{m.group(1)}"
+
+    r = re.compile(r"^fedora(\d+)")
+    m = re.match(r, worker)
+    if m:
+        return f"fedora-{m.group(1)}"
+
+    r = re.compile(r"^opensuse(\d{2})(\d{1})")
+    m = re.match(r, worker)
+    if m:
+        return f"opensuseleap-{m.group(1)}.{m.group(2)}"
+
+    r = re.compile(r"^rocky(\d+)")
+    m = re.match(r, worker)
+    if m:
+        return f"rocky-{m.group(1)}"
+
+    r = re.compile(r"^stream(\d+)")
+    m = re.match(r, worker)
+    if m:
+        return f"centosstream-{m.group(1)}"
+
+    r = re.compile(r"^ubuntu(\d{2})(\d{2})")
+    m = re.match(r, worker)
+    if m:
+        return f"ubuntu-{m.group(1)}.{m.group(2)}"
+
+    return ""
+
+
+def _compare(ab_workers: set, poky_workers: set):
+    ok = True
+
+    print("Configured on the autobuilder:")
+    _print_worker_list(sorted(list(ab_workers)))
+    print()
+
+    print("Listed in poky.conf:")
+    _print_worker_list(sorted(list(poky_workers)))
+    print()
+
+    poky_missing = ab_workers.difference(sorted(list(poky_workers)))
+    if poky_missing:
+        print("Missing in poky.conf but configured on the autobuilder:")
+        _print_worker_list(poky_missing)
+        print()
+        ok = False
+
+    ab_missing = poky_workers.difference(sorted(list(ab_workers)))
+    if ab_missing:
+        print("Missing on the autobuilder but listed in poky.conf:")
+        _print_worker_list(sorted(list(ab_missing)))
+        print()
+        ok = False
+
+    return ok
+
+
+def main():
+
+    args = parse_arguments()
+
+    if not args.config and not args.config_from_web:
+        print("Must provide path to config or --config-from-web")
+        exit(1)
+
+    if args.config_from_web:
+        r = requests.get(CONFIG_REMOTE_URL)
+        with tempfile.TemporaryDirectory() as tempdir:
+            with open(Path(tempdir) / "config.py", "wb") as conf:
+                conf.write(r.content)
+            sys.path.append(tempdir)
+            import config
+    else:
+        sys.path.append(os.path.dirname(args.config))
+        import config
+
+    releases = None
+    if args.release_from_env:
+        releases = [_get_metadata_branch()]
+    else:
+        releases = args.releases
+
+    if not releases:
+        print("Must provide one or more release, or --release-from-env")
+        exit(1)
+
+    possible_workers = {}
+
+    for release in releases:
+
+        if release != "master" and release not in config.workers_prev_releases:
+            print(f"Release {release} does not exist")
+            if args.release_from_env:
+                # Might be a custom branch or something else... safely exiting
+                exit(0)
+            else:
+                exit(1)
+
+        if release == "master":
+            possible_workers.update({release: config.all_workers})
+            continue
+
+        if release not in config.workers_prev_releases:
+            print(f"Release {release} does not exist, available releases: "
+                  f"{config.workers_prev_releases.keys()}")
+            exit(1)
+
+        possible_workers.update(
+            {release: _possible_workers(config.workers_prev_releases[release],
+                                        config.all_workers)})
+
+    if args.compare:
+        assert len(releases) == 1, "Only one release should be passed for this mode"
+        release = releases[0]
+        print(f"Comparing for release {release}...\n")
+
+        poky_workers = _get_poky_distros()
+        ab_workers = set()
+        for w in possible_workers[release]:
+            mangled_w = _mangle_worker(w)
+            if mangled_w:
+                ab_workers.add(mangled_w)
+
+        if not _compare(ab_workers, poky_workers):
+            print("Errors were found")
+            exit(1)
+        else:
+            print("All good!")
+
+    else:
+        _print_workers(possible_workers)
+
+
+if __name__ == "__main__":
+    main()
