@@ -7,5 +7,9 @@
 builddir=$(realpath "$1")
 scriptdir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
+cd $builddir
+$scriptdir/release-parser.py 
+
+rsync -irlp --checksum --ignore-times releases.json docs@docs.yoctoproject.org:dashboard/
 rsync -irlp --checksum --ignore-times $scriptdir/dashboard/index.html docs@docs.yoctoproject.org:dashboard/
 
