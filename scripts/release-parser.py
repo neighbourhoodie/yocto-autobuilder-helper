@@ -10,11 +10,11 @@ from collections import defaultdict
 import datetime
 import semver
 
-GIT_REPO = "~/git/poky"
+GIT_REPO = "~/git/mirror/poky"
 
+repo = Repo(GIT_REPO)
 
 def get_git_tags():
-    repo = Repo(GIT_REPO)
     tagmap = {}
     for t in repo.tags:
         tagmap.setdefault(repo.commit(t), []).append(t)
@@ -53,6 +53,7 @@ def get_git_tags():
                 return semver.VersionInfo.parse(tag + ".0")
 
         tag_names = [parse(re.sub(r"yocto-", "", e.name)) for e in tags]
+        tag_strings = [re.sub(r"yocto-", "", e.name) for e in tags]
 
         if len(tag_names) == 1:
             latest_tag = repo.tags[
@@ -87,13 +88,14 @@ def get_git_tags():
         if branch == "yocto-5.1":
             status = "Stable Release"
 
-        # Create a dictionary for the tag
+        # Create a dictionary for the series entry
         tag_dict = {
             "series_version": re.sub(r"[^\d\.]", "", tags[0].name),
             "original_release_date": tags[0].commit.committed_datetime.isoformat(),
             "latest_release_date": latest_tag.commit.committed_datetime.isoformat(),
             "release_codename": convert_name(tags[0]),
             "latest_tag": str(max(tag_names)),
+            "releases": tag_strings,
             "status": status,
             "download": download,
             "release_notes": release_notes,
@@ -113,6 +115,7 @@ tags.append(
         "latest_release_date": "",
         "release_codename": "Walnascar",
         "latest_tag": "",
+        "releases" : list(e.name for e in filter(lambda e: e.name.startswith("5.2"), repo.tags)),
         "status": "Active Development",
         "download": "",
     }
