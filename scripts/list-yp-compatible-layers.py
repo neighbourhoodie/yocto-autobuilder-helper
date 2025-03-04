@@ -39,7 +39,7 @@ def main():
 
     parser.add_argument("-b", "--branches",
             help = "Branches to find a matching build for in Auto Builder builds query",
-            action="store", dest="query_branches", default="dunfell,kirkstone,mickledore,nanbield,master")
+            action="store", dest="query_branches", default="kirkstone,scarthgap,styhead,master")
     parser.add_argument("-j", "--jobs",
             help = "Jobs ('Builders') to query on the Auto Builder that perform the actual compatibility checks",
             action="store", dest="query_jobs", default="check-layer,check-layer-nightly")
