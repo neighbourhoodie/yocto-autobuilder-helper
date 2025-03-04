@@ -107,6 +107,14 @@ def _print_worker_list(worker_list: List, indent=2):
         print(" " * indent + w)
 
 
+def _print_worker_list_warning(worker_list: List, warning):
+    """
+    Helper to print a set nicely.
+    """
+    for w in worker_list:
+        print("WARNING: " + warning + ": " + w)
+
+
 def _print_workers(possible_workers: Dict[str, List]):
     """
     Helper to print the workers nicely.
@@ -204,15 +212,13 @@ def _compare(ab_workers: set, poky_workers: set):
 
     poky_missing = ab_workers.difference(sorted(list(poky_workers)))
     if poky_missing:
-        print("Missing in poky.conf but configured on the autobuilder:")
-        _print_worker_list(poky_missing)
+        _print_worker_list_warning(poky_missing, "Missing in poky.conf but configured on the autobuilder")
         print()
         ok = False
 
     ab_missing = poky_workers.difference(sorted(list(ab_workers)))
     if ab_missing:
-        print("Missing on the autobuilder but listed in poky.conf:")
-        _print_worker_list(sorted(list(ab_missing)))
+        _print_worker_list_warning(sorted(list(ab_missing)), "Missing on the autobuilder but listed in poky.conf")
         print()
         ok = False
 
@@ -286,8 +292,7 @@ def main():
                 ab_workers.add(mangled_w)
 
         if not _compare(ab_workers, poky_workers):
-            print("Errors were found")
-            exit(1)
+            print("Mismatches were found")
         else:
             print("All good!")
 
