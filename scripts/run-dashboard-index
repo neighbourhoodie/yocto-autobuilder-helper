@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Called with $1 as the build directory
+
+builddir=$(realpath "$1")
+scriptdir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+rsync -irlp --checksum --ignore-times $scriptdir/dashboard/index.html docs@docs.yoctoproject.org:dashboard/
+

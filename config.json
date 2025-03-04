@@ -1373,6 +1373,10 @@
             "step2" : {
                 "shortname" : "Extract ptest logs",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/generate-ptest-logs.py ${BASE_SHAREDDIR}/pub/non-release/"]
+            },
+            "step3" : {
+                "shortname" : "Populate/update dashboard site",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-dashboard-index ${BUILDDIR}/../"]
             }
         },
         "meta-mingw" : {
