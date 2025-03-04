@@ -519,6 +519,10 @@
                 "shortname" : "Source Mirror Selftest",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest -a -t yocto-mirrors -j 15"],
                 "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+            },
+            "step2" : {
+                "shortname" : "Compare AB workers and SANITY_TESTED_DISTROS",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/yocto-supported-distros --config-from-web --release-from-env --compare"]
             }
         }
 
