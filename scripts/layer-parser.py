@@ -2,43 +2,31 @@
 
 import os
 import time
-import requests
 import json
+import urllib.request
 
 LAYER_API_URL = "https://layers.openembedded.org/layerindex/api/layers/?filter=yp_compatible_version__isnull:false&format=json"
 LAYERDATA = "layerdata.json"
-RELEASE_URL = "https://docs.yoctoproject.org/releases.json"
-RELEASEDATA = "releasedata.json"
+# RELEASE_URL = "https://docs.yoctoproject.org/releases.json"
+RELEASEDATA = "releases.json"
 
+with open(RELEASEDATA, "r") as file:
+    releases = json.load(file)
 
-def fetch_data(url, file_path, cache):
-    if os.path.isfile(file_path):
-        modification_time = os.path.getmtime(file_path)
-        time_difference = time.time() - modification_time
-    else:
-        time_difference = 1000000
+with urllib.request.urlopen(LAYER_API_URL) as response:
+    if response.getcode() == 200:
+        data = response.read().decode("utf-8")
+        layers = json.loads(data)
 
-    # Re-download if the time difference is greater than cache value
-    if time_difference > cache:
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(file_path, "w") as file:
-                file.write(response.text)
-            return json.loads(response.text)
-    else:
-        with open(file_path, "r") as file:
-            return json.load(file)
-
-
-layers = fetch_data(LAYER_API_URL, LAYERDATA, 600)
-releases = fetch_data(RELEASE_URL, RELEASEDATA, 600)
 
 # grab the recent release branches and add master, so we can ignore old branches
 active_releases = [
-    e["release_codename"].lower() for e in releases if e["series"] != "full"
+    e["release_codename"].lower() for e in releases if e["series"] == "current"
 ]
 active_releases.append("master")
 active_releases.append("main")
+
+print(active_releases)
 
 header = dict()
 header["layer"] = "Layer"
@@ -85,7 +73,7 @@ for layer in parsed_layers:
         parsed_layers[layer]["maintainers"] = "{} and {}".format(
             ", ".join(maintainers[:-1]), maintainers[-1]
         )
-sorted_parsed_layers = {"header": header} 
+sorted_parsed_layers = {"header": header}
 for layername in sorted(parsed_layers.keys()):
     sorted_parsed_layers[layername] = parsed_layers[layername]
 with open("parsed-layers.json", "w") as file:
