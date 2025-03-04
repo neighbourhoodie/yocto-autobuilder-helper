@@ -32,9 +32,7 @@ def get_git_tags():
     tag_list = []
     branches = sorted(set([tag.name[:9] for tag in tags]))
     # Remove bad tags
-    branches.remove("yocto-1.9")
-    branches.remove("yocto_1.5")
-    branches.remove("yocto-1.4")
+    branches.remove("yocto-1.9") # To deal with milestone 1 before 1.9 was renamed 2.0.
 
     odd_commit_strings = ["rc", "final", "docs"]
     for branch in branches:
