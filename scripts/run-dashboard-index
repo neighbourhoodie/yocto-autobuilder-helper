@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Called with $1 as the build directory
+# Called with $1 as the build directory.
+# Set DEST in the environment to override the destination for testing purposes.
 
 set -e
 set -u
@@ -12,10 +13,12 @@ set -x
 builddir=$(realpath "$1")
 scriptdir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
+dest=${DEST:-docs@docs.yoctoproject.org:dashboard/}
+
 cd $builddir
 $scriptdir/release-parser.py 
 $scriptdir/layer-parser.py
 
-rsync -irlp --checksum --ignore-times releases.json docs@docs.yoctoproject.org:dashboard/
-rsync -irlp --checksum --ignore-times parsed-layers.json docs@docs.yoctoproject.org:dashboard/
-rsync -irlp --checksum --ignore-times $scriptdir/dashboard/ docs@docs.yoctoproject.org:dashboard/
+rsync -irlp --checksum --ignore-times releases.json ${dest}
+rsync -irlp --checksum --ignore-times parsed-layers.json ${dest}
+rsync -irlp --checksum --ignore-times $scriptdir/dashboard/ ${dest}
