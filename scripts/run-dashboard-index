@@ -21,4 +21,4 @@ $scriptdir/layer-parser.py
 
 rsync -irlp --checksum --ignore-times releases.json ${dest}
 rsync -irlp --checksum --ignore-times parsed-layers.json ${dest}
-rsync -irlp --checksum --ignore-times $scriptdir/dashboard/ ${dest}
+rsync -irlp --checksum --ignore-times $scriptdir/dashboard/* ${dest}
