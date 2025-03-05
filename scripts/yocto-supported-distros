@@ -199,7 +199,7 @@ def _mangle_worker(worker: str) -> str:
     return ""
 
 
-def _compare(ab_workers: set, poky_workers: set):
+def _compare(ab_workers: set, poky_workers: set, stable_release: bool):
     ok = True
 
     print("Configured on the autobuilder:")
@@ -218,9 +218,13 @@ def _compare(ab_workers: set, poky_workers: set):
 
     ab_missing = poky_workers.difference(sorted(list(ab_workers)))
     if ab_missing:
-        _print_worker_list_warning(sorted(list(ab_missing)), "Missing on the autobuilder but listed in poky.conf")
+        if stable_release:
+            print("Missing entries on the autobuilder while listed in poky.conf, "
+                  "but comparing for a stable release so ignoring")
+        else:
+            _print_worker_list_warning(sorted(list(ab_missing)), "Missing on the autobuilder but listed in poky.conf")
+            ok = False
         print()
-        ok = False
 
     return ok
 
@@ -256,6 +260,8 @@ def main():
 
     possible_workers = {}
 
+    stable_release = True
+
     for release in releases:
 
         if release != "master" and release not in config.workers_prev_releases:
@@ -267,6 +273,7 @@ def main():
                 exit(1)
 
         if release == "master":
+            stable_release = False
             possible_workers.update({release: config.all_workers})
             continue
 
@@ -291,7 +298,7 @@ def main():
             if mangled_w:
                 ab_workers.add(mangled_w)
 
-        if not _compare(ab_workers, poky_workers):
+        if not _compare(ab_workers, poky_workers, stable_release):
             print("Mismatches were found")
         else:
             print("All good!")
