@@ -88,18 +88,11 @@ testmode = args.test
 
 # toolchain tests are run in system mode for x86, user mode for the other 
 # arches due to speed
-# toolchain tests only run on full builds
-arch = args.target
-arch = arch.replace("-tc", "")
-if arch in ["qemuriscv32", "qemuriscv64", "qemuppc64"]:
-    args.build_type = "full"
-if args.build_type == "quick":
-    ourconfig["HELPERSTMACHTARGS"] = "-a -t machine"
-elif args.build_type == "full":
-    if arch == "qemux86" or arch == "qemux86-64":
-        ourconfig["HELPERSTMACHTARGS"] = "-a -t machine -t toolchain-system"
-    else:
-        ourconfig["HELPERSTMACHTARGS"] = "-a -t machine -t toolchain-user"
+arch = args.target.replace("-tc", "")
+if arch == "qemux86" or arch == "qemux86-64":
+    ourconfig["HELPERSTMACHTARGS"] = "-a -t machine -t toolchain-system"
+else:
+    ourconfig["HELPERSTMACHTARGS"] = "-a -t machine -t toolchain-user"
 
 # Find out the number of steps this target has
 maxsteps = 0
