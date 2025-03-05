@@ -129,7 +129,7 @@ def _get_poky_distros() -> Set[str]:
     poky_distros = set()
 
     tested_distros = subprocess.check_output(
-        ["bitbake-getvar", "--value", "SANITY_TESTED_DISTROS"],
+        ["bitbake-getvar", "--quiet", "--value", "SANITY_TESTED_DISTROS"],
         encoding="utf-8")
     tested_distros = tested_distros.replace("\\n", "")
 
@@ -151,7 +151,7 @@ def _get_poky_distros() -> Set[str]:
 
 def _get_metadata_branch() -> str:
     branch = subprocess.check_output(
-        ["bitbake-getvar", "--value", "METADATA_BRANCH"],
+        ["bitbake-getvar", "--quiet", "--value", "METADATA_BRANCH"],
         encoding="utf-8")
     return branch.strip()
 
