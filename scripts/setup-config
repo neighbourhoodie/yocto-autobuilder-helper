@@ -96,6 +96,13 @@ extravars = utils.getconfiglistfilter("extravars", ourconfig, args.target, stepn
 if extravars:
     variables.extend(extravars)
 
+removevars = utils.getconfiglistfilter("removevars", ourconfig, args.target, stepnum)
+if removevars:
+    for var in variables[:]:
+        for remove in removevars:
+            if remove in var:
+                variables.remove(var)
+
 bh_path, remoterepo, remotebranch, baseremotebranch = utils.getbuildhistoryconfig(ourconfig, args.builddir, args.target, args.reponame, args.branchname, stepnum)
 if bh_path:
     variables.append('INHERIT += "buildhistory"')
