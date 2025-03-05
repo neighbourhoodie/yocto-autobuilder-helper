@@ -136,7 +136,9 @@ def addstepentry(name, taskdesc, shortname, description, detail, phase, usepty=F
         bbdesc = bbdesc + ": " + detail
     jsonconfig.append({"name" : name, "bbname" : bbname[:46], "phase" : phase, "description" : bbdesc, "usepty" : usepty})
 
-if jcfg:
+if args.target == "indexing":
+    pass
+elif jcfg:
     buildtools = utils.setup_buildtools_tarball(ourconfig, args.workername, None, checkonly=True)
     if buildtools:
         addentry("buildtools", "Setup buildtools tarball", "init")
