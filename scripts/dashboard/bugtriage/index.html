@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bug Triage</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    .pin-top {
+      position: relative;
+    }
+
+    .pin-bottom {
+      position: relative;
+    }
+
+    .pinned {
+      position: fixed !important;
+    }
+
+    .table-of-contents a.active {
+      border-left-color: #03a9f4;
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="nav-wrapper light-blue" id="nav">
+      <span class="brand-logo">&nbsp;Yocto Project Bug Triage</span>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <li><a href="https://bugzilla.yoctoproject.org/">Bugzilla</a></li>
+        <li><a href="https://autobuilder.yoctoproject.org/">Autobuilder</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="row">
+    <div class="col s12 m9 l10">
+      <p>
+        The outcome of the bug triage meeting should be that all bugs have an
+        owner, a target milestone, and a priority.
+      </p>
+      <p>
+        The meeting is held every Thursday at 07:30 Pacific Time (typically
+        15:30 GMT or 16:30 CET, but be aware of daylight saving shifts). The
+        meeting is held on <a href="https://zoom.us/">Zoom</a>, join with either the <a
+        href="https://zoom.us/j/454367603?pwd=ZGxoa2ZXL3FkM3Y0bFd5aVpHVVZ6dz09">direct
+        link</a> or use the Meeting ID <strong>454-367-603</strong> and password
+        <strong>277925</strong>.
+      </p>
+      <p>
+        The call facilitator is Stephen Jolley &lt;<a
+        href="mailto:sjolley.yp.pm@gmail.com">sjolley.yp.pm@gmail.com</a>&gt;. The
+        facilitator's job is to ensure the agenda is kept to, without ratholing
+        on any particular bug, and keeping to the time slot.
+      </p>
+
+      <div class="section scrollspy" id="security-container">
+        <h4>Security-related</h4>
+        <p>
+          <a href="https://bugzilla.yoctoproject.org/buglist.cgi?list_id=604307&resolution=---&query_format=advanced&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ACCEPTED&bug_status=IN%20PROGRESS%20DESIGN&bug_status=IN%20PROGRESS%20DESIGN%20COMPLETE&bug_status=IN%20PROGRESS%20IMPLEMENTATION&bug_status=IN%20PROGRESS%20REVIEW&bug_status=REOPENED&bug_status=NEEDINFO&product=Security&product=Security%20-%20Recipe%20Upgrade" target="_blank">View security-related bugs in Bugzilla</a>.
+        </p>
+        <p>
+          Security issues a need to be viewed directly in Bugzilla as they are
+          only visible to users with sufficient permissions.
+        </p>
+      </div>
+
+      <div class="section scrollspy" id="unprioritised-container">
+        <h4>Unprioritised <a class="waves-effect btn-flat" onclick="reloadTable('#unprioritised');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          Bugs without a priority, that need a priority, target milestone, and owner assigned.
+        </p>
+        <div id="unprioritised"></div>
+      </div>
+
+      <div class="section scrollspy" id="high-container">
+        <h4>High <a class="waves-effect btn-flat" onclick="reloadTable('#high');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All open high-priority bugs.
+        </p>
+        <div id="high"></div>
+      </div>
+
+      <div class="section scrollspy" id="abint-container">
+        <h4>Autobuilder Intermittent <a class="waves-effect btn-flat" onclick="reloadTable('#abint');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          Bugs which are tagged as tracking intermittent failures on the
+          autobuilder. A <a
+          href="https://valkyrie.yocto.io/pub/non-release/abint/" target="_blank">graphical
+          view</a> is also available.
+        </p>
+        <div id="abint"></div>
+      </div>
+
+      <div class="section scrollspy" id="reopened-container">
+        <h4>Reopened <a class="waves-effect btn-flat" onclick="reloadTable('#reopened');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          Bugs that have been reopened. The owner should be reviewed and the bug
+          moved to another state.
+        </p>
+        <div id="reopened"></div>
+      </div>
+
+      <div class="section scrollspy" id="needinfo-container">
+        <h4>Need Info <a class="waves-effect btn-flat" onclick="reloadTable('#needinfo');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All bugs that are in the NEEDINFO state, and should be reviewed to
+          identify if the information has been provided and the bug should be
+          moved to another state.
+        </p>
+        <div id="needinfo"></div>
+      </div>
+
+      <div class="section scrollspy" id="inactive-container">
+        <h4>Inactive <a class="waves-effect btn-flat" onclick="reloadTable('#inactive');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All open bugs that haven't been altered in two years.
+        </p>
+        <div id="inactive"></div>
+      </div>
+
+      <div class="section scrollspy" id="oldmilestone-container">
+        <h4>Old Milestone <a class="waves-effect btn-flat" onclick="reloadTable('#oldmilestone');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All open bugs that are targetted for a milestone in the past: they
+          should be closed or moved to a future milestone.
+        </p>
+        <div id="oldmilestone"></div>
+      </div>
+
+      <div class="section scrollspy" id="newcomer-container">
+        <h4>Potential Newcomer <a class="waves-effect btn-flat" onclick="reloadTable('#newcomer');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All open bugs which have been tagged as being potentially good for
+          newcomers to the project who want to make their first contribution.
+        </p>
+        <div id="newcomer"></div>
+      </div>
+    </div>
+
+    <div class="col hide-on-small-only m3 l2">
+      <ul class="section table-of-contents pushpin">
+        <li><a href="#security-container">Security</a></li>
+        <li><a href="#unprioritised-container">Unprioritised</a></li>
+        <li><a href="#high-container">High</a></li>
+        <li><a href="#abint-container">AB-INT</a></li>
+        <li><a href="#reopened-container">Reopened</a></li>
+        <li><a href="#needinfo-container">Need Info</a></li>
+        <li><a href="#inactive-container">Inactive</a></li>
+        <li><a href="#oldmilestone-container">Old Milestone</a></li>
+        <li><a href="#newcomer-container">Newcomer</a></li>
+      </ul>
+    </div>
+  </div>
+  </div>
+  <script>
+    const serverUrl = "https://bugzilla.yoctoproject.org";
+
+    const ignoreProducts = [
+      "opkg",
+      "Other YP Layers",
+      "Security Response Tool",
+      "Toaster",
+      "Yocto Project Compatible"
+    ];
+
+    // Fields to display (bugzilla field name -> column header)
+    const fields = new Map([
+      ["id", "ID"],
+      ["summary", "Summary"],
+      ["product", "Product"],
+      ["status", "Status"],
+      ["target_milestone", "Milestone"],
+      ["assigned_to", "Owner"],
+    ]);
+
+    function populateTable(selector, bugs) {
+      if (bugs.length === 0) {
+        const p = document.createElement("p");
+        p.innerHTML = "<em>No bugs found</em>.";
+        document.querySelector(selector).replaceChildren(p);
+        return;
+      }
+
+      const table = document.createElement("table");
+      table.setAttribute("class", "highlight")
+
+      const header = table.appendChild(document.createElement("thead"));
+      const tr = header.appendChild(document.createElement("tr"));
+      for (const value of fields.values()) {
+        tr.appendChild(document.createElement("th")).append(value);
+      }
+
+      const body = table.appendChild(document.createElement("tbody"));
+      for (const bug of bugs) {
+        const row = body.appendChild(document.createElement("tr"));
+        for (const field of fields.keys()) {
+          const td = row.appendChild(document.createElement("td"));
+          if (field === "id")
+            td.innerHTML = `<a href="${serverUrl}/show_bug.cgi?id=${bug.id}" target="_blank">${bug.id}</a>`
+          else
+            td.innerHTML = bug[field];
+        }
+      }
+
+      const footer = table.appendChild(document.createElement("tfoot"));
+      footer.innerHTML = `<tr><td colspan="${fields.size}">${bugs.length} bugs found.</td></tr>`;
+
+      document.querySelector(selector).replaceChildren(table);
+    }
+
+    async function searchBugs(selector, params) {
+      const spinner = document.createElement("div");
+      spinner.setAttribute("class", "progress")
+      spinner.innerHTML = `<div class="indeterminate"></div>`;
+      document.querySelector(selector).replaceChildren(spinner);
+
+      try {
+        params.append("include_fields", Array.from(fields.keys()).join());
+        params.append("f0", "product",)
+        params.append("o0", "notregexp",)
+        params.append("v0", `^(${ignoreProducts.map((s) => escapeRegExp(s)).join("|")})$`)
+
+        const response = await fetch(`${serverUrl}/rest/bug?${params}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        populateTable(selector, data.bugs);
+      } catch (error) {
+        console.error(`Failed to fetch bugs for ${selector}: ${error}`);
+        alert("Error fetching bugs. Check the console for details.");
+      }
+    }
+
+    async function bugsByWhiteboard(table, keyword) {
+      const params = new URLSearchParams({
+        resolution: "---",
+        whiteboard: keyword,
+      });
+      const bugs = await searchBugs(table, params);
+    }
+
+    async function bugsByPriority(table, priority) {
+      const params = new URLSearchParams({
+        resolution: "---",
+        priority: priority
+      });
+      const bugs = await searchBugs(table, params);
+    }
+
+    async function bugsByStatus(table, status) {
+      const params = new URLSearchParams({
+        status: status
+      });
+      const bugs = await searchBugs(table, params);
+    }
+
+    async function bugsInactive(table) {
+      const params = new URLSearchParams({
+        resolution: "---",
+        f1: "days_elapsed",
+        o1: "greaterthaneq",
+        v1: 365 * 2
+      });
+      const bugs = await searchBugs(table, params);
+    }
+
+    function escapeRegExp(string) {
+      // In the Glorious Future we can use RegExp.escape()
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    async function getActiveReleases() {
+      // Download releases.json and use it to generate the active milestones.
+
+      // Start with milestones that are always active
+      const active = [
+        "---",
+        "0.0.0",
+        "5.99",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "future"
+      ];
+
+      const response = await fetch("https://dashboard.yoctoproject.org/releases.json");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch releases: ${response.statusText}`);
+      }
+
+      const releases = await response.json();
+      for (const release of releases) {
+        if (release.series !== "current")
+          continue
+
+        if (release.latest_tag) {
+          // If there is a latest_tag set then this series has been releases, so
+          // add point releases.
+
+          const parts = release.latest_tag.split(".");
+          // Pad to three digits if needed
+          const origlen = parts.length;
+          parts.length = 3;
+          parts.fill(0, origlen);
+
+          // Add the next three point releases
+          for (let i = 0; i < 3; i++) {
+            // Let JavaScript so-called-typing ignore the fact that we're incrementing a string
+            parts[parts.length - 1]++;
+            active.push(parts.join("."));
+          }
+        } else {
+          // If there's not a latest_tag set then this is the current development cycle.
+
+          // The current major release is active
+          active.push(release.series_version);
+          // And so is the next major release
+          const parts = release.series_version.split(".")
+          parts[parts.length - 1]++;
+          active.push(parts.join("."));
+
+          // All remaining milestones in this release
+          let milestones = new Set([1, 2, 3, 4].map((m) => `${release.series_version} M${m}`));
+          // Remove the milestones that have been releases. Map the tag names to milestone names here.
+          const seenMilestones = new Set(release.releases.map((s) => s.replace("_", " ")));
+          milestones = milestones.difference(seenMilestones);
+          active.push(...milestones);
+        }
+      }
+      return active;
+    }
+
+    async function bugsOldMilestone(table) {
+      const activeMilestones = await getActiveReleases();
+
+      const params = new URLSearchParams({
+        resolution: "---",
+        f1: "target_milestone",
+        o1: "notregexp",
+        v1: `^(${activeMilestones.map((s) => escapeRegExp(s)).join("|")})$`
+      });
+      const bugs = await searchBugs(table, params);
+    }
+
+    function reloadTable(table) {
+      switch (table) {
+        case "#unprioritised":
+          bugsByPriority(table, "Undecided");
+          break;
+        case "#high":
+          bugsByPriority(table, "High");
+          break;
+        case "#abint":
+          bugsByWhiteboard(table, "AB-INT");
+          break;
+        case "#newcomer":
+          bugsByWhiteboard(table, "NEWCOMER");
+          break;
+        case "#reopened":
+          bugsByStatus(table, "REOPENED");
+          break;
+        case "#needinfo":
+          bugsByStatus(table, "NEEDINFO");
+          break;
+        case "#inactive":
+          bugsInactive(table);
+          break;
+        case "#oldmilestone":
+          bugsOldMilestone(table);
+          break;
+      }
+    }
+
+    reloadTable("#unprioritised");
+    reloadTable("#high");
+    reloadTable("#abint");
+    reloadTable("#newcomer");
+    reloadTable("#reopened");
+    reloadTable("#needinfo");
+    reloadTable("#inactive");
+    reloadTable("#oldmilestone");
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var elems = document.querySelectorAll('.scrollspy');
+      M.ScrollSpy.init(elems, { scrollOffset: 100 });
+
+      elems = document.querySelectorAll('.pushpin');
+      M.Pushpin.init(elems, { offset: document.querySelector("#nav").offsetHeight });
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>
