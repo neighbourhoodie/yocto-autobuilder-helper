@@ -41,7 +41,7 @@
 import argparse
 import os
 import re
-import requests
+import urllib.request
 import sys
 import subprocess
 import tempfile
@@ -238,12 +238,12 @@ def main():
         exit(1)
 
     if args.config_from_web:
-        r = requests.get(CONFIG_REMOTE_URL)
-        with tempfile.TemporaryDirectory() as tempdir:
-            with open(Path(tempdir) / "config.py", "wb") as conf:
-                conf.write(r.content)
-            sys.path.append(tempdir)
-            import config
+        with urllib.request.urlopen(CONFIG_REMOTE_URL) as r:
+            with tempfile.TemporaryDirectory() as tempdir:
+                with open(Path(tempdir) / "config.py", "wb") as conf:
+                    conf.write(r.read())
+                sys.path.append(tempdir)
+                import config
     else:
         sys.path.append(os.path.dirname(args.config))
         import config
