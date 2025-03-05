@@ -31,3 +31,9 @@ source venv/bin/activate
 python3 -m pip install -r $pokydir/bitbake/toaster-requirements.txt -r $pokydir/bitbake/lib/toaster/tests/toaster-tests-requirements.txt
 
 python3 -m pytest -c $pokydir/bitbake/lib/toaster/pytest.ini $pokydir/bitbake/lib/toaster/tests/
+
+if [ -e $pokydir/bitbake/lib/toaster/orm/fixtures/check_fixtures.py ]; then
+    echo "Checking toaster fixtures"
+    cd $pokydir/bitbake/lib/toaster/orm/fixtures/
+    $pokydir/bitbake/lib/toaster/orm/fixtures/check_fixtures.py
+fi
