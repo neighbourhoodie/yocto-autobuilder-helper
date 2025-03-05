@@ -1366,6 +1366,13 @@
                 "EXTRACMDS": [ "${SCRIPTSDIR}/run-abint ${HELPERRESULTSDIR}/../../abint/"]
             }
         },
+        "metrics-gitstats" : {
+            "NEEDEDREPOS" : [],
+            "step1" : {
+                "shortname" : "Generate gitstats",
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-gitstats ${BUILDDIR}/../"]
+            }
+        },
         "indexing" : {
             "NEEDEDREPOS" : [],
             "step1" : {

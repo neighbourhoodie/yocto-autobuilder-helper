@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Called with $1 as the build directory.
+# Set DEST in the environment to override the destination for testing purposes.
+
+set -e
+set -u
+set -o pipefail
+set -x
+
+builddir=$(realpath "$1")
+scriptdir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+dest=${DEST:-docs@docs.yoctoproject.org:dashboard/gitstats}
+
+cd $builddir
+mkdir gitstats
+gitstats ~/git/mirror/poky $builddir/gitstats/poky
+gitstats ~/git/mirror/oecore $builddir/gitstats/oecore
+gitstats ~/git/mirror/bitbake $builddir/gitstats/bitbake
+gitstats ~/git/mirror/meta-openembedded $builddir/gitstats/meta-openembedded
+gitstats ~/git/mirror/yocto-docs $builddir/gitstats/yocto-docs
+
+rsync -irlp --checksum --ignore-times $builddir/gitstats/* ${dest}
