@@ -21,6 +21,5 @@ gitstats ~/git/mirror/poky $builddir/gitstats/poky > /dev/null
 gitstats ~/git/mirror/oecore $builddir/gitstats/oecore > /dev/null
 gitstats ~/git/mirror/bitbake $builddir/gitstats/bitbake > /dev/null
 gitstats ~/git/mirror/meta-openembedded $builddir/gitstats/meta-openembedded > /dev/null
-gitstats ~/git/mirror/yocto-docs $builddir/gitstats/yocto-docs > /dev/null
 
 rsync -irlp --checksum --ignore-times $builddir/gitstats/* ${dest}
