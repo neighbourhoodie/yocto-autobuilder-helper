@@ -23,14 +23,14 @@
 #    ./tools/supported-distros --config /path/to/config.py --releases master --compare
 #
 # The opts --release-from-env and --config-from-web can also be used to get
-# these info using respectively the METADATA_BRANCH variable and the config.py
+# these info using respectively the LAYERSERIES_COMPAT_core variable and the config.py
 # from the git web interface.
 #
 # Example:
 #
 #    ./tools/supported-distros --config-from-web --release-from-env --compare
 #
-# Will get the current branch from METADATA_BRANCH, fetch config.py from
+# Will get the current release from LAYERSERIES_COMPAT_core, fetch config.py from
 # git.yoctoproject.org/yocto-autobuilder2, compare and output the differences.
 #
 # The script will return 1 in case of difference, 0 if the distros match.
@@ -69,7 +69,7 @@ def parse_arguments() -> argparse.Namespace:
 
     parser.add_argument("--release-from-env",
                         action="store_true",
-                        help="Get release from METADATA_BRANCH bitbake var")
+                        help="Get release from LAYERSERIES_COMPAT_core bitbake var")
 
     parser.add_argument("--compare",
                         action="store_true",
@@ -149,11 +149,16 @@ def _get_poky_distros() -> Set[str]:
     return poky_distros
 
 
-def _get_metadata_branch() -> str:
-    branch = subprocess.check_output(
-        ["bitbake-getvar", "--quiet", "--value", "METADATA_BRANCH"],
+def _get_current_core_release() -> str:
+    """
+    Return the current release from LAYERSERIES_COMPAT_core. In the odd case
+    where there are multiple entries to LAYERSERIES_COMPAT_core (e.g.
+    "styhead walnascar") return the last entry.
+    """
+    release = subprocess.check_output(
+        ["bitbake-getvar", "--quiet", "--value", "LAYERSERIES_COMPAT_core"],
         encoding="utf-8")
-    return branch.strip()
+    return release.strip().split()[-1]
 
 
 def _mangle_worker(worker: str) -> str:
@@ -250,7 +255,7 @@ def main():
 
     releases = None
     if args.release_from_env:
-        releases = [_get_metadata_branch()]
+        releases = [_get_current_core_release()]
     else:
         releases = args.releases
 
