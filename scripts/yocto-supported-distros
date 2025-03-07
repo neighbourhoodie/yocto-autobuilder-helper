@@ -69,7 +69,7 @@ def parse_arguments() -> argparse.Namespace:
 
     parser.add_argument("--release-from-env",
                         action="store_true",
-                        help="Get release from LAYERSERIES_COMPAT_core bitbake var")
+                        help="Get the release codename from the bitbake environment")
 
     parser.add_argument("--compare",
                         action="store_true",
@@ -151,10 +151,17 @@ def _get_poky_distros() -> Set[str]:
 
 def _get_current_core_release() -> str:
     """
-    Return the current release from LAYERSERIES_COMPAT_core. In the odd case
-    where there are multiple entries to LAYERSERIES_COMPAT_core (e.g.
-    "styhead walnascar") return the last entry.
+    Return the current release.
+    Try METADATA_BRANCH first since this is the only way for us to know we're on
+    master. If we're not on master, return the latest value in LAYERSERIES_COMPAT_core
     """
+    release = subprocess.check_output(
+        ["bitbake-getvar", "--quiet", "--value", "METADATA_BRANCH"],
+        encoding="utf-8")
+    release = release.strip()
+    if release == "master":
+        return release
+
     release = subprocess.check_output(
         ["bitbake-getvar", "--quiet", "--value", "LAYERSERIES_COMPAT_core"],
         encoding="utf-8")
