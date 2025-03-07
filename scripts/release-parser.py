@@ -84,7 +84,7 @@ def get_git_tags():
         if branch == "yocto-5.0":
             status = "LTS until Apr. 2028"
         if branch == "yocto-5.1":
-            status = "Stable Release"
+            status = "Stable Release until May 2025"
 
         # Create a dictionary for the series entry
         tag_dict = {
