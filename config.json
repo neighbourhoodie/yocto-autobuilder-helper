@@ -1385,7 +1385,7 @@
             "step3" : {
                 "shortname" : "Populate/update dashboard site",
                 "NOBUILDTOOLS" : true,
-                "EXTRACMDS" : ["${SCRIPTSDIR}/run-dashboard-index ${BUILDDIR}/../"]
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-dashboard-index ${HELPERBUILDDIR}/../"]
             }
         },
         "meta-mingw" : {
