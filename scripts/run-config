@@ -129,14 +129,22 @@ def addstepentry(name, taskdesc, shortname, description, detail, phase, usepty=F
         bbdesc = bbdesc + ": " + detail
     jsonconfig.append({"name" : name, "bbname" : bbname[:46], "phase" : phase, "description" : bbdesc, "usepty" : usepty})
 
-if args.target == "indexing":
-    pass
-elif jcfg:
+if jcfg:
     buildtools = utils.setup_buildtools_tarball(ourconfig, args.workername, None, checkonly=True)
     if buildtools:
         addentry("buildtools", "Setup buildtools tarball", "init")
 else:
-    utils.setup_buildtools_tarball(ourconfig, args.workername, args.builddir + "/../buildtools")
+    # If we're executing a specific step, check whether we buildtools is disabled for it
+    buildtools = True
+    if args.stepname in ("build-targets", "cmds", "test-targets", "plain-cmds"):
+        try:
+            buildtools = not utils.getconfigvar("NOBUILDTOOLS", ourconfig, args.target, int(args.phase))
+        except ValueError:
+            # Not an integer step phase
+            pass
+
+    if buildtools:
+        utils.setup_buildtools_tarball(ourconfig, args.workername, args.builddir + "/../buildtools")
     if args.phase == "init" and args.stepname == "buildtools":
         sys.exit(0)
 

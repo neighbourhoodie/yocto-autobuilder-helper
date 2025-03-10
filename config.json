@@ -1374,7 +1374,6 @@
             }
         },
         "indexing" : {
-            "NEEDEDREPOS" : [],
             "step1" : {
                 "shortname" : "Generate non-release index",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/generate-testresult-index.py ${BASE_SHAREDDIR}/pub/non-release/"]
@@ -1385,6 +1384,7 @@
             },
             "step3" : {
                 "shortname" : "Populate/update dashboard site",
+                "NOBUILDTOOLS" : true,
                 "EXTRACMDS" : ["${SCRIPTSDIR}/run-dashboard-index ${BUILDDIR}/../"]
             }
         },
