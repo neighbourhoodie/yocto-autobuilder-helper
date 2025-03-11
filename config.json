@@ -367,10 +367,8 @@
                     "${BUILDDIR}/../meta-openembedded/meta-initramfs"
                 ],
                 "extravars" : [
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES =  'kexec-klibc kexec-tools-klibc-dbg'",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'mtdinfo-klibc ubiattach-klibc ubiblock-klibc ubicrc32-klibc ubidetach-klibc ubiformat-klibc ubimkvol-klibc'",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'ubinfo-klibc ubinize-klibc ubirename-klibc ubirmvol-klibc ubirsvol-klibc ubiupdatevol-klibc ubi-utils-klibc-dbg'",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES += 'vmcore-dmesg-klibc kexecboot-klibc kexecboot-klibc-dbg'"
+                    "include conf/include/non-repro-meta-initramfs.inc",
+                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_INITRAMFS}'"
                 ]
             },
             "step4" : {
