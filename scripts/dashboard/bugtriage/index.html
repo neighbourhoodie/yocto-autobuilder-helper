@@ -23,6 +23,10 @@
     .table-of-contents a.active {
       border-left-color: #03a9f4;
     }
+
+    table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
+      content: " \25B4\25BE"
+    }
   </style>
 </head>
 
@@ -157,6 +161,7 @@
     </div>
   </div>
   </div>
+  <script src="sorttable.js"></script>
   <script>
     const serverUrl = "https://bugzilla.yoctoproject.org";
 
@@ -187,7 +192,7 @@
       }
 
       const table = document.createElement("table");
-      table.setAttribute("class", "highlight")
+      table.setAttribute("class", "highlight sortable")
 
       const header = table.appendChild(document.createElement("thead"));
       const tr = header.appendChild(document.createElement("tr"));
@@ -209,6 +214,8 @@
 
       const footer = table.appendChild(document.createElement("tfoot"));
       footer.innerHTML = `<tr><td colspan="${fields.size}">${bugs.length} bugs found.</td></tr>`;
+
+      sorttable.makeSortable(table);
 
       document.querySelector(selector).replaceChildren(table);
     }
