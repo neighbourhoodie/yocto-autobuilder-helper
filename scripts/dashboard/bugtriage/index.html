@@ -332,10 +332,14 @@
           // And so is the next major release
           const parts = release.series_version.split(".")
           parts[parts.length - 1]++;
-          active.push(parts.join("."));
+          const next = parts.join(".")
+          active.push(next);
+          // And all of the next releases milestones
+          let milestones = new Set([1, 2, 3, 4].map((m) => `${next} M${m}`));
+          active.push(...milestones);
 
           // All remaining milestones in this release
-          let milestones = new Set([1, 2, 3, 4].map((m) => `${release.series_version} M${m}`));
+          milestones = new Set([1, 2, 3, 4].map((m) => `${release.series_version} M${m}`));
           // Remove the milestones that have been releases. Map the tag names to milestone names here.
           const seenMilestones = new Set(release.releases.map((s) => s.replace("_", " ")));
           milestones = milestones.difference(seenMilestones);
