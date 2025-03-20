@@ -89,6 +89,15 @@
         <div id="high"></div>
       </div>
 
+      <div class="section scrollspy" id="reopened-container">
+        <h4>Reopened <a class="waves-effect btn-flat" onclick="reloadTable('#reopened');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          Bugs that have been reopened. The owner should be reviewed and the bug
+          moved to another state.
+        </p>
+        <div id="reopened"></div>
+      </div>
+
       <div class="section scrollspy" id="abint-container">
         <h4>Autobuilder Intermittent <a class="waves-effect btn-flat" onclick="reloadTable('#abint');"><i class="material-icons">refresh</i></a></h4>
         <p>
@@ -98,15 +107,6 @@
           view</a> is also available.
         </p>
         <div id="abint"></div>
-      </div>
-
-      <div class="section scrollspy" id="reopened-container">
-        <h4>Reopened <a class="waves-effect btn-flat" onclick="reloadTable('#reopened');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          Bugs that have been reopened. The owner should be reviewed and the bug
-          moved to another state.
-        </p>
-        <div id="reopened"></div>
       </div>
 
       <div class="section scrollspy" id="needinfo-container">
@@ -151,8 +151,8 @@
         <li><a href="#security-container">Security</a></li>
         <li><a href="#unprioritised-container">Unprioritised</a></li>
         <li><a href="#high-container">High</a></li>
-        <li><a href="#abint-container">AB-INT</a></li>
         <li><a href="#reopened-container">Reopened</a></li>
+        <li><a href="#abint-container">AB-INT</a></li>
         <li><a href="#needinfo-container">Need Info</a></li>
         <li><a href="#inactive-container">Inactive</a></li>
         <li><a href="#oldmilestone-container">Old Milestone</a></li>
