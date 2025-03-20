@@ -1981,13 +1981,14 @@
         }
     },
     "buildtools" : {
+        "ubuntu2004-vk-arm*" : "${BUILDTOOLS_ARM_URL}",
+        "ubuntu2004*"  : "${BUILDTOOLS_URL}",
         "alma8*"       : "${BUILDTOOLS_URL}",
         "rocky8*"      : "${BUILDTOOLS_URL}",
         "stream8*"     : "${BUILDTOOLS_URL}",
         "opensuse154*" : "${BUILDTOOLS_URL}",
         "opensuse155*" : "${BUILDTOOLS_URL}",
         "opensuse156*" : "${BUILDTOOLS_URL}",
-        "ubuntu2004*"  : "${BUILDTOOLS_URL}",
         "perf-alma8*"  : "${BUILDTOOLS_URL}",
         "perf-ubuntu1804-ty-*" : "${BUILDTOOLS_URL}"
     }
