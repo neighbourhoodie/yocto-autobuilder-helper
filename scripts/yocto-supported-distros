@@ -160,8 +160,8 @@ def _get_current_core_release() -> str:
         ["bitbake-getvar", "--quiet", "--value", "METADATA_BRANCH"],
         encoding="utf-8")
     release = release.strip()
-    if release == "master":
-        return release
+    if "master" in release:
+        return "master"
 
     release = subprocess.check_output(
         ["bitbake-getvar", "--quiet", "--value", "LAYERSERIES_COMPAT_core"],
