@@ -164,6 +164,15 @@
                 "TEST_SUITES = 'ping ssh ptest'"
             ]
         },
+        "ptest-qemu-musl" : {
+            "BUILDINFO" : true,
+            "BBTARGETS" : "core-image-ptest-all",
+            "SANITYTARGETS" : "core-image-ptest-all:do_testimage",
+            "extravars" : [
+                "TEST_SUITES = 'ping ssh ptest'",
+                "TCLIBC = 'musl'"
+            ]
+        },
         "ltp-qemu" : {
             "BUILDINFO" : true,
             "BBTARGETS" : "core-image-sato",
@@ -619,6 +628,10 @@
             "MACHINE" : "qemuarm64",
             "TEMPLATE" : "ptest-qemu-fast"
         },
+        "qemuarm64-musl-ptest" : {
+            "MACHINE" : "qemuarm64",
+            "TEMPLATE" : "ptest-qemu-musl"
+        },
         "qemuarm64-ltp" : {
             "MACHINE" : "qemuarm64",
             "TEMPLATE" : "ltp-qemu"
@@ -639,7 +652,6 @@
             "MACHINE" : "qemuriscv64",
             "TEMPLATE" : "toolchain-qemu"
         },
-
         "qemuriscv64-ptest" : {
             "MACHINE" : "qemuriscv64",
             "TEMPLATE" : "ptest-qemu"
@@ -804,6 +816,10 @@
             "MACHINE" : "qemux86",
             "TEMPLATE" : "ptest-qemu-fast"
         },
+        "qemux86-musl-ptest" : {
+            "MACHINE" : "qemux86",
+            "TEMPLATE" : "ptest-qemu-musl"
+        },
         "genericarm64" : {
             "MACHINE" : "genericarm64",
             "TEMPLATE" : "arch-hw"
@@ -907,6 +923,10 @@
         "qemux86-64-ptest-fast" : {
             "MACHINE" : "qemux86-64",
             "TEMPLATE" : "ptest-qemu-fast"
+        },
+        "qemux86-64-musl-ptest" : {
+            "MACHINE" : "qemux86-64",
+            "TEMPLATE" : "ptest-qemu-musl"
         },
         "qemux86-64-ltp" : {
             "MACHINE" : "qemux86-64",
