@@ -954,16 +954,6 @@
                 "extravars" : [
                     "OE_FRAGMENTS += 'core/yocto-autobuilder/multilib-x86-lib64'"
                 ]
-            },
-            "step6" : {
-                "shortname" : "mip64 n32",
-                "description" : "qemumips64 image using n32 as default",
-                "MACHINE" : "qemumips64",
-                "BBTARGETS" : "core-image-minimal core-image-minimal:do_populate_sdk",
-                "SANITYTARGETS" : "core-image-minimal:do_testimage core-image-minimal:do_testsdk",
-                "extravars" : [
-                    "OE_FRAGMENTS += 'core/yocto-autobuilder/multilib-mips64-n32'"
-                ]
             }
         },
         "pkgman-non-rpm" : {
