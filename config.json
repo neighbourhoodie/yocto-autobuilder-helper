@@ -1531,7 +1531,7 @@
                 "BBTARGETS" : "core-image-sato",
                 "SANITYTARGETS" : "core-image-sato:do_testimage",
                 "extravars" : [
-                    "PACKAGECONFIG:append:x86-64:pn-mesa = ' gallium-llvm gallium r600'"
+                    "PACKAGECONFIG:append:x86-64:pn-mesa = ' gallium-llvm gallium amd'"
                 ]
             },
             "step8" : {
