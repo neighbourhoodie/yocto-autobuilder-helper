@@ -18,6 +18,7 @@ dest=${DEST:-docs@docs.yoctoproject.org:dashboard/}
 cd $builddir
 $scriptdir/release-parser.py 
 $scriptdir/layer-parser.py
+curl --silent --output $scriptdir/dashboard/testresults.json https://git.yoctoproject.org/yocto-testresults/plain/oeselftest/reproducible/qemux86-64/testresults.json
 
 rsync -irlp --checksum --ignore-times releases.json ${dest}
 rsync -irlp --checksum --ignore-times parsed-layers.json ${dest}
