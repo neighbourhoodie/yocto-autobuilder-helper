@@ -65,8 +65,12 @@ def mirror_processor(mirrordir):
         mirror = ourconfig["repo-defaults"][repo]["url"]
         mirrorpath = os.path.join(mirrordir, repo)
         mirrorpaths.append(mirrorpath)
-        if not os.path.exists(mirrorpaths[-1] + "/.git/"):
-            os.system("git clone --bare --mirror %s %s" % (mirror, mirrorpaths[-1]))
+        while not os.path.exists(mirrorpath + "/refs"):
+            exit_code = os.system("git clone --bare --mirror %s %s" % (mirror, mirrorpath))
+            if exit_code == 0:
+                break
+            print("Failed to clone %s. Retrying in 30 seconds..." % mirror)
+            time.sleep(30)
     while True:
         for path in mirrorpaths:
             os.chdir(path)
