@@ -318,8 +318,8 @@
           parts.length = 3;
           parts.fill(0, origlen);
 
-          // Add the next three point releases
-          for (let i = 0; i < 3; i++) {
+          // Add the next ten point releases to be sure we cover all the future releases.
+          for (let i = 0; i < 10; i++) {
             // Let JavaScript so-called-typing ignore the fact that we're incrementing a string
             parts[parts.length - 1]++;
             active.push(parts.join("."));
