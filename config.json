@@ -312,9 +312,7 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-networking'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-filesystems.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_FILESYSTEMS}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step2" : {
@@ -334,9 +332,7 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-networking'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-gnome.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_GNOME}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step3" : {
@@ -344,10 +340,6 @@
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; OEQA_DEBUGGING_SAVED_OUTPUT=${BASE_SHAREDDIR}/pub/repro-fail-openembedded/meta-initramfs/ DISPLAY=:1 oe-selftest --newbuilddir $BUILDDIR/build-st-meta-initramfs -r reproducible && ${SCRIPTSDIR}/../janitor/clobberdir ${BUILDDIR}/build-st-meta-initramfs"],
                 "ADDLAYER" : [
                     "${BUILDDIR}/../meta-openembedded/meta-initramfs"
-                ],
-                "extravars" : [
-                    "include conf/include/non-repro-meta-initramfs.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_INITRAMFS}'"
                 ]
             },
             "step4" : {
@@ -364,9 +356,7 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-multimedia'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-multimedia'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-multimedia.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_MULTIMEDIA}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step5" : {
@@ -383,9 +373,7 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-networking'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-networking.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_NETWORKING}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step6" : {
@@ -396,9 +384,7 @@
                 ],
                 "extravars" : [
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "include conf/include/non-repro-meta-oe.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_OE}'"
+                    "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'"
                 ]
             },
             "step7" : {
@@ -413,9 +399,7 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-perl'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-perl'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-perl.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_PERL}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step8" : {
@@ -428,9 +412,7 @@
                 "extravars" : [
                     "EXCLUDE_FROM_WORLD:layer-openembedded-layer = '1'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-python.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_PYTHON}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step9" : {
@@ -445,9 +427,7 @@
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-webserver'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-webserver'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-oe'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'",
-                    "include conf/include/non-repro-meta-webserver.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_WEBSERVER}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-oe'"
                 ]
             },
             "step10" : {
@@ -473,9 +453,7 @@
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-networking'",
                     "USERADD_GID_TABLES:append = ' files/static-group-meta-multimedia'",
                     "USERADD_UID_TABLES:append = ' files/static-passwd-meta-multimedia'",
-                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-gnome'",
-                    "include conf/include/non-repro-meta-xfce.inc",
-                    "OEQA_REPRODUCIBLE_EXCLUDED_PACKAGES = '${KNOWN_NON_REPRO_META_XFCE}'"
+                    "USERADD_UID_TABLES:append = ' files/static-passwd-meta-gnome'"
                 ]
             }
         },
