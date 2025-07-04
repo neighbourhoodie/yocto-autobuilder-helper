@@ -1219,7 +1219,7 @@
             }
         },
         "check-layer-nightly" : {
-            "NEEDREPOS" : ["poky", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein"],
+            "NEEDREPOS" : ["poky", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein", "meta-qcom"],
             "step1" : {
                 "shortname" : "Test meta-agl YP Compatibility",
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-agl/meta-agl-core ../meta-agl/meta-netboot --dependency ../meta-openembedded/meta-oe ../meta-openembedded/meta-networking ../meta-openembedded/meta-python --no-auto-dependency"]
@@ -1259,6 +1259,10 @@
                     "HOSTTOOLS:remove = 'clang llvm-strip'"
                 ],
                 "EXTRACMDS" : ["export PATH=$PATH:${SCRIPTSDIR}/exein-path-intercepts; yocto-check-layer-wrapper ../meta-exein --dependency ../meta-openembedded/meta-oe --no-auto-dependency"]
+            },
+            "step10" : {
+                "shortname" : "Test meta-qcom YP Compatibility",
+                "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-qcom --no-auto-dependency"]
             }
         },
         "metrics" : {
@@ -1917,6 +1921,12 @@
         },
         "meta-webosose" : {
             "url" : "https://github.com/webosose/meta-webosose.git",
+            "branch" : "master",
+            "revision" : "HEAD",
+            "no-layer-add" : true
+        },
+        "meta-qcom" : {
+            "url" : "https://github.com/qualcomm-linux/meta-qcom",
             "branch" : "master",
             "revision" : "HEAD",
             "no-layer-add" : true
