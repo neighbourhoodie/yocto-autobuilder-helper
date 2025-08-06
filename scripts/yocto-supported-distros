@@ -39,6 +39,7 @@
 # from a custom branch.
 
 import argparse
+import json
 import os
 import re
 import urllib.request
@@ -52,6 +53,7 @@ from urllib.error import HTTPError
 
 
 CONFIG_REMOTE_URL = "https://git.yoctoproject.org/yocto-autobuilder2/plain/config.py"
+AUTOBUILDER_WORKERS_ENDPOINT = "https://autobuilder.yoctoproject.org/valkyrie/api/v2/workers"
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -79,6 +81,11 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--config-from-web",
                         action="store_true",
                         help="Get config.py from yoctoproject's git web interface")
+
+    parser.add_argument("--check-worker-statuses",
+                        action="store_true",
+                        default=False,
+                        help="Also check the worker statuses using the Autobuilder API")
 
     return parser.parse_args()
 
@@ -242,6 +249,40 @@ def _compare(ab_workers: set, poky_workers: set, stable_release: bool):
     return ok
 
 
+def _filter_inactive_workers(possible_workers: Dict) -> Dict:
+    """
+    From the current dictionary of workers, remove the workers that are inactive
+    (disconnected) by checking the Autobuilder REST API.
+    """
+
+    _possible_workers = {}
+    workers_ab = None
+
+    try:
+        with urllib.request.urlopen(AUTOBUILDER_WORKERS_ENDPOINT) as r:
+            workers_ab = json.load(r).get("workers")
+    except (HTTPError, AttributeError) as e:
+        print(f"WARNING: Error when trying to fetch the worker statuses from {AUTOBUILDER_WORKERS_ENDPOINT}:")
+        print(e)
+        print("Safely exiting...")
+        exit(0)
+
+    if not workers_ab:
+        return possible_workers
+
+    def is_connected(worker):
+        for w_info in workers_ab:
+            if w_info.get("name") == worker and w_info.get("connected_to"):
+                return True
+
+        return False
+
+    for release in possible_workers:
+        _possible_workers[release] = [w for w in possible_workers[release] if is_connected(w)]
+
+    return _possible_workers
+
+
 def main():
 
     args = parse_arguments()
@@ -304,6 +345,9 @@ def main():
         possible_workers.update(
             {release: _possible_workers(config.workers_prev_releases[release],
                                         config.all_workers)})
+
+    if args.check_worker_statuses:
+        possible_workers = _filter_inactive_workers(possible_workers)
 
     if args.compare:
         assert len(releases) == 1, "Only one release should be passed for this mode"
