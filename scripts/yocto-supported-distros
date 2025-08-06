@@ -61,11 +61,9 @@ def parse_arguments() -> argparse.Namespace:
 
     g1 = parser.add_mutually_exclusive_group()
 
-    g1.add_argument("--releases",
+    g1.add_argument("--release",
                     type=str,
-                    nargs='+',
-                    default=[],
-                    help="Yocto releases")
+                    help="Yocto release (master, walnascar, ...)")
 
     g1.add_argument("--release-from-env",
                     action="store_true",
@@ -127,14 +125,12 @@ def _print_worker_list_warning(worker_list: List, warning):
         print("WARNING: " + warning + ": " + w)
 
 
-def _print_workers(possible_workers: Dict[str, List]):
+def _print_workers(release: str, possible_workers: List[str]):
     """
     Helper to print the workers nicely.
     """
-    for release in possible_workers:
-        print(f"{release}:\n")
-        _print_worker_list(sorted(possible_workers[release]))
-        print("")
+    print(f"{release}:\n")
+    _print_worker_list(sorted(possible_workers))
 
 
 def _get_poky_distros() -> Set[str]:
@@ -253,14 +249,14 @@ def _compare(ab_workers: set, poky_workers: set, stable_release: bool):
     return ok
 
 
-def _filter_inactive_workers(possible_workers: Dict) -> Dict:
+def _filter_inactive_workers(possible_workers: List[str]) -> List[str]:
     """
-    From the current dictionary of workers, remove the workers that are inactive
+    From the current list of workers, remove the workers that are inactive
     (disconnected) by checking the Autobuilder REST API.
     """
 
-    _possible_workers = {}
-    workers_ab = None
+    _possible_workers = []
+    workers_ab = []
 
     try:
         with urllib.request.urlopen(AUTOBUILDER_WORKERS_ENDPOINT) as r:
@@ -281,8 +277,7 @@ def _filter_inactive_workers(possible_workers: Dict) -> Dict:
 
         return False
 
-    for release in possible_workers:
-        _possible_workers[release] = [w for w in possible_workers[release] if is_connected(w)]
+    _possible_workers = [w for w in possible_workers if is_connected(w)]
 
     return _possible_workers
 
@@ -312,55 +307,44 @@ def main():
         sys.path.append(os.path.dirname(args.config))
         import config
 
-    releases = None
+    release = None
     if args.release_from_env:
-        releases = [_get_current_core_release()]
+        release = _get_current_core_release()
     else:
-        releases = args.releases
+        release = args.release
 
-    if not releases:
-        print("Must provide one or more release, or --release-from-env")
+    if not release:
+        print("Must provide a release, or --release-from-env")
         exit(1)
 
-    possible_workers = {}
+    possible_workers = []
 
     stable_release = True
 
-    for release in releases:
-
-        if release != "master" and release not in config.workers_prev_releases:
-            print(f"Release {release} does not exist")
-            if args.release_from_env:
-                # Might be a custom branch or something else... safely exiting
-                exit(0)
-            else:
-                exit(1)
-
-        if release == "master":
-            stable_release = False
-            possible_workers.update({release: config.all_workers})
-            continue
-
-        if release not in config.workers_prev_releases:
-            print(f"Release {release} does not exist, available releases: "
-                  f"{config.workers_prev_releases.keys()}")
+    if release != "master" and release not in config.workers_prev_releases:
+        print(f"Release {release} does not exist")
+        if args.release_from_env:
+            # Might be a custom branch or something else... safely exiting
+            exit(0)
+        else:
             exit(1)
 
-        possible_workers.update(
-            {release: _possible_workers(config.workers_prev_releases[release],
-                                        config.all_workers)})
+    if release == "master":
+        stable_release = False
+        possible_workers = config.all_workers
+    else:
+        possible_workers = _possible_workers(config.workers_prev_releases[release],
+                                             config.all_workers)
 
     if args.check_worker_statuses:
         possible_workers = _filter_inactive_workers(possible_workers)
 
     if args.compare:
-        assert len(releases) == 1, "Only one release should be passed for this mode"
-        release = releases[0]
         print(f"Comparing for release {release}...\n")
 
         poky_workers = _get_poky_distros()
         ab_workers = set()
-        for w in possible_workers[release]:
+        for w in possible_workers:
             mangled_w = _mangle_worker(w)
             if mangled_w:
                 ab_workers.add(mangled_w)
@@ -371,7 +355,7 @@ def main():
             print("All good!")
 
     else:
-        _print_workers(possible_workers)
+        _print_workers(release, possible_workers)
 
 
 if __name__ == "__main__":
