@@ -470,7 +470,7 @@
             "step2" : {
                 "removevars" : ["SANITY_TESTED_DISTROS"],
                 "shortname" : "Compare AB workers and SANITY_TESTED_DISTROS",
-                "EXTRACMDS" : ["${SCRIPTSDIR}/yocto-supported-distros --config-from-web --release-from-env --compare"]
+                "EXTRACMDS" : ["${SCRIPTSDIR}/yocto-supported-distros --config-from-web --release-from-env --compare --check-worker-statuses"]
             }
         },
         "trigger-build-posttrigger" : {
