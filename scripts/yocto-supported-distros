@@ -80,9 +80,15 @@ def parse_arguments() -> argparse.Namespace:
                     action="store_true",
                     help="Get config.py from yoctoproject's git web interface")
 
-    parser.add_argument("--compare",
-                        action="store_true",
-                        help="Compare to poky.conf releases")
+    g3 = parser.add_mutually_exclusive_group()
+
+    g3.add_argument("--compare",
+                    action="store_true",
+                    help="Compare to poky.conf releases")
+
+    g3.add_argument("--old-distros",
+                    action="store_true",
+                    help="Print previously tested distros")
 
     parser.add_argument("--check-worker-statuses",
                         action="store_true",
@@ -210,6 +216,11 @@ def _mangle_worker(worker: str) -> str:
     m = re.match(r, worker)
     if m:
         return f"centosstream-{m.group(1)}"
+
+    r = re.compile(r"^centos(\d+)")
+    m = re.match(r, worker)
+    if m:
+        return f"centos-{m.group(1)}"
 
     r = re.compile(r"^ubuntu(\d{2})(\d{2})")
     m = re.match(r, worker)
@@ -353,6 +364,19 @@ def main():
             print("Mismatches were found")
         else:
             print("All good!")
+
+    elif args.old_distros:
+        if release == "master":
+            print("The --old-distros argument only makes sense for stable release")
+            exit(1)
+
+        old_distros = []
+
+        for distro in config.workers_prev_releases[release]:
+            if not any(distro in w for w in config.all_workers):
+                old_distros.append(_mangle_worker(distro))
+
+        _print_workers(release, old_distros)
 
     else:
         _print_workers(release, possible_workers)
