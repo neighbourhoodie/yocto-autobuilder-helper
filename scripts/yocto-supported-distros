@@ -157,6 +157,10 @@ def parse_arguments() -> argparse.Namespace:
                     action="store_true",
                     help="Compare to poky.conf releases")
 
+    g3.add_argument("--poky-distros",
+                    action="store_true",
+                    help="Print previously tested distros")
+
     g3.add_argument("--old-distros",
                     action="store_true",
                     help="Print previously tested distros")
@@ -412,6 +416,15 @@ def main():
             print("Mismatches were found")
         else:
             print("All good!")
+
+    elif args.poky_distros:
+        poky_distros = _get_poky_distros()
+        workers = set()
+        for w in poky_distros:
+            mangled_w = _mangle_worker(w, "lsb", args.output_format)
+            if mangled_w:
+                workers.add(mangled_w)
+        _print_workers(release, workers)
 
     elif args.old_distros:
         if release == "master":
