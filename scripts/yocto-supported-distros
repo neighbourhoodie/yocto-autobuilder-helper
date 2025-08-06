@@ -59,28 +59,32 @@ AUTOBUILDER_WORKERS_ENDPOINT = "https://autobuilder.yoctoproject.org/valkyrie/ap
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Print supported distributions")
 
-    parser.add_argument("--releases",
-                        type=str,
-                        nargs='+',
-                        default=[],
-                        help="Yocto releases")
+    g1 = parser.add_mutually_exclusive_group()
 
-    parser.add_argument("--config",
-                        type=Path,
-                        default=None,
-                        help="Autobuilder config.py input file")
+    g1.add_argument("--releases",
+                    type=str,
+                    nargs='+',
+                    default=[],
+                    help="Yocto releases")
 
-    parser.add_argument("--release-from-env",
-                        action="store_true",
-                        help="Get the release codename from the bitbake environment")
+    g1.add_argument("--release-from-env",
+                    action="store_true",
+                    help="Get the release codename from the bitbake environment")
+
+    g2 = parser.add_mutually_exclusive_group()
+
+    g2.add_argument("--config",
+                    type=Path,
+                    default=None,
+                    help="Autobuilder config.py input file")
+
+    g2.add_argument("--config-from-web",
+                    action="store_true",
+                    help="Get config.py from yoctoproject's git web interface")
 
     parser.add_argument("--compare",
                         action="store_true",
                         help="Compare to poky.conf releases")
-
-    parser.add_argument("--config-from-web",
-                        action="store_true",
-                        help="Get config.py from yoctoproject's git web interface")
 
     parser.add_argument("--check-worker-statuses",
                         action="store_true",
