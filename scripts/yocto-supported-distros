@@ -56,6 +56,77 @@ CONFIG_REMOTE_URL = "https://git.yoctoproject.org/yocto-autobuilder2/plain/confi
 AUTOBUILDER_WORKERS_ENDPOINT = "https://autobuilder.yoctoproject.org/valkyrie/api/v2/workers"
 
 
+INPUT_REGEXES = {
+    "alma": {
+        "ab": re.compile(r"^alma(\d+)"),
+        "lsb": re.compile(r"^almalinux-(\d+)"),
+    },
+    "debian": {
+        "ab": re.compile(r"^debian(\d+)"),
+        "lsb": re.compile(r"^debian-(\d+)"),
+    },
+    "fedora": {
+        "ab": re.compile(r"^fedora(\d+)"),
+        "lsb": re.compile(r"^fedora-(\d+)"),
+    },
+    "opensuseleap": {
+        "ab": re.compile(r"^opensuse(\d{2})(\d{1})"),
+        "lsb": re.compile(r"^opensuse-(\d{2})\.(\d{1})"),
+    },
+    "centos": {
+        "ab": re.compile(r"^centos(\d+)"),
+        "lsb": re.compile(r"^centos-(\d+)"),
+    },
+    "centosstream": {
+        "ab": re.compile(r"^stream(\d+)"),
+        "lsb": re.compile(r"^stream-(\d+)"),
+    },
+    "rocky": {
+        "ab": re.compile(r"^rocky(\d+)"),
+        "lsb": re.compile(r"^rocky-(\d+)"),
+    },
+    "ubuntu": {
+        "ab": re.compile(r"^ubuntu(\d{2})(\d{2})"),
+        "lsb": re.compile(r"^ubuntu-(\d{2})\.(\d{2})"),
+    },
+}
+
+OUTPUT_FORMATS = {
+    "alma": {
+        "lsb": "almalinux-{}",
+        "docs": "-  AlmaLinux {}",
+    },
+    "debian": {
+        "lsb": "debian-{}",
+        "docs": "-  Debian {}",
+    },
+    "fedora": {
+        "lsb": "fedora-{}",
+        "docs": "-  Fedora {}",
+    },
+    "opensuseleap": {
+        "lsb": "opensuseleap-{}.{}",
+        "docs": "-  OpenSUSE Leap {}.{}",
+    },
+    "centos": {
+        "lsb": "centos-{}",
+        "docs": "-  CentOS {}",
+    },
+    "centosstream": {
+        "lsb": "centosstream-{}",
+        "docs": "-  CentOS Stream {}",
+    },
+    "rocky": {
+        "lsb": "rocky-{}",
+        "docs": "-  Rocky Linux {}",
+    },
+    "ubuntu": {
+        "lsb": "ubuntu-{}.{}",
+        "docs": "-  Ubuntu {}.{}",
+    },
+}
+
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Print supported distributions")
 
@@ -95,6 +166,12 @@ def parse_arguments() -> argparse.Namespace:
                         default=False,
                         help="Also check the worker statuses using the Autobuilder API")
 
+    parser.add_argument("--output-format",
+                        type=str,
+                        default="lsb",
+                        choices=['lsb', 'docs'],
+                        help="Output format of the workers ('lsb' or 'docs')")
+
     return parser.parse_args()
 
 
@@ -115,17 +192,17 @@ def _possible_workers(all_workers: List[str],
     return possible_workers
 
 
-def _print_worker_list(worker_list: List, indent=2):
+def _print_worker_list(worker_list: List):
     """
     Helper to print a set nicely.
     """
     for w in worker_list:
-        print(" " * indent + w)
+        print(w)
 
 
 def _print_worker_list_warning(worker_list: List, warning):
     """
-    Helper to print a set nicely.
+    Helper to print a warning nicely.
     """
     for w in worker_list:
         print("WARNING: " + warning + ": " + w)
@@ -135,7 +212,6 @@ def _print_workers(release: str, possible_workers: List[str]):
     """
     Helper to print the workers nicely.
     """
-    print(f"{release}:\n")
     _print_worker_list(sorted(possible_workers))
 
 
@@ -182,50 +258,22 @@ def _get_current_core_release() -> str:
     return release.strip().split()[-1]
 
 
-def _mangle_worker(worker: str) -> str:
+def _mangle_worker(worker: str, format_in: str, format_out: str) -> str:
     """
-    Mangle the worker name to convert it to an lsb_release type of string.
+    Mangle the worker name to convert it to a different format.
+    Input -> output formats can be:
+    - ab -> lsb
+    - ab -> docs
+    - lsb -> docs
     """
 
-    r = re.compile(r"^alma(\d+)")
-    m = re.match(r, worker)
-    if m:
-        return f"almalinux-{m.group(1)}"
+    if format_in == format_out:
+        return worker
 
-    r = re.compile(r"^debian(\d+)")
-    m = re.match(r, worker)
-    if m:
-        return f"debian-{m.group(1)}"
-
-    r = re.compile(r"^fedora(\d+)")
-    m = re.match(r, worker)
-    if m:
-        return f"fedora-{m.group(1)}"
-
-    r = re.compile(r"^opensuse(\d{2})(\d{1})")
-    m = re.match(r, worker)
-    if m:
-        return f"opensuseleap-{m.group(1)}.{m.group(2)}"
-
-    r = re.compile(r"^rocky(\d+)")
-    m = re.match(r, worker)
-    if m:
-        return f"rocky-{m.group(1)}"
-
-    r = re.compile(r"^stream(\d+)")
-    m = re.match(r, worker)
-    if m:
-        return f"centosstream-{m.group(1)}"
-
-    r = re.compile(r"^centos(\d+)")
-    m = re.match(r, worker)
-    if m:
-        return f"centos-{m.group(1)}"
-
-    r = re.compile(r"^ubuntu(\d{2})(\d{2})")
-    m = re.match(r, worker)
-    if m:
-        return f"ubuntu-{m.group(1)}.{m.group(2)}"
+    for distro in INPUT_REGEXES:
+        m = re.match(INPUT_REGEXES[distro][format_in], worker)
+        if m:
+            return OUTPUT_FORMATS[distro][format_out].format(*list(m.groups()))
 
     return ""
 
@@ -356,7 +404,7 @@ def main():
         poky_workers = _get_poky_distros()
         ab_workers = set()
         for w in possible_workers:
-            mangled_w = _mangle_worker(w)
+            mangled_w = _mangle_worker(w, "ab", "lsb")
             if mangled_w:
                 ab_workers.add(mangled_w)
 
@@ -374,12 +422,17 @@ def main():
 
         for distro in config.workers_prev_releases[release]:
             if not any(distro in w for w in config.all_workers):
-                old_distros.append(_mangle_worker(distro))
+                old_distros.append(_mangle_worker(distro, "ab", args.output_format))
 
         _print_workers(release, old_distros)
 
     else:
-        _print_workers(release, possible_workers)
+        workers = set()
+        for w in possible_workers:
+            mangled_w = _mangle_worker(w, "ab", args.output_format)
+            if mangled_w:
+                workers.add(mangled_w)
+        _print_workers(release, workers)
 
 
 if __name__ == "__main__":
