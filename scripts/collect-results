@@ -28,6 +28,14 @@ if [ -e $WORKDIR/buildhistory ]; then
     fi
 fi
 
+case "$target" in
+    "metrics")
+        mkdir -p $DEST/$target/db-update
+        # there are multiple logs (for core and oe bitbake runs)
+        cp -f $WORKDIR/tmp/work/*/cve-update-*-native/*/temp/log.do_fetch.* $DEST/$target/db-update/ || true
+        ;;
+esac
+
 HSFILE=$WORKDIR/tmp/buildstats/*/host_stats*
 d="intermittent_failure_host_data"
 
