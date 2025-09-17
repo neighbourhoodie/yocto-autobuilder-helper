@@ -49,6 +49,10 @@ if "TRASH_DIR" not in ourconfig:
 
 trashdir = utils.getconfig("TRASH_DIR", ourconfig)
 
+if not os.path.exists(trashdir):
+    print("Error, TRASH_DIR %s does not exist" % trashdir)
+    sys.exit(1)
+
 for x in [clobberdir]:
     if os.path.exists(x) and os.path.exists(trashdir):
         if (os.stat(trashdir).st_dev == os.stat(x).st_dev):
