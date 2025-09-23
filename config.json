@@ -1508,23 +1508,6 @@
                 ]
             }
         },
-        "eclipse-plugin-neon" : {
-            "NEEDREPOS" : ["eclipse-poky-neon"],
-            "WRITECONFIG" : false,
-            "SENDERRORS" : false,
-            "EXTRAPLAINCMDS" : [
-                "cd scripts; ./setup.sh; ECLIPSE_HOME=`pwd`/eclipse/ ./build.sh neon-master master development"
-            ]
-
-        },
-        "eclipse-plugin-oxygen" : {
-            "NEEDREPOS" : ["eclipse-poky-oxygen"],
-            "WRITECONFIG" : false,
-            "SENDERRORS" : false,
-            "EXTRAPLAINCMDS" : [
-                "cd scripts; ./setup.sh; ECLIPSE_HOME=`pwd`/eclipse/ ./build.sh oxygen-master master development"
-            ]
-        },
         "buildperf-debian11" : {
             "TEMPLATE" : "buildperf"
         },
@@ -1816,20 +1799,6 @@
             "url" : "ssh://git@push.openembedded.org/bitbake",
             "branch" : "master",
             "revision" : "HEAD",
-            "no-layer-add" : true
-        },
-        "eclipse-poky-neon" : {
-            "url" : "ssh://git@push.yoctoproject.org/eclipse-yocto",
-            "branch" : "neon-master",
-            "revision" : "HEAD",
-            "checkout-dirname" : ".",
-            "no-layer-add" : true
-        },
-        "eclipse-poky-oxygen" : {
-            "url" : "ssh://git@push.yoctoproject.org/eclipse-yocto",
-            "branch" : "oxygen-master",
-            "revision" : "HEAD",
-            "checkout-dirname" : ".",
             "no-layer-add" : true
         },
         "meta-mingw" : {
