@@ -1696,7 +1696,7 @@
             ],
             "extravars" : [
                 "LICENSE_FLAGS_ACCEPTED = 'commercial'",
-                "DISTRO_FEATURES:append = ' pam systemd usrmerge'",
+                "DISTRO_FEATURES:append = ' pam systemd usrmerge opencl'",
                 "FORTRAN:forcevariable = ',fortran'",
                 "RUNTIMETARGET:append:pn-gcc-runtime = ' libquadmath'"
             ],
