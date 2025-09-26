@@ -297,6 +297,14 @@ def publishrepo(clonedir, repo, publishdir):
     mkdir(publishdir)
     subprocess.check_call("rsync -av " + archive_name + "* " + publishdir, shell=True, cwd=sharedrepo)
 
+# The repo json needs to be filtered to allow builds with and without bitbake-setup
+def filterrepojson(data):
+    # If bitbake and poky are present, we should use poky and ignore bitbake
+    # If oecore is there, it is a-full or a-quick so don't do that
+    if "bitbake" in data and "poky" in data and "oecore" not in data:
+        del data["bitbake"]
+    return
+
 def mkdir(path):
     try:
         os.makedirs(path)

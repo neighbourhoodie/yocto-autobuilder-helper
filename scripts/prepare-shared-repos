@@ -38,6 +38,8 @@ ourconfig = utils.loadconfig()
 with open(args.repojson) as f:
     repos = json.load(f)
 
+utils.filterrepojson(repos)
+
 stashdir = utils.getconfig("REPO_STASH_DIR", ourconfig)
 
 with tempfile.TemporaryDirectory(prefix="shared-repo-temp-", dir="/home/pokybuild/tmp") as tempdir:

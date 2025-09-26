@@ -131,6 +131,8 @@ def send_qa_email():
     with open(args.repojson) as f:
         repos = json.load(f)
 
+    utils.filterrepojson(repos)
+
     resulttool = os.path.dirname(args.repojson) + "/build/scripts/resulttool"
     querytool = os.path.dirname(args.repojson) + "/build/scripts/yocto_testresults_query.py"
 
