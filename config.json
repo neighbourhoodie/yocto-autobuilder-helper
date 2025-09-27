@@ -1227,7 +1227,7 @@
             },
             "step5" : {
                 "shortname" : "Test meta-ti YP Compatibility",
-                "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-ti/meta-ti-bsp ../meta-ti/meta-ti-extras --dependency ../meta-arm --no-auto-dependency"]
+                "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-ti/meta-ti-bsp ../meta-ti/meta-ti-extras ../meta-ti/meta-beagle --dependency ../meta-arm --no-auto-dependency"]
             },
             "step6" : {
                 "shortname" : "Test meta-oe YP Compatibility",
