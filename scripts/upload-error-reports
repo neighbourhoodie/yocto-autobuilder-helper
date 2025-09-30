@@ -22,7 +22,7 @@ if [ -d $BUILDDIR/tmp/log/error-report/ ]; then
     host=`hostname`
     echo "yp-ab-$host" > ~/.oe-send-error
 
-    . ./oe-init-build-env
+    source ./build/init-build-env
     for x in `ls $BUILDDIR/tmp/log/error-report/ | grep error_report_`; do
         send-error-report -y  -l $ERRORLINK tmp/log/error-report/$x
     done

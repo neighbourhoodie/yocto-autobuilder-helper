@@ -26,32 +26,22 @@ args = parser.parse_args()
 ourconfig = utils.loadconfig()
 
 def bitbakecmd(targetdir, cmd):
-    subprocess.check_call(". ./oe-init-build-env; %s" % cmd, shell=True, cwd=targetdir)
+    subprocess.check_call(". ./init-build-env; %s" % cmd, shell=True, cwd=targetdir)
 
 needrepos = utils.getconfigvar("NEEDREPOS", ourconfig, args.target, None)
-
-callinit = False
 
 repos = utils.getconfig("repo-defaults", ourconfig)
 
 for repo in needrepos:
     repo_basename = repo.split('/')[0]
-    checkdir = repo_basename
-    if repo_basename in repos:
-        if "call-init" in repos[repo_basename] and repos[repo_basename]["call-init"]:
-            callinit = True
-        if "checkout-dirname" in repos[repo_basename]:
-            checkdir = repos[repo_basename]["checkout-dirname"]
-
+    if repo_basename in ['bitbake', 'oecore']:
+        continue
     source = args.abworkdir + "/repos/" + repo_basename
-    destination = args.abworkdir + "/" + checkdir
-    if not os.path.isdir(destination) or callinit:
+    destination = args.abworkdir + "/" + repo_basename
+    if not os.path.isdir(destination):
         utils.mkdir(destination)
         for f in os.listdir(source):
             subprocess.check_call(['mv', source + "/" + f, destination + "/"])
-
-if callinit:
-    subprocess.check_call(". ./oe-init-build-env", shell=True, cwd=args.abworkdir)
 
 for repo in needrepos:
     repo_basename = repo.split('/')[0]
@@ -61,7 +51,7 @@ for repo in needrepos:
     if repo_basename in nolayeradd:
         continue
     try:
-        bitbakecmd(args.abworkdir, "bitbake-layers add-layer %s" % (args.abworkdir + "/" + repo))
+        bitbakecmd(args.abworkdir + "/build", "bitbake-layers add-layer %s" % (args.abworkdir + "/" + repo))
     except subprocess.CalledProcessError as e:
         utils.printheader("ERROR: Command %s failed with exit code %d, see errors above." % (e.cmd, e.returncode))
         sys.exit(e.returncode)

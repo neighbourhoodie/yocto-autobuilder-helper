@@ -157,7 +157,7 @@ elif extratools:
     if args.phase == "init" and args.stepname == "extratools":
         sys.exit(0)
 
-logconfig = args.builddir + "/../bitbake/contrib/autobuilderlog.json"
+logconfig = args.builddir + "/../layers/bitbake/contrib/autobuilderlog.json"
 print("Using BB_LOGCONFIG=%s" % logconfig)
 os.environ["BB_LOGCONFIG"] = logconfig
 
@@ -202,21 +202,23 @@ def bitbakecmd(builddir, cmd, report, stepnum, stepname, oeenv=True):
     except FileNotFoundError:
         numreports = 0
 
+    cmdpath = builddir
+
     def writelog(msg, a, b):
         a.write(msg)
         b.write(msg)
 
     if oeenv:
-        cmd = ". ./oe-init-build-env; %s" % cmd
+        cmd = ". ./init-build-env; %s" % cmd
 
     if testmode:
         print("Would run '%s'" % cmd)
         return
 
     with open(log, "a") as outf:
-        writelog("Running '%s' with output to %s\n" % (cmd, log), outf, sys.stdout)
+        writelog("Running '%s' with output to %s in %s\n" % (cmd, log, cmdpath), outf, sys.stdout)
 
-    with subprocess.Popen(cmd, shell=True, cwd=builddir + "/..", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0) as p, open(log, 'ab') as f:
+    with subprocess.Popen(["/bin/bash", "-c", cmd], cwd=cmdpath, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0) as p, open(log, 'ab') as f:
         for line in p.stdout:
             writelog(line, f, sys.stdout.buffer)
             sys.stdout.flush()
@@ -370,9 +372,10 @@ elif args.phase == "finish" and args.stepname == "send-errors":
 
 if jcfg:
     addentry("builddir-cleanup", "Cleaning up build directory", "finish")
-elif args.phase == "finish" and args.stepname == "builddir-cleanup":
+# full/quick have a second phase in post-trigger
+elif args.phase == "finish" and args.stepname == "builddir-cleanup" and args.target not in ["a-full", "a-quick"]:
     if args.builddir and os.path.exists(args.builddir):
-        if os.path.exists("oe-init-build-env"):
+        if os.path.exists(args.builddir + "/build/init-build-env"):
             bitbakecmd(args.builddir, "bitbake -m", report, 99, args.stepname)
         runcmd(["mv", args.builddir, args.builddir + "-renamed"])
 

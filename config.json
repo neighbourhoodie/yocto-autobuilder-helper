@@ -26,7 +26,10 @@
     "AUTOBUILDER_HASHSERV" : "wss://hashserv.yoctoproject.org/ws",
 
     "defaults" : {
-        "NEEDREPOS" : ["poky"],
+        "NEEDREPOS" : ["bitbake"],
+        "BBSETUP_DLDIR" : "${BASE_SHAREDDIR}/current_sources",
+        "BBSETUP_CONFIG" : ["poky-master", "poky"],
+        "BBSETUP_FRAGMENTS" : [],
         "DISTRO" : "poky",
         "MACHINE" : "qemux86-64",
         "SDKMACHINE" : "x86_64",
@@ -43,7 +46,8 @@
         "extravars" : [
             "SANITY_TESTED_DISTROS = ''",
             "BB_HASHSERVE = '${AUTOBUILDER_HASHSERV}'",
-            "OE_FRAGMENTS += 'core/yocto-autobuilder/autobuilder core/yocto-autobuilder/autobuilder-resource-constraints'"
+            "OE_FRAGMENTS += 'core/yocto-autobuilder/autobuilder core/yocto-autobuilder/autobuilder-resource-constraints'",
+            "EXTRA_IMAGE_FEATURES ?= 'allow-empty-password empty-root-password allow-root-login'"
         ]
     },
     "templates" : {
@@ -85,7 +89,7 @@
             "step1" : {
                 "shortname" : "Machine oe-selftest",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest ${HELPERSTMACHTARGS} -j 15"],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"]
             }
         },
         "altcfg-qemu" : {
@@ -221,7 +225,7 @@
                     "RPM_GPG_SIGN_CHUNK = '1'"
                 ],
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest -a --skip-tests distrodata.Distrodata.test_checkpkg -T yocto-mirrors -T machine -T toolchain-user -T toolchain-system -j 15"],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"]
             }
         },
         "buildperf" : {
@@ -257,7 +261,7 @@
             "step2" : {
                 "shortname" : "OE Selftest",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; OEQA_DEBUGGING_SAVED_OUTPUT=${BASE_SHAREDDIR}/pub/repro-fail/ DISPLAY=:1 oe-selftest -a --skip-tests distrodata.Distrodata.test_checkpkg reproducible -T yocto-mirrors -T machine -T toolchain-user -T toolchain-system -j 15"],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"]
             },
             "step3" : {
                 "shortname" : "Python Linter Report",
@@ -277,16 +281,16 @@
             "step1" : {
                 "shortname" : "Reproducible Selftest",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; OEQA_DEBUGGING_SAVED_OUTPUT=${BASE_SHAREDDIR}/pub/repro-fail/ DISPLAY=:1 oe-selftest -r reproducible"],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"]
 
             }
         },
         "reproducible-meta-oe" : {
             "MACHINE" : "qemux86-64",
             "SDKMACHINE" : "x86_64",
-            "NEEDREPOS" : ["poky", "meta-openembedded"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded"],
             "ADDLAYER" : [
-                "${BUILDDIR}/../meta-selftest"
+                "${BUILDDIR}/../layers/openembedded-core/meta-selftest"
             ],
             "extravars" : [
                 "EXCLUDE_FROM_WORLD:layer-core = '1'",
@@ -462,7 +466,7 @@
             "step1" : {
                 "shortname" : "Sources pre-fetching",
                 "BBTARGETS" : "universe -c fetch -k",
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"],
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"],
                 "extravars" : [
                     "SOURCE_MIRROR_FETCH = '1'"
                 ]
@@ -478,16 +482,17 @@
             "step1" : {
                 "shortname" : "Source Mirror Selftest",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest -a -t yocto-mirrors -j 15"],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"]
             }
         }
 
     },
     "overrides" : {
         "qemuarm-oecore" : {
-            "NEEDREPOS" : ["oecore", "bitbake"],
+            "NEEDREPOS" : ["bitbake"],
             "MACHINE" : "qemuarm",
-            "DISTRO" : "None",
+            "DISTRO" : "",
+            "BBSETUP_CONFIG" : ["oe-nodistro", "nodistro"],
             "extravars" : [
                 "INHERIT += 'uninative'",
                 "require conf/distro/include/yocto-uninative.inc",
@@ -557,7 +562,7 @@
             "step1" : {
                 "shortname" : "Sources pre-fetching (arm specific)",
                 "BBTARGETS" : "universe -c fetch -k",
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"],
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"],
                 "extravars" : [
                     "SOURCE_MIRROR_FETCH = '1'"
                 ]
@@ -614,7 +619,7 @@
         },
 
         "meta-arm" : {
-            "NEEDREPOS" : ["poky", "meta-arm"],
+            "NEEDREPOS" : ["bitbake", "meta-arm"],
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-arm/meta-arm-toolchain",
                 "${BUILDDIR}/../meta-arm/meta-arm",
@@ -648,7 +653,7 @@
             }
         },
         "meta-agl-core" : {
-            "NEEDREPOS" : ["poky", "meta-agl"],
+            "NEEDREPOS" : ["bitbake", "meta-agl"],
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-agl/meta-agl-core"
             ],
@@ -665,7 +670,7 @@
             }
         },
         "meta-aws" : {
-            "NEEDREPOS" : ["poky", "meta-openembedded", "meta-aws"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded", "meta-aws"],
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-openembedded/meta-oe",
                 "${BUILDDIR}/../meta-openembedded/meta-python",
@@ -799,7 +804,7 @@
             }
         },
         "meta-intel" : {
-            "NEEDREPOS" : ["poky", "meta-intel"],
+            "NEEDREPOS" : ["bitbake", "meta-intel"],
             "ADDLAYER" : ["${BUILDDIR}/../meta-intel"],
             "MACHINE" : "intel-corei7-64",
             "TEMPLATE" : "arch-hw"
@@ -1050,7 +1055,7 @@
         },
         "buildtools-docs" : {
             "MACHINE" : "qemux86-64",
-            "NEEDREPOS" : ["poky", "meta-openembedded"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded"],
             "ADDLAYER" : [
                     "${BUILDDIR}/../meta-openembedded/meta-oe",
                     "${BUILDDIR}/../meta-openembedded/meta-python",
@@ -1188,20 +1193,20 @@
             "TEMPLATE" : "reproducible"
         },
         "check-layer" : {
-            "NEEDREPOS" : ["poky", "meta-mingw"],
+            "NEEDREPOS" : ["bitbake", "meta-mingw"],
             "DISTRO" : "nodistro",
             "step1" : {
-                "EXTRACMDS" : ["bitbake-layers remove-layer ../meta-poky; yocto-check-layer ../meta-poky"]
+                "EXTRACMDS" : ["yocto-check-layer ../layers/meta-yocto/meta-poky"]
             },
             "step2" : {
-                "EXTRACMDS" : ["bitbake-layers remove-layer ../meta-yocto-bsp; yocto-check-layer ../meta-yocto-bsp"]
+                "EXTRACMDS" : ["yocto-check-layer ../layers/meta-yocto/meta-yocto-bsp"]
             },
             "step3" : {
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-mingw"]
             }
         },
         "check-layer-nightly" : {
-            "NEEDREPOS" : ["poky", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein", "meta-qcom"],
+            "NEEDREPOS" : ["bitbake", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein", "meta-qcom"],
             "step1" : {
                 "shortname" : "Test meta-agl YP Compatibility",
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-agl/meta-agl-core ../meta-agl/meta-netboot --dependency ../meta-openembedded/meta-oe ../meta-openembedded/meta-networking ../meta-openembedded/meta-python --no-auto-dependency"]
@@ -1248,7 +1253,7 @@
             }
         },
         "metrics" : {
-            "NEEDREPOS" : ["poky", "meta-openembedded"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded"],
             "extravars" : [
                 "INHERIT += 'cve-check'",
                 "BB_DISKMON_DIRS = ''",
@@ -1299,7 +1304,7 @@
             }
         },
         "metrics-gitstats" : {
-            "NEEDEDREPOS" : [],
+            "NEEDREPOS" : [],
             "step1" : {
                 "shortname" : "Generate gitstats",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/run-gitstats ${BUILDDIR}/../"]
@@ -1321,7 +1326,7 @@
             }
         },
         "meta-mingw" : {
-            "NEEDREPOS" : ["poky", "meta-mingw"],
+            "NEEDREPOS" : ["bitbake", "meta-mingw"],
             "MACHINE" : "qemux86-64",
             "BBTARGETS" : "core-image-mingw-sdktest:do_populate_sdk",
             "ADDLAYER" : ["${BUILDDIR}/../meta-mingw"],
@@ -1334,7 +1339,7 @@
             }
         },
         "meta-oe" : {
-            "NEEDREPOS" : ["poky", "meta-openembedded"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded"],
             "MACHINE" : "qemux86-64",
             "extravars" : [
                 "INHERIT += 'rm_work'"
@@ -1354,7 +1359,7 @@
             }
         },
         "meta-virt" : {
-            "NEEDREPOS" : ["poky", "meta-openembedded", "meta-virtualization"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded", "meta-virtualization"],
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-openembedded/meta-oe",
                 "${BUILDDIR}/../meta-openembedded/meta-python",
@@ -1459,7 +1464,7 @@
                     "IMAGE_INSTALL:append = ' service hello-mod'",
                     "TEST_SUITES:append = ' skeletoninit'"
                 ],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-skeleton"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-skeleton"]
             },
             "step4" : {
                 "shortname" : "Systemd with sysvinit compat",
@@ -1515,7 +1520,7 @@
             "TEMPLATE" : "buildperf"
         },
         "auh" : {
-            "NEEDREPOS" : ["poky", "auto-upgrade-helper"],
+            "NEEDREPOS" : ["bitbake", "auto-upgrade-helper"],
             "extravars" :[
                 "DL_DIR = '${TOPDIR}/downloads'",
                 "INHERIT += 'buildhistory'",
@@ -1542,7 +1547,7 @@
             }
         },
         "auh-meta-oe": {
-            "NEEDREPOS": ["poky", "auto-upgrade-helper", "meta-openembedded"],
+            "NEEDREPOS": ["bitbake", "auto-upgrade-helper", "meta-openembedded"],
             "extravars": [
                 "DL_DIR = '${TOPDIR}/downloads'",
                 "INHERIT += 'buildhistory'",
@@ -1673,15 +1678,15 @@
             "step1" : {
                 "shortname" : "Yocto Mirror Selftest",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/checkvnc; DISPLAY=:1 oe-selftest -r buildoptions.SourceMirroring.test_yocto_source_mirror"],
-                "ADDLAYER" : ["${BUILDDIR}/../meta-selftest"]
+                "ADDLAYER" : ["${BUILDDIR}/../layers/openembedded-core/meta-selftest"]
             }
         },
         "meta-oe-mirror" : {
             "SDKMACHINE" : "x86_64",
             "MACHINE" : "qemux86-64",
-            "NEEDREPOS" : ["poky", "meta-openembedded"],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded"],
             "ADDLAYER" : [
-                "${BUILDDIR}/../meta-selftest",
+                "${BUILDDIR}/../layers/openembedded-core/meta-selftest",
 
                 "${BUILDDIR}/../meta-openembedded/meta-oe",
                 "${BUILDDIR}/../meta-openembedded/meta-python",
@@ -1713,7 +1718,7 @@
             }
         },
         "meta-webosose" : {
-            "NEEDREPOS" : ["poky", "meta-webosose", "meta-security", "meta-clang", "meta-openembedded", "meta-qt6"],
+            "NEEDREPOS" : ["bitbake", "meta-webosose", "meta-security", "meta-clang", "meta-openembedded", "meta-qt6"],
             "DISTRO": "webos",
             "MACHINE": "qemux86-64",
             "NOLAYERADD": ["meta-security", "meta-clang", "meta-qt6", "meta-webosose", "meta-openembedded"],
@@ -1751,7 +1756,7 @@
             "TEMPLATE" : "trigger-build-posttrigger"
         },
         "patchtest" : {
-            "NEEDREPOS" : ["poky", "meta-patchtest", "meta-openembedded"],
+            "NEEDREPOS" : ["bitbake", "meta-patchtest", "meta-openembedded"],
             "MACHINE" : "qemux86-64",
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-openembedded/meta-oe",
@@ -1763,10 +1768,10 @@
             }
         },
 	"patchtest-selftest" : {
-	    "NEEDREPOS" : ["poky"],
+	    "NEEDREPOS" : ["bitbake"],
 	    "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchtest-selftest ${HELPERBUILDDIR}/.."],
 	    "ADDLAYER" : [
-	        "${BUILDDIR}/../meta-selftest"
+	        "${BUILDDIR}/../layers/openembedded-core/meta-selftest"
 	    ]
 	},
         "toaster" : {

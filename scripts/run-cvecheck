@@ -73,7 +73,7 @@ fi
 
 cd ..
 set +u
-. oe-init-build-env build
+source build/init-build-env build
 set -u
 bitbake world --runall cve_check -R conf/distro/include/cve-extra-exclusions.inc
 

@@ -46,17 +46,19 @@ stashdir = utils.getconfig("REPO_STASH_DIR", ourconfig)
 
 needrepos = utils.getconfigvar("NEEDREPOS", ourconfig, args.target, None)
 
-with open(args.repojson) as f:
+layerjson = args.repojson
+bbsetup_json = args.repojson.replace("layerinfo.json", "bbsetup-overrides.json")
+
+with open(layerjson) as f:
     repos = json.load(f)
 
 utils.filterrepojson(repos, args.target)
 
+bitbake_setup = False
+
 targetsubdir = args.abworkdir + "/repos"
 needrepos_baseddirs = [r.split('/')[0] for r in needrepos]
 for repo in sorted(repos.keys()):
-    # gplv2 is no longer built/tested in master
-    if repo == "meta-gplv2":
-        continue
     if repo not in needrepos_baseddirs:
         continue
     if args.cache_dir:
@@ -76,7 +78,38 @@ for repo in sorted(repos.keys()):
 
 utils.setup_buildtools_tarball(ourconfig, args.workername, args.abworkdir + "/buildtools")
 
+if "bitbake" not in repos:
+    sys.exit(0)
+
 try:
-    subprocess.check_call([scriptsdir + "/layer-config", args.abworkdir, args.target])
+    bbs_dldir = utils.getconfigvar("BBSETUP_DLDIR", ourconfig, args.target, None)
+    bbs_config = utils.getconfiglist("BBSETUP_CONFIG", ourconfig, args.target, None)
+    bbs_fragments = utils.getconfiglist("BBSETUP_FRAGMENTS", ourconfig, args.target, None)
+    machine = utils.getconfigvar("MACHINE", ourconfig, args.target, None)
+    if machine:
+        bbs_fragments.append("machine/" + machine)
+    distro = utils.getconfigvar("DISTRO", ourconfig, args.target, None)
+    if distro:
+        bbs_fragments.append("distro/" + distro)
+
+    cmd = [targetsubdir + "/bitbake/bin/bitbake-setup",
+           "--setting", "default", "top-dir-prefix",  os.path.dirname(os.path.dirname(args.abworkdir)),
+           "--setting", "default", "top-dir-name", os.path.basename(os.path.dirname(args.abworkdir)),
+           "--setting", "default", "dl-dir", bbs_dldir,
+           "--global-settings", args.abworkdir + "/settings.conf",
+           "init",
+           "--skip-selection", "machine",
+           "--skip-selection", "distro",
+           "--source-overrides", bbsetup_json,
+           "--build-dir-name", "build",
+           "--non-interactive",
+           ] + bbs_config + bbs_fragments
+    print("Running command %s" % " ".join(cmd))
+    utils.flush()
+    subprocess.check_call(cmd)
+    layercmd = [scriptsdir + "/layer-config", args.abworkdir, args.target]
+    print("Running command %s" % " ".join(layercmd))
+    utils.flush()
+    subprocess.check_call(layercmd)
 except subprocess.CalledProcessError as e:
     sys.exit(e.returncode)

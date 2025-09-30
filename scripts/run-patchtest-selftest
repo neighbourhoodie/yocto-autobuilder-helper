@@ -9,10 +9,10 @@ set -u
 set -o pipefail
 set -x
 
-pokydir=$(realpath "$1")
+oecoredir=$(realpath "$1")/layers/openembedded-core/
 
 python3 -m venv venv --without-pip --system-site-packages
 source venv/bin/activate
-python3 -m pip install -r $pokydir/meta/lib/patchtest/requirements.txt
+python3 -m pip install -r $oecoredir/meta/lib/patchtest/requirements.txt
 
-$pokydir/meta/lib/patchtest/selftest/selftest
+$oecoredir/meta/lib/patchtest/selftest/selftest

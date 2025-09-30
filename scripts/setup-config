@@ -56,12 +56,22 @@ sdkextraconf = os.path.join(args.builddir, "conf", "sdk-extra.conf")
 if os.path.exists(sdkextraconf):
     os.remove(sdkextraconf)
 
-for v in ["MACHINE", "DISTRO", "SDKMACHINE", "PACKAGE_CLASSES"]:
+for v in ["SDKMACHINE", "PACKAGE_CLASSES"]:
     value = utils.getconfigvar(v, ourconfig, args.target, stepnum)
     if value and value != "None":
         variables.append(v + ' = "%s"' % value)
 
+machine = utils.getconfigvar("MACHINE", ourconfig, args.target, stepnum) 
 distro = utils.getconfigvar("DISTRO", ourconfig, args.target, stepnum)
+
+def enable_fragment(fragment):
+    cmd = ". ./init-build-env; bitbake-config-build enable-fragment %s" % fragment
+    cmdpath = args.builddir
+
+    print("Running '%s' in %s\n" % (cmd, cmdpath))
+    utils.flush()
+    subprocess.check_call(["/bin/bash", "-c", cmd], cwd=cmdpath)
+
 
 for v in ["DLDIR", "PRSERV"]:
     value = utils.getconfigvar(v, ourconfig, args.target, stepnum)
@@ -129,4 +139,9 @@ with open(sdkextraconf, "w") as f:
         v = v.replace("@RELEASENUM@", replace)
         print("  " + v)
         f.write(v + "\n")
+
+if machine:
+    enable_fragment("machine/" + machine)
+if distro:
+    enable_fragment("distro/" + distro)
 
