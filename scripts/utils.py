@@ -300,7 +300,7 @@ def publishrepo(clonedir, repo, publishdir):
 # The repo json needs to be filtered to allow builds with and without bitbake-setup
 def filterrepojson(data, target=None):
     # For a-full or a-quick, we want all repos. Otherwise we should use poky and ignore bitbake and friends
-    if target and target != "a-full" and target != "a-quick":
+    if target and target != "a-full" and target != "a-quick" and "poky" in data:
         data.pop("bitbake", None)
         data.pop("meta-yocto", None)
         data.pop("yocto-docs", None)
