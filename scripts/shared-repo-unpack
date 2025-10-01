@@ -49,7 +49,7 @@ needrepos = utils.getconfigvar("NEEDREPOS", ourconfig, args.target, None)
 with open(args.repojson) as f:
     repos = json.load(f)
 
-utils.filterrepojson(repos)
+utils.filterrepojson(repos, args.target)
 
 targetsubdir = args.abworkdir + "/repos"
 needrepos_baseddirs = [r.split('/')[0] for r in needrepos]

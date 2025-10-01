@@ -298,11 +298,13 @@ def publishrepo(clonedir, repo, publishdir):
     subprocess.check_call("rsync -av " + archive_name + "* " + publishdir, shell=True, cwd=sharedrepo)
 
 # The repo json needs to be filtered to allow builds with and without bitbake-setup
-def filterrepojson(data):
-    # If bitbake and poky are present, we should use poky and ignore bitbake
-    # If oecore is there, it is a-full or a-quick so don't do that
-    if "bitbake" in data and "poky" in data and "oecore" not in data:
-        del data["bitbake"]
+def filterrepojson(data, target=None):
+    # For a-full or a-quick, we want all repos. Otherwise we should use poky and ignore bitbake and friends
+    if target and target != "a-full" and target != "a-quick":
+        data.pop("bitbake", None)
+        data.pop("meta-yocto", None)
+        data.pop("yocto-docs", None)
+        data.pop("oecore", None)
     return
 
 def mkdir(path):
