@@ -55,9 +55,9 @@ for repo in sorted(repos.keys()):
     if not os.path.exists(layerpath):
         # layer may not be used by the build and hence not moved into final position
         layerpath = builddir + '/repos/' + repo
-    #if not os.path.exists(layerpath):
-    #    # Repos is specified on the controller but not used in the helper config
-    #    continue
+    if not os.path.exists(layerpath) and repo in ['meta-security']:
+        # Repos is specified on the controller but not used in the helper config
+        continue
     getrevs(jsonprops, layerpath, repo)
 
 # We need a way to match builds which are the same in the buildbot UI. Traditionally this was
