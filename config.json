@@ -244,6 +244,7 @@
                 "CONNECTIVITY_CHECK_URIS = ''",
                 "BB_HASHSERVE = 'auto'",
                 "BB_LOG_HOST_STAT_CMDS = ''",
+                "INHERIT += 'buildstats'",
                 "BB_SERVER_TIMEOUT = '0'"
             ]
         },
