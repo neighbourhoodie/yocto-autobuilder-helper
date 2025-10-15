@@ -38,12 +38,12 @@ parser.add_argument('-P', '--push-remote',
 parser.add_argument('-r', '--results-dir',
                     action='store',
                     help="Where to store results artefacts")
-parser.add_argument('-w', '--work-dir',
-                    action='store',
-                    help="build directory to run the tests in")
 parser.add_argument('-p', '--publish-dir',
                     action='store',
                     help="directory to publish into")
+parser.add_argument('--build-dir',
+                    action='store',
+                    help="Directory to run the build in")
 
 args = parser.parse_args()
 
@@ -78,11 +78,7 @@ hostname = os.uname()[1]
 
 print("Running on " + hostname)
 
-try:
-    gitdir = subprocess.check_output("git rev-parse --show-toplevel", shell=True).decode("utf-8").strip()
-except subprocess.CalledProcessError:
-    print("The current working dir doesn't seem to be a git clone. Please cd there before running " + sys.argv[0])
-    sys.exit(1)
+gitdir = args.build_dir + "/../layers/openembedded-core"
 
 os.chdir(gitdir)
 
@@ -93,23 +89,18 @@ if not args.branch:
     # Strip refs/heads/
     branch = branch[11:]
 
-if not args.work_dir:
-    args.work_dir = gitdir + "/build-perf-test"
 if not archive_dir:
-    archive_dir = gitdir + "/archive-results"
+    archive_dir = args.build_dir + "/archive-results"
 os.makedirs(archive_dir, exist_ok=True)
 
-# Ensure we start with a clean build buil directory
-subprocess.check_call("rm -rf %s/*" % args.work_dir, shell=True)
-
-print("Using working dir " + args.work_dir)
+print("Using build dir " + args.build_dir)
 
 if not args.download_dir:
-    args.download_dir = args.work_dir + "/downloads"
+    args.download_dir = args.build_dir + "/downloads"
 os.makedirs(args.download_dir, exist_ok=True)
 
 if not global_results:
-    global_results = args.work_dir
+    global_results = args.build_dir
 os.makedirs(global_results, exist_ok=True)
 
 
@@ -117,19 +108,14 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
 gitrev = subprocess.check_output("git rev-parse --short HEAD", shell=True).decode("utf-8").strip()
 gitrevfull = subprocess.check_output("git rev-parse HEAD", shell=True).decode("utf-8").strip()
-build_dir = args.work_dir + "/build-" + gitrev + "-" + timestamp
-results_tmpdir = args.work_dir + "/results-" + gitrev + "-" + timestamp
+build_dir = args.build_dir
+results_tmpdir = args.build_dir + "/results-" + gitrev + "-" + timestamp
 globalres_log = global_results + "/globalres.log"
 machine = "qemux86"
 
-os.makedirs(args.work_dir, exist_ok=True)
-os.makedirs(build_dir + "/conf", exist_ok=True)
-# copy in auto.conf
-subprocess.check_call("cp -r %s/build/conf/auto.conf %s/conf" % (gitdir, build_dir), shell=True)
-
 # Run actual test script
-ret = subprocess.call("BDIR=%s source ./build/init-build-env >/dev/null; oe-build-perf-test --out-dir %s --globalres-file %s --lock-file %s/oe-build-perf.lock"
- % (build_dir, results_tmpdir, globalres_log, args.work_dir), shell=True)
+ret = subprocess.call("BDIR=%s source %s/init-build-env >/dev/null; oe-build-perf-test --out-dir %s --globalres-file %s --lock-file %s/oe-build-perf.lock"
+ % (build_dir, build_dir, results_tmpdir, globalres_log, args.build_dir), shell=True)
 
 if ret == 1:
     print("ERROR: oe-build-perf-test script failed!")
@@ -147,7 +133,7 @@ if git_repo:
     print("\nArchiving results in " + git_repo)
 
     os.makedirs(git_repo, exist_ok=True)
-    subprocess.check_call("BDIR=%s source ./build/init-build-env >/dev/null; oe-git-archive " % build_dir + \
+    subprocess.check_call("BDIR=%s source ./init-build-env >/dev/null; oe-git-archive " % build_dir + \
         "--git-dir " + git_repo + " " \
         "--branch-name '{hostname}/{branch}/{machine}' " \
         "--tag-name '{hostname}/{branch}/{machine}/{commit_count}-g{commit}/{tag_number}' " \
@@ -214,8 +200,6 @@ if archive_dir:
     cmd = "tar -czf %s/%s-%s.tar.gz -C %s %s" % (archive_dir, hostname, results_basename, results_dirname, results_basename)
     subprocess.check_call(cmd, shell=True)
 
-subprocess.check_call("rm -rf %s" % build_dir, shell=True)
 subprocess.check_call("rm -rf %s" % results_tmpdir, shell=True)
-subprocess.check_call("rm -rf *", shell=True)
 
 print("DONE")
