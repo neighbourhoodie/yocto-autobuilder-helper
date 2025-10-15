@@ -133,7 +133,7 @@ if git_repo:
     print("\nArchiving results in " + git_repo)
 
     os.makedirs(git_repo, exist_ok=True)
-    subprocess.check_call("BDIR=%s . ./init-build-env >/dev/null; oe-git-archive " % build_dir + \
+    subprocess.check_call("BDIR=%s . %s/init-build-env >/dev/null; oe-git-archive " % (build_dir, build_dir) + \
         "--git-dir " + git_repo + " " \
         "--branch-name '{hostname}/{branch}/{machine}' " \
         "--tag-name '{hostname}/{branch}/{machine}/{commit_count}-g{commit}/{tag_number}' " \
@@ -168,8 +168,8 @@ if git_repo:
         with open(report_txt, "w") as f:
             f.write("HTML Report/Graphs are available at:\n    %s\n\n" % url)
 
-    subprocess.check_call("BDIR=%s . ./build/init-build-env >/dev/null; oe-build-perf-report -r %s %s >> %s" % (build_dir, git_repo, extraopts, report_txt), shell=True)
-    subprocess.check_call("BDIR=%s . ./build/init-build-env >/dev/null; oe-build-perf-report -r %s %s --html > %s " % (build_dir, git_repo, extraopts, report_html), shell=True)
+    subprocess.check_call("BDIR=%s . %s/init-build-env >/dev/null; oe-build-perf-report -r %s %s >> %s" % (build_dir, build_dir, git_repo, extraopts, report_txt), shell=True)
+    subprocess.check_call("BDIR=%s . %s/init-build-env >/dev/null; oe-build-perf-report -r %s %s --html > %s " % (build_dir, build_dir, git_repo, extraopts, report_html), shell=True)
 
     subprocess.check_call("cp %s %s/%s.txt" % (report_txt, global_results, filename), shell=True)
     subprocess.check_call("cp %s %s/%s.html" % (report_html, global_results, filename), shell=True)
