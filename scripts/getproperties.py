@@ -72,6 +72,8 @@ buildid = hashlib.sha1(buildid.encode("utf-8")).hexdigest()
 
 jsonprops['yp_build_revision'] = buildid
 
+jsonprops['use_bitbake_setup'] = True
+
 ourconfig = utils.loadconfig()
 exported_properties = ['DISTRO', 'MACHINE', 'SDKMACHINE', 'PACKAGE_CLASSES']
 if targetname in ourconfig['overrides']:
