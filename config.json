@@ -1776,7 +1776,7 @@
 	    ]
 	},
         "toaster" : {
-            "EXTRACMDS" : ["${SCRIPTSDIR}/run-toaster-tests ${HELPERBUILDDIR} ${HELPERBUILDDIR}/.."]
+            "EXTRACMDS" : ["${SCRIPTSDIR}/run-toaster-tests ${HELPERBUILDDIR} ${HELPERBUILDDIR}/../layers/bitbake"]
         }
     },
     "repo-defaults" : {
