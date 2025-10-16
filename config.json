@@ -1273,15 +1273,15 @@
             },
             "step2" : {
                 "shortname" : "Patch metrics for meta",
-                "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --poky ../ --metrics ../yocto-metrics --repo ../ --layer ../meta --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --oecore ../layers/openembedded-core/ --metrics ./yocto-metrics --repo ../layers/openembedded-core/ --layer ../layers/openembedded-core/meta --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
             },
             "step3" : {
                 "shortname" : "CVE checks for meta",
-                "EXTRACMDS" : ["${SCRIPTSDIR}/run-cvecheck --metrics ../yocto-metrics --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-cvecheck --metrics ./yocto-metrics --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics --push"]
             },
             "step4" : {
                 "shortname" : "Patch metrics for meta-oe",
-                "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --poky ../ --metrics ../yocto-metrics-meta-oe --repo ../meta-openembedded --layer ../meta-openembedded --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
+                "EXTRACMDS" : ["${SCRIPTSDIR}/run-patchmetrics --oecore ../layers/openembedded-core/ --metrics ./yocto-metrics-meta-oe --repo ../meta-openembedded --layer ../meta-openembedded --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
             },
             "step5" : {
                 "shortname" : "CVE checks for meta-oe",
@@ -1297,7 +1297,7 @@
                     "${BUILDDIR}/../meta-openembedded/meta-initramfs",
                     "${BUILDDIR}/../meta-openembedded/meta-webserver"
                     ],
-                "EXTRACMDS" : ["echo 'do_cve_check:layer-core = \"\"' >> conf/auto.conf ; ${SCRIPTSDIR}/run-cvecheck --metrics ../yocto-metrics-meta-oe --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
+                "EXTRACMDS" : ["echo 'do_cve_check:layer-core = \"\"' >> conf/auto.conf ; ${SCRIPTSDIR}/run-cvecheck --metrics ./yocto-metrics-meta-oe --branch ${HELPERBRANCHNAME} --results ${HELPERRESULTSDIR}/../../patchmetrics-meta-oe --push"]
             },
             "step6": {
                 "shortname": "AB-INT report",
