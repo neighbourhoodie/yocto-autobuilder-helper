@@ -8,8 +8,9 @@ import sys
 
 import utils
 
+# Usage: scripts/getproperties.py <builddir> [builder_name]
 builddir = sys.argv[1]
-
+targetname = sys.argv[2] if len(sys.argv) > 2 else None
 
 with open(builddir + "/../layerinfo.json") as f:
     repos = json.load(f)
@@ -71,5 +72,29 @@ buildid = hashlib.sha1(buildid.encode("utf-8")).hexdigest()
 
 jsonprops['yp_build_revision'] = buildid
 
-print(json.dumps(jsonprops, indent=4, sort_keys=True))
+ourconfig = utils.loadconfig()
+exported_properties = ['DISTRO', 'MACHINE', 'SDKMACHINE', 'PACKAGE_CLASSES']
+if targetname in ourconfig['overrides']:
+    target_props = {}
+    target = ourconfig['overrides'][targetname]
+    maxsteps = 1
+    # For each properties, construct of set of all values this property is
+    # assigned with.
+    # We iterate each steps, and get corresponding values from:
+    # - The step itself.
+    # - If no value was found, the build target template.
+    # - If still not value is found, the defaults value.
+    for v in target:
+        if v.startswith("step"):
+            for prop in exported_properties:
+                for propdict in (target[v], target, ourconfig['defaults']):
+                    if prop in propdict:
+                        target_props.setdefault(prop, set()).add(propdict[prop])
+                        break
 
+    # Transform property sets: as single value if the set only contains one
+    # value, as a list of values otherwise.
+    for k, v in target_props.items():
+        jsonprops[k] = list(v)[0] if len(v) == 1 else list(v)
+
+print(json.dumps(jsonprops, indent=4, sort_keys=True))
