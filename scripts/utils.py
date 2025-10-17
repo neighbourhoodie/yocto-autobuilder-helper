@@ -283,10 +283,11 @@ def fetchgitrepo(clonedir, repo, params, stashdir, depth=None):
 def taggitrepo(clonedir, repo, params, tagremote, tagname):
     sharedrepo = "%s/%s" % (clonedir, repo)
     revision = params["revision"]
+    tag = f"{repo}/{tagname}"
     print("Creating tag...")
-    subprocess.check_call(["git", "tag", tagname, revision], cwd=sharedrepo)
+    subprocess.check_call(["git", "tag", tag, revision], cwd=sharedrepo)
     print("Pushing tag...")
-    subprocess.check_call(["git", "push", tagremote, tagname], cwd=sharedrepo)
+    subprocess.check_call(["git", "push", tagremote, tag], cwd=sharedrepo)
 
 def publishrepo(clonedir, repo, publishdir):
     sharedrepo = "%s/%s" % (clonedir, repo)

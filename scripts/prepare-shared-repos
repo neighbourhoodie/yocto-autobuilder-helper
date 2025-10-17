@@ -17,6 +17,7 @@ import tempfile
 import utils
 
 poky_tag_remote = "git@push.yoctoproject.org:poky-ci-archive"
+tagged_repos = {"bitbake", "oecore", "meta-yocto"}
 
 parser = utils.ArgParser(description='Iterates over a set of repositories in a json file and sets up a shared directory containing them.')
 
@@ -55,7 +56,7 @@ with tempfile.TemporaryDirectory(prefix="shared-repo-temp-", dir="/home/pokybuil
             utils.fetchgitrepo(tempdir, repo, repos[repo], stashdir, depth=1)
         if args.publish_dir:
             utils.publishrepo(tempdir, repo, args.publish_dir)
-        if repo == "poky" and args.tag:
+        if repo in tagged_repos and args.tag:
             utils.taggitrepo(tempdir, repo, repos[repo], poky_tag_remote, args.tag)
 
     utils.printheader("Creating shared src tarball")
