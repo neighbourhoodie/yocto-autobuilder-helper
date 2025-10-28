@@ -658,7 +658,7 @@
             "ADDLAYER" : [
                 "${BUILDDIR}/../meta-agl/meta-agl-core"
             ],
-            "DISTRO" : "poky-agl",
+            "DISTRO" : "agl",
             "BUILDINFO" : true,
             "BUILDHISTORY" : true,
             "PACKAGE_CLASSES" : "package_rpm",
