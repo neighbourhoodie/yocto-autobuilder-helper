@@ -291,6 +291,7 @@
         "---",
         "0.0.0",
         "5.99",
+        "6.99",
         "Q1",
         "Q2",
         "Q3",
@@ -327,21 +328,24 @@
         } else {
           // If there's not a latest_tag set then this is the current development cycle.
 
+          function createMilestones(version) {
+            // Create all milestones for a specific version
+            return new Set([1, 2, 3, 4].map((m) => `${version} M${m}`));
+          }
+
           // The current release is active (e.g. 5.3)
           active.push(release.series_version);
 
           // And so is the next minor release (eg 5.4)
           let parts = release.series_version.split(".");
           parts[parts.length - 1]++;
-          const next = parts.join(".");
+          let next = parts.join(".");
           active.push(next);
-
           // And all of the next releases milestones
-          let milestones = new Set([1, 2, 3, 4].map((m) => `${next} M${m}`));
-          active.push(...milestones);
+          active.push(...createMilestones(next));
 
           // All remaining milestones in this release
-          milestones = new Set([1, 2, 3, 4].map((m) => `${release.series_version} M${m}`));
+          let milestones = createMilestones(release.series_version);
           // Remove the milestones that have been releases. Map the tag names to milestone names here.
           const seenMilestones = new Set(release.releases.map((s) => s.replace("_", " ")));
           milestones = milestones.difference(seenMilestones);
@@ -349,7 +353,11 @@
 
           // The next major release (eg 6.0) is active
           parts = release.series_version.split(".");
-          active.push(`${parseInt(parts[0])+1}.0`);
+          next = `${parseInt(parts[0])+1}.0`
+          active.push(next);
+          // And all of the next releases milestones
+          active.push(...createMilestones(next));
+
           console.log(active);
         }
       }
