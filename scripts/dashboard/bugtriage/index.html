@@ -119,12 +119,20 @@
         <div id="needinfo"></div>
       </div>
 
-      <div class="section scrollspy" id="inactive-container">
-        <h4>Inactive <a class="waves-effect btn-flat" onclick="reloadTable('#inactive');"><i class="material-icons">refresh</i></a></h4>
+      <div class="section scrollspy" id="inactivebugs-container">
+        <h4>Inactive Bugs <a class="waves-effect btn-flat" onclick="reloadTable('#inactivebugs');"><i class="material-icons">refresh</i></a></h4>
         <p>
           All open bugs that haven't been altered in two years.
         </p>
-        <div id="inactive"></div>
+        <div id="inactivebugs"></div>
+      </div>
+
+      <div class="section scrollspy" id="inactivefeatures-container">
+        <h4>Inactive Enhancements <a class="waves-effect btn-flat" onclick="reloadTable('#inactivefeatures');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All open enhancements that haven't been altered in two years.
+        </p>
+        <div id="inactivefeatures"></div>
       </div>
 
       <div class="section scrollspy" id="oldmilestone-container">
@@ -154,7 +162,8 @@
         <li><a href="#reopened-container">Reopened</a></li>
         <li><a href="#abint-container">AB-INT</a></li>
         <li><a href="#needinfo-container">Need Info</a></li>
-        <li><a href="#inactive-container">Inactive</a></li>
+        <li><a href="#inactivebugs-container">Old Bugs</a></li>
+        <li><a href="#inactivefeatures-container">Old Features</a></li>
         <li><a href="#oldmilestone-container">Wrong Milestone</a></li>
         <li><a href="#newcomer-container">Newcomer</a></li>
       </ul>
@@ -268,12 +277,15 @@
       const bugs = await searchBugs(table, params);
     }
 
-    async function bugsInactive(table) {
+    async function bugsInactive(table, operator) {
       const params = new URLSearchParams({
         resolution: "---",
         f1: "days_elapsed",
         o1: "greaterthaneq",
-        v1: 365 * 2
+        v1: 365 * 2,
+        f2: "bug_severity",
+        o2: operator,
+        v2: "enhancement"
       });
       const bugs = await searchBugs(table, params);
     }
@@ -396,8 +408,11 @@
         case "#needinfo":
           bugsByStatus(table, "NEEDINFO");
           break;
-        case "#inactive":
-          bugsInactive(table);
+        case "#inactivebugs":
+          bugsInactive(table, "notequals");
+          break;
+        case "#inactivefeatures":
+          bugsInactive(table, "equals");
           break;
         case "#oldmilestone":
           bugsOldMilestone(table);
@@ -411,7 +426,8 @@
     reloadTable("#newcomer");
     reloadTable("#reopened");
     reloadTable("#needinfo");
-    reloadTable("#inactive");
+    reloadTable("#inactivebugs");
+    reloadTable("#inactivefeatures");
     reloadTable("#oldmilestone");
 
     document.addEventListener('DOMContentLoaded', function () {
