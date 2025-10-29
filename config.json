@@ -1305,7 +1305,7 @@
             }
         },
         "metrics-gitstats" : {
-            "NEEDREPOS" : [],
+            "NEEDREPOS" : ["bitbake", "meta-openembedded"],
             "step1" : {
                 "shortname" : "Generate gitstats",
                 "EXTRACMDS" : ["${SCRIPTSDIR}/run-gitstats ${BUILDDIR}/../"]
