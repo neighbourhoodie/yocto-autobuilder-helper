@@ -101,7 +101,7 @@ try:
            "--skip-selection", "machine",
            "--skip-selection", "distro",
            "--source-overrides", bbsetup_json,
-           "--build-dir-name", "build",
+           "--setup-dir-name", "build",
            "--non-interactive",
            ] + bbs_config + bbs_fragments
     print("Running command %s" % " ".join(cmd))
