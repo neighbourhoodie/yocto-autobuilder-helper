@@ -1532,10 +1532,10 @@
             "step1" : {
                 "shortname" : "setup AUH",
                 "EXTRAPLAINCMDS" : [
-                    "git config user.email auh@yoctoproject.org",
-                    "git config user.name 'Auto Upgrade Helper'",
-                    "git switch -C tmp-auh-upgrades HEAD",
-                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./build/upgrade-helper/upgrade-helper.conf"
+                    "git -C ../layers/openembedded-core config user.email auh@yoctoproject.org",
+                    "git -C ../layers/openembedded-core config user.name 'Auto Upgrade Helper'",
+                    "git -C ../layers/openembedded-core switch -C tmp-auh-upgrades HEAD",
+                    "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./upgrade-helper/upgrade-helper.conf"
                 ]
             },
             "step2" : {
