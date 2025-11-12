@@ -133,8 +133,8 @@ def send_qa_email():
 
     utils.filterrepojson(repos)
 
-    resulttool = os.path.dirname(args.repojson) + "/build/scripts/resulttool"
-    querytool = os.path.dirname(args.repojson) + "/build/scripts/yocto_testresults_query.py"
+    resulttool = os.path.dirname(args.repojson) + "/build/layers/openembedded-core/scripts/resulttool"
+    querytool = os.path.dirname(args.repojson) + "/build/layers/openembedded-core/scripts/yocto_testresults_query.py"
 
     buildtoolsdir = os.path.dirname(args.repojson) + "/build/buildtools"
     if os.path.exists(buildtoolsdir):
@@ -148,13 +148,13 @@ def send_qa_email():
     else:
         test_results_url = TEST_RESULTS_REPOSITORY_URL
 
-    if 'poky' in repos and os.path.exists(resulttool) and os.path.exists(querytool) and args.results_dir:
+    if 'oecore' in repos and os.path.exists(resulttool) and os.path.exists(querytool) and args.results_dir:
         utils.printheader("Processing test report")
         # Need the finalised revisions (not 'HEAD')
-        targetrepodir = "%s/poky" % (repodir)
+        targetrepodir = "%s/oecore" % (repodir)
         revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=targetrepodir).decode('utf-8').strip()
-        branch = repos['poky']['branch']
-        repo = repos['poky']['url']
+        branch = repos['oecore']['branch']
+        repo = repos['oecore']['url']
 
         targetbranch, basebranch = utils.getcomparisonbranch(ourconfig, repo, branch)
         report = subprocess.check_output([resulttool, "report", args.results_dir])
