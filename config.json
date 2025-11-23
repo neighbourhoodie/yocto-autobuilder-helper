@@ -249,10 +249,12 @@
             ]
         },
         "selftest" : {
-            "MACHINE" : "qemux86-64",
+            "MACHINE" : "unset",
+            "DISTRO" : "unset",
             "PACKAGE_CLASSES" : "package_rpm",
             "extravars" : [
                 "RPM_GPG_SIGN_CHUNK = '1'",
+                "DISTRO = 'poky'",
                 "IMAGE_INSTALL:append = ' ssh-pregen-hostkeys'"
             ],
             "step1" : {
@@ -1150,27 +1152,61 @@
             ]
         },
         "oe-selftest" : {
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            }
         },
         "oe-selftest-ubuntu" : {
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            }
         },
         "oe-selftest-debian" : {
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            }
         },
         "oe-selftest-fedora" : {
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            }
         },
         "oe-selftest-opensuse" : {
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            }
         },
         "oe-selftest-centos" : {
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            }
         },
         "oe-selftest-armhost" : {
-            "MACHINE": "qemuarm64",
             "SDKMACHINE": "aarch64",
-            "TEMPLATE" : "selftest"
+            "TEMPLATE" : "selftest",
+            "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemuarm64'"
+                ]
+            }
         },
         "reproducible" : {
             "TEMPLATE" : "reproducible"

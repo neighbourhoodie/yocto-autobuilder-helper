@@ -65,6 +65,9 @@ machine = utils.getconfigvar("MACHINE", ourconfig, args.target, stepnum)
 distro = utils.getconfigvar("DISTRO", ourconfig, args.target, stepnum)
 
 def enable_fragment(fragment):
+    if fragment.endswith("/unset"):
+        return
+
     cmd = ". ./init-build-env; bitbake-config-build enable-fragment %s" % fragment
     cmdpath = args.builddir
 
