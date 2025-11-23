@@ -42,19 +42,23 @@ import argparse
 import json
 import os
 import re
-import urllib.request
 import sys
 import subprocess
 import tempfile
 
 from pathlib import Path
 from typing import List, Dict, Set
-from urllib.error import HTTPError
 
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 CONFIG_REMOTE_URL = "https://git.yoctoproject.org/yocto-autobuilder2/plain/config.py"
 AUTOBUILDER_WORKERS_ENDPOINT = "https://autobuilder.yoctoproject.org/valkyrie/api/v2/workers"
 
+REQ_HEADERS = {
+    "User-Agent": "yocto-autobuilder-helper (git://git.yoctoproject.org/yocto-autobuilder-helper)",
+    "Accept": "*/*",
+}
 
 INPUT_REGEXES = {
     "alma": {
@@ -321,8 +325,10 @@ def _filter_inactive_workers(possible_workers: List[str]) -> List[str]:
     _possible_workers = []
     workers_ab = []
 
+    req = Request(AUTOBUILDER_WORKERS_ENDPOINT, headers=REQ_HEADERS)
+
     try:
-        with urllib.request.urlopen(AUTOBUILDER_WORKERS_ENDPOINT) as r:
+        with urlopen(req) as r:
             workers_ab = json.load(r).get("workers")
     except (HTTPError, AttributeError) as e:
         print(f"WARNING: Error when trying to fetch the worker statuses from {AUTOBUILDER_WORKERS_ENDPOINT}:")
@@ -354,8 +360,9 @@ def main():
         exit(1)
 
     if args.config_from_web:
+        req = Request(CONFIG_REMOTE_URL, headers=REQ_HEADERS)
         try:
-            with urllib.request.urlopen(CONFIG_REMOTE_URL) as r:
+            with urlopen(req) as r:
                 with tempfile.TemporaryDirectory() as tempdir:
                     with open(Path(tempdir) / "config.py", "wb") as conf:
                         conf.write(r.read())
