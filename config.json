@@ -1160,11 +1160,21 @@
                 "extravars" : [
                     "MACHINE = 'qemux86-64'"
                 ]
+            },
+            "step5" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
             }
         },
         "oe-selftest-ubuntu" : {
             "TEMPLATE" : "selftest",
             "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            },
+            "step5" : {
                 "extravars" : [
                     "MACHINE = 'qemux86-64'"
                 ]
@@ -1176,11 +1186,21 @@
                 "extravars" : [
                     "MACHINE = 'qemux86-64'"
                 ]
+            },
+            "step5" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
             }
         },
         "oe-selftest-fedora" : {
             "TEMPLATE" : "selftest",
             "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            },
+            "step5" : {
                 "extravars" : [
                     "MACHINE = 'qemux86-64'"
                 ]
@@ -1192,11 +1212,21 @@
                 "extravars" : [
                     "MACHINE = 'qemux86-64'"
                 ]
+            },
+            "step5" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
             }
         },
         "oe-selftest-centos" : {
             "TEMPLATE" : "selftest",
             "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemux86-64'"
+                ]
+            },
+            "step5" : {
                 "extravars" : [
                     "MACHINE = 'qemux86-64'"
                 ]
@@ -1206,6 +1236,11 @@
             "SDKMACHINE": "aarch64",
             "TEMPLATE" : "selftest",
             "step2" : {
+                "extravars" : [
+                    "MACHINE = 'qemuarm64'"
+                ]
+            },
+            "step5" : {
                 "extravars" : [
                     "MACHINE = 'qemuarm64'"
                 ]
