@@ -498,7 +498,7 @@
             "NEEDREPOS" : ["bitbake"],
             "MACHINE" : "qemuarm",
             "DISTRO" : "",
-            "BBSETUP_CONFIG" : ["oe-nodistro", "nodistro"],
+            "BBSETUP_CONFIG" : ["oe-nodistro-master", "nodistro"],
             "extravars" : [
                 "INHERIT += 'uninative'",
                 "require conf/distro/include/yocto-uninative.inc",
