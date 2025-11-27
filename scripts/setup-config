@@ -64,17 +64,22 @@ for v in ["SDKMACHINE", "PACKAGE_CLASSES"]:
 machine = utils.getconfigvar("MACHINE", ourconfig, args.target, stepnum) 
 distro = utils.getconfigvar("DISTRO", ourconfig, args.target, stepnum)
 
+def runcmd(cmd):
+    cmdpath = args.builddir
+    print("Running '%s' in %s\n" % (cmd, cmdpath))
+    utils.flush()
+    subprocess.check_call(["/bin/bash", "-c", cmd], cwd=cmdpath)
+
+def disable_all_fragments():
+    cmd = ". ./init-build-env; bitbake-config-build disable-all-fragments"
+    runcmd(cmd)
+
 def enable_fragment(fragment):
     if fragment.endswith("/unset"):
         return
 
     cmd = ". ./init-build-env; bitbake-config-build enable-fragment %s" % fragment
-    cmdpath = args.builddir
-
-    print("Running '%s' in %s\n" % (cmd, cmdpath))
-    utils.flush()
-    subprocess.check_call(["/bin/bash", "-c", cmd], cwd=cmdpath)
-
+    runcmd(cmd)
 
 for v in ["DLDIR", "PRSERV"]:
     value = utils.getconfigvar(v, ourconfig, args.target, stepnum)
@@ -143,6 +148,7 @@ with open(sdkextraconf, "w") as f:
         print("  " + v)
         f.write(v + "\n")
 
+disable_all_fragments()
 if machine:
     enable_fragment("machine/" + machine)
 if distro:
