@@ -74,13 +74,18 @@ parser.add_argument('--phase',
 args = parser.parse_args()
 
 scriptsdir = os.path.dirname(os.path.realpath(__file__))
+# FIXME, we need to ultimately pass this value from buildbot on the commandline
+propertiesjson = scriptsdir + "/../../build/build-properties.json"
+with open(propertiesjson) as f:
+    properties = json.load(f)['properties']
+
 os.environ["SCRIPTSDIR"] = scriptsdir
 ourconfig = utils.loadconfig()
 ourconfig["HELPERBUILDDIR"] = args.builddir
 ourconfig["HELPERTARGET"] = args.target
 ourconfig["HELPERRESULTSDIR"] = (args.results_dir or "")
-ourconfig["HELPERREPONAME"] = args.reponame
-ourconfig["HELPERBRANCHNAME"] = args.branchname
+ourconfig["HELPERREPONAME"] = properties['repo_oecore']
+ourconfig["HELPERBRANCHNAME"] = properties['branch_oecore']
 
 hp = utils.HeaderPrinter()
 
@@ -173,7 +178,7 @@ def logname(path, stepnum, stepname):
 utils.mkdir(args.builddir)
 
 revision = "unknown"
-report = utils.ErrorReport(ourconfig, args.target, args.builddir, args.branchname, revision)
+report = utils.ErrorReport(ourconfig, args.target, args.builddir, properties['branch_oecore'], revision)
 errordir = utils.errorreportdir(args.builddir)
 utils.mkdir(errordir)
 
@@ -246,7 +251,7 @@ def runcmd(cmd, *args, **kwargs):
     except subprocess.CalledProcessError:
         print("ERROR: Command %s failed" % cmd)
 
-bh_path, remoterepo, remotebranch, baseremotebranch = utils.getbuildhistoryconfig(ourconfig, args.builddir, args.target, args.reponame, args.branchname, 1)
+bh_path, remoterepo, remotebranch, baseremotebranch = utils.getbuildhistoryconfig(ourconfig, args.builddir, args.target, properties['repo_oecore'], properties['branch_oecore'], 1)
 if bh_path:
     if jcfg:
         addentry("buildhistory-init", "Initialize buildhistory", "init")
@@ -276,7 +281,7 @@ def handle_stepnum(stepnum):
         if jcfg:
             addstepentry("write-config", "Write config", shortdesc, desc, None, str(stepnum))
         elif args.stepname == "write-config":
-            runcmd([scriptsdir + "/setup-config", args.target, str(stepnum - 1), args.builddir, args.branchname, args.reponame, "-s", args.sstateprefix, "-b", args.buildappsrcrev])
+            runcmd([scriptsdir + "/setup-config", args.target, str(stepnum - 1), args.builddir, properties['branch_oecore'], properties['repo_oecore'], "-s", args.sstateprefix, "-b", args.buildappsrcrev])
             log_file_contents(args.builddir + "/conf/auto.conf", args.builddir, stepnum, args.stepname)
 
     # Execute the targets for this configuration
