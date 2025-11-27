@@ -21,7 +21,7 @@ def get_revision(repopath):
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repopath).decode('utf-8').strip()
 
 def get_branch(repopath):
-   return subprocess.check_output(["git", "name-rev", "--name-only", "HEAD"], cwd=repopath).decode('utf-8').strip()
+   return subprocess.check_output(["git", "name-rev", "--name-only", "--exclude=refs/tags*", "HEAD"], cwd=repopath).decode('utf-8').strip()
 
 jsonprops = {}
 jsonprops['commit_yocto-autobuilder-helper'] = get_revision(builddir + "/../yocto-autobuilder-helper/")
