@@ -26,7 +26,7 @@ def is_a_main_branch(reponame, branchname):
     includes master and release branches in poky, while excluding "next"
     branches
     """
-    return reponame == "poky" and not branchname.endswith("-next")
+    return reponame == "openembedded-core" and not branchname.endswith("-next")
 
 #
 # Check if config contains all the listed params
