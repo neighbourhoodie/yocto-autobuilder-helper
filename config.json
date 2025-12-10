@@ -658,6 +658,18 @@
                 "SANITYTARGETS" : "core-image-minimal:do_testimage core-image-sato:do_testimage core-image-weston:do_testimage"
             }
         },
+        "meta-qcom" : {
+            "NEEDREPOS" : ["bitbake", "meta-qcom"],
+            "ADDLAYER" : [
+                "${BUILDDIR}/../meta-qcom"
+            ],
+            "step1": {
+                "shortname": "Build for rb3gen2-core-kit",
+                "DISTRO": "poky-altcfg",
+                "MACHINE": "rb3gen2-core-kit",
+                "BBTARGETS": "core-image-base"
+            }
+        },
         "meta-agl-core" : {
             "NEEDREPOS" : ["bitbake", "meta-agl"],
             "ADDLAYER" : [
