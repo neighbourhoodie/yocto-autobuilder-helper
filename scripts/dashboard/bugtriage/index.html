@@ -152,6 +152,14 @@
         </p>
         <div id="newcomer"></div>
       </div>
+
+      <div class="section scrollspy" id="retest-container">
+        <h4>Needs Testing <a class="waves-effect btn-flat" onclick="reloadTable('#retest');"><i class="material-icons">refresh</i></a></h4>
+        <p>
+          All open bugs which have been tagged as needing to be retested.
+        </p>
+        <div id="retest"></div>
+      </div>
     </div>
 
     <div class="col hide-on-small-only m3 l2">
@@ -166,6 +174,7 @@
         <li><a href="#inactivefeatures-container">Old Features</a></li>
         <li><a href="#oldmilestone-container">Wrong Milestone</a></li>
         <li><a href="#newcomer-container">Newcomer</a></li>
+        <li><a href="#retest-container">Retest</a></li>
       </ul>
     </div>
   </div>
@@ -401,6 +410,9 @@
         case "#newcomer":
           bugsByWhiteboard(table, "NEWCOMER");
           break;
+        case "#retest":
+          bugsByWhiteboard(table, "RETEST");
+          break;
         case "#reopened":
           bugsByStatus(table, "REOPENED");
           break;
@@ -428,6 +440,7 @@
     reloadTable("#inactivebugs");
     reloadTable("#inactivefeatures");
     reloadTable("#oldmilestone");
+    reloadTable("#retest");
 
     document.addEventListener('DOMContentLoaded', function () {
       var elems = document.querySelectorAll('.scrollspy');
