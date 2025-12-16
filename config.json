@@ -1293,7 +1293,7 @@
             }
         },
         "check-layer-nightly" : {
-            "NEEDREPOS" : ["bitbake", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein", "meta-qcom"],
+            "NEEDREPOS" : ["bitbake", "meta-agl", "meta-arm", "meta-aws", "meta-intel", "meta-ti", "meta-openembedded", "meta-virtualization", "meta-clang", "meta-exein", "meta-qcom", "meta-riscv"],
             "step1" : {
                 "shortname" : "Test meta-agl YP Compatibility",
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-agl/meta-agl-core ../meta-agl/meta-netboot --dependency ../meta-openembedded/meta-oe ../meta-openembedded/meta-networking ../meta-openembedded/meta-python --no-auto-dependency"]
@@ -1337,6 +1337,10 @@
             "step10" : {
                 "shortname" : "Test meta-qcom YP Compatibility",
                 "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-qcom --no-auto-dependency"]
+            },
+            "step11" : {
+                "shortname" : "Test meta-riscv YP Compatibility",
+                "EXTRACMDS" : ["yocto-check-layer-wrapper ../meta-riscv --no-auto-dependency"]
             }
         },
         "metrics" : {
@@ -1970,6 +1974,12 @@
         },
         "meta-qcom" : {
             "url" : "https://github.com/qualcomm-linux/meta-qcom",
+            "branch" : "master",
+            "revision" : "HEAD",
+            "no-layer-add" : true
+        },
+        "meta-riscv" : {
+            "url" : "https://github.com/riscv/meta-riscv",
             "branch" : "master",
             "revision" : "HEAD",
             "no-layer-add" : true
