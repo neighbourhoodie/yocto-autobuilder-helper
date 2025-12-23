@@ -13,6 +13,7 @@ import tempfile
 import re
 import logging
 
+import send_qa_email_data
 import utils
 
 TEST_RESULTS_REPOSITORY_URL="git@push.yoctoproject.org:yocto-testresults"
@@ -62,9 +63,21 @@ def get_last_tested_rev_on_branch(branch, test_results_url, log):
     # Fetch latest test results revision on corresponding branch in test
     # results repository
     tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", test_results_url, "refs/tags/" + branch + "/*"]).decode('utf-8').strip()
-    latest_test_tag=tags_list.splitlines()[-1].split()[1]
+    for line in reversed(tags_list.splitlines()):
+        skip = False
+        for exclude in send_qa_email_data.POKY_TESTRESULTS:
+            if exclude in line:
+                skip = True
+                break
+        if skip:
+            continue
+        break
+
+    latest_test_tag=line.split()[1]
     # From test results tag, extract Poky revision
     tested_revision = re.match(r'refs\/tags\/.*\/\d+-g([a-f0-9]+)\/\d', latest_test_tag).group(1)
+    
+    
     log.info(f"Last tested revision on branch {branch} is {tested_revision}")
     return tested_revision
 
