@@ -203,7 +203,15 @@ def send_qa_email():
             utils.printheader("Storing results")
 
             if not args.dry_run:
-                subprocess.check_call([resulttool, "store", "--revision", revision, "-l", args.results_dir + "/../../testresult-logarchives" , args.results_dir, tempdir])
+                cmd = [resulttool, "store", "--revision", revision, args.results_dir, tempdir]
+
+                # Ask resulttool to store logs in log archive folder. We should
+                # also ask to push the tags before copying these logs, as tags
+                # and log folder names have to match.
+                if basebranch or targetbranch:
+                    cmd.extend(["-l", args.results_dir + "/../../testresult-logarchives", "-p"])
+
+                subprocess.check_call(cmd)
                 if basebranch:
                     subprocess.check_call(["git", "push", "--all", "--force"], cwd=tempdir)
                     subprocess.check_call(["git", "push", "--tags", "--force"], cwd=tempdir)
