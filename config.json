@@ -1625,6 +1625,7 @@
                     "git -C ../layers/openembedded-core config user.email auh@yoctoproject.org",
                     "git -C ../layers/openembedded-core config user.name 'Auto Upgrade Helper'",
                     "git -C ../layers/openembedded-core switch -C tmp-auh-upgrades HEAD",
+                    "rm -f ../layers/openembedded-core/.git/hooks/pre-commit",
                     "install -D ${SCRIPTSDIR}/auh-config/upgrade-helper.conf ./upgrade-helper/upgrade-helper.conf"
                 ]
             },
