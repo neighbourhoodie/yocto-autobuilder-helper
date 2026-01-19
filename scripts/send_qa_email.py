@@ -48,7 +48,9 @@ def get_previous_tag(targetrepodir, version):
         else:
             comparetagstring = utils.get_tag_from_version(compareversion, comparemilestone)
             previous_major = compareversion[0] - 1
-            tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", "origin", f"refs/tags/yocto-{previous_major}*"], cwd=targetrepodir).decode('utf-8').strip()
+            cmd = ["git", "ls-remote", "--refs", "-t", "origin", f"refs/tags/yocto-{previous_major}*"]
+            log.info("Running %s" % " ".join(cmd))
+            tags_list = subprocess.check_output(cmd, cwd=targetrepodir).decode('utf-8').strip()
             # Get last tag from list, pick only the tag part, and remove the
             # "refs/tags/" part
             return tags_list.splitlines()[-1].split()[1].split('/')[-1]
@@ -62,7 +64,9 @@ def get_previous_tag(targetrepodir, version):
 def get_last_tested_rev_on_branch(branch, test_results_url, log):
     # Fetch latest test results revision on corresponding branch in test
     # results repository
-    tags_list = subprocess.check_output(["git", "ls-remote", "--refs", "-t", test_results_url, "refs/tags/" + branch + "/*"]).decode('utf-8').strip()
+    cmd = ["git", "ls-remote", "--refs", "-t", test_results_url, "refs/tags/" + branch + "/*"]
+    log.info("Running %s" % " ".join(cmd))
+    tags_list = subprocess.check_output(cmd).decode('utf-8').strip()
     for line in reversed(tags_list.splitlines()):
         skip = False
         for exclude in send_qa_email_data.POKY_TESTRESULTS:
@@ -183,7 +187,9 @@ def send_qa_email():
             elif targetbranch:
                 cloneopts = ["--branch", targetbranch]
             try:
-                subprocess.check_call(["git", "clone", test_results_url, tempdir, "--depth", "1"] + cloneopts)
+                cmd = ["git", "clone", test_results_url, tempdir, "--depth", "1"] + cloneopts
+                log.info("Running %s" % " ".join(cmd))
+                subprocess.check_call(cmd)
             except subprocess.CalledProcessError:
                 log.info("No comparision branch found, falling back to master")
                 subprocess.check_call(["git", "clone", test_results_url, tempdir, "--depth", "1"])
@@ -211,7 +217,9 @@ def send_qa_email():
                 if basebranch or targetbranch:
                     cmd.extend(["-l", args.results_dir + "/../../testresult-logarchives", "-p"])
 
+                log.info("Running %s" % " ".join(cmd))
                 subprocess.check_call(cmd)
+
                 if basebranch:
                     subprocess.check_call(["git", "push", "--all", "--force"], cwd=tempdir)
                     subprocess.check_call(["git", "push", "--tags", "--force"], cwd=tempdir)
