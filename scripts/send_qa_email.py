@@ -28,7 +28,7 @@ def get_previous_tag(targetrepodir, version, log):
     previousmilestone = None
     if version:
         if not is_release_version(version):
-            return subprocess.check_output(["git", "describe", "--abbrev=0"], cwd=targetrepodir).decode('utf-8').strip()
+            return subprocess.check_output(["git", "tag", "-l", "yocto-*"], cwd=targetrepodir).decode('utf-8').split()[-1]
         compareversion, comparemilestone, _ = utils.get_version_from_string(version)
         compareversionminor = compareversion[-1]
         # After ignoring rc part, if we get a minor to 0 on point release (e.g 4.0.0),
