@@ -23,7 +23,7 @@ def is_release_version(version):
     p = re.compile(r'\d{8}-\d+')
     return version is not None and p.match(version) is None
 
-def get_previous_tag(targetrepodir, version):
+def get_previous_tag(targetrepodir, version, log):
     previousversion = None
     previousmilestone = None
     if version:
@@ -93,7 +93,7 @@ def get_regression_base_and_target(targetbranch, basebranch, release, targetrepo
     if is_release_version(release):
         # We are on a release: ignore basebranch (which is very likely None),
         # regression reporting must be done against previous tag
-        return get_previous_tag(targetrepodir, release), targetbranch
+        return get_previous_tag(targetrepodir, release, log), targetbranch
     elif basebranch:
         # Basebranch/targetbranch are defined in config.json: regression
         # reporting must be done between latest test result available on base branch
@@ -102,7 +102,7 @@ def get_regression_base_and_target(targetbranch, basebranch, release, targetrepo
         return latest_tested_rev_on_basebranch, targetbranch
 
     #Default case: return previous tag as base
-    return get_previous_tag(targetrepodir, release), targetbranch
+    return get_previous_tag(targetrepodir, release, log), targetbranch
 
 def generate_regression_report(querytool, targetrepodir, base, target, resultdir, outputdir, log):
     log.info(f"Comparing {target} to {base}")
