@@ -5,181 +5,414 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bug Triage</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="../resources/pico.fluid.classless.min.css">
+  <link rel="stylesheet" href="../resources/shared-styles.css">
+  <link rel="apple-touch-icon" sizes="144x144" href="../resources/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../resources/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../resources/favicon-16x16.png">
   <style>
-    .pin-top {
-      position: relative;
+    body>main {
+      padding-block-start: 0;
     }
 
-    .pin-bottom {
-      position: relative;
+    .spread {
+      display: flex;
+      justify-content: space-between;
     }
 
-    .pinned {
-      position: fixed !important;
+    .content-with-sidebar {
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row-reverse;
     }
 
-    .table-of-contents a.active {
-      border-left-color: #03a9f4;
+    .content {
+      padding-block-start: 1em;
     }
 
-    table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
-      content: " \25B4\25BE"
+    .sidebar {
+      border-left: 1px solid #ddd;
+      width: 20rem;
+    }
+
+    tr td:nth-child(2) {
+      word-break: break-word;
+    }
+
+    #table-of-contents {
+      position: fixed;
+      margin: 0.5em 1em;
+    }
+
+    #table-of-contents ul {
+      padding: 0;
+      margin: 0.5em;
+    }
+
+    #table-of-contents li {
+      list-style: none;
+    }
+
+    #table-of-contents a {
+      text-decoration: none;
+      padding-inline-start: 0.5em;
+      border-left: 5px solid transparent;
+    }
+
+    #table-of-contents a.active {
+      font-weight: bold;
+      border-left-color: var(--pico-primary);
+    }
+
+    .bug-count {
+      padding-inline: 0.25em;
+    }
+
+    .reload-button {
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0;
+    }
+
+    .reload-button::after {
+      content: "↻";
+      font-size: 1.25rem;
+    }
+
+    [href="#top"] {
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1em;
+      padding-inline-end: 1em;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-inline-end: 0;
+      max-width: calc(100vw - 20rem);
+    }
+
+    th {
+      cursor: pointer;
+    }
+
+    th span {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.5em;
+    }
+
+    th span:after {
+      content: "⏶⏷";
+      color: #111;
+      opacity: 0.25;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      th span:after {
+        color: #EEE;
+      }
+    }
+
+    th[aria-sort="ascending"] span:after {
+      content: "⏶";
+      opacity: 1;
+    }
+    
+    th[aria-sort="descending"] span:after {
+      content: "⏷";
+      opacity: 1;
+    }
+
+    #nav-drawer-open, 
+    #nav-drawer-close {
+      display: none;
+      cursor: pointer;
+      font-size: 2.5rem;
+      line-height: 0.9em;
+    } 
+
+    #nav-drawer-open {
+      margin-inline-end: 0.75em;
+    }
+
+    #nav-drawer-close {
+      width: 100%;
+      text-align: right;
+      margin-top: 0.35em;
+      padding-inline-end: 0.4em;
+    }
+    
+    @media (max-width: 1024px) {
+      body>main {
+        padding-right: 0;
+      }
+      #nav-drawer-open, 
+      #nav-drawer-close {
+        display: block;
+      } 
+      .spread {
+        display: flex;
+        justify-content: space-between;
+        position: sticky;
+      }
+      body.show-nav .sidebar{
+        transform: translateX(0em);
+      }
+      .sidebar {
+        display: block;
+        position: fixed;
+        background: white;
+        height: 100vh;
+        z-index: 1;
+        transform: translateX(22em);
+        width: auto;
+        transition: all 0.5s;
+        overflow-y: auto;
+      }
+      #table-of-contents {
+        position: relative;
+        margin-bottom: 2em;
+      }
+      section {
+        margin-inline: 0;
+      }
+      .table-container {
+        max-width: 95vw;
+      }
     }
   </style>
 </head>
 
 <body>
-  <nav>
-    <div class="nav-wrapper light-blue" id="nav">
-      <span class="brand-logo">&nbsp;Yocto Project Bug Triage</span>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="https://bugzilla.yoctoproject.org/">Bugzilla</a></li>
-        <li><a href="https://autobuilder.yoctoproject.org/">Autobuilder</a></li>
-      </ul>
+  <main>
+    <div class="content-with-sidebar">
+      <div class="sidebar">
+        <div id="table-of-contents">
+          <div id="nav-drawer-close">×</div>
+          <ul>
+            <li>Navigation:</li>
+            <li><a href="/">Yocto Dashboard</a></li>
+            <li><a href="https://bugzilla.yoctoproject.org/">Bugzilla</a></li>
+            <li><a href="https://autobuilder.yoctoproject.org/">Autobuilder</a></li>
+            <li>Bug Categories:</li>
+            <li><a href="#security-container">Security<span class="bug-count"></span></a></li>
+            <li><a href="#unprioritised-container">Unprioritised<span class="bug-count"></span></a></li>
+            <li><a href="#high-container">High<span class="bug-count"></span></a></li>
+            <li><a href="#reopened-container">Reopened<span class="bug-count"></span></a></li>
+            <li><a href="#abint-container">AB-INT<span class="bug-count"></span></a></li>
+            <li><a href="#needinfo-container">Need Info<span class="bug-count"></span></a></li>
+            <li><a href="#inactivebugs-container">Old Bugs<span class="bug-count"></span></a></li>
+            <li><a href="#inactivefeatures-container">Old Features<span class="bug-count"></span></a></li>
+            <li><a href="#oldmilestone-container">Wrong Milestone<span class="bug-count"></span></a></li>
+            <li><a href="#newcomer-container">Newcomer<span class="bug-count"></span></a></li>
+            <li><a href="#retest-container">Retest<span class="bug-count"></span></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="content">
+        <div class="spread">
+          <h1 id="top" class="with-logo">Yocto Project Bug Triage</h1>
+          <div id="nav-drawer-open">≡</div>
+        </div>
+        <section>
+          <p>
+            The outcome of the bug triage meeting should be that all bugs have an
+            owner, a target milestone, and a priority.
+          </p>
+          <p>
+            The meeting is held every Thursday at 07:30 Pacific Time (typically
+            15:30 GMT or 16:30 CET, but be aware of daylight saving shifts). The
+            meeting is held on <a href="https://zoom.us/">Zoom</a>, join with either the <a href="https://zoom.us/j/454367603?pwd=ZGxoa2ZXL3FkM3Y0bFd5aVpHVVZ6dz09">direct
+              link</a> or use the Meeting ID <strong>454-367-603</strong> and password
+            <strong>277925</strong>.
+          </p>
+          <p>
+            The call facilitator is Stephen Jolley &lt;<a href="mailto:sjolley.yp.pm@gmail.com">sjolley.yp.pm@gmail.com</a>&gt;. The
+            facilitator's job is to ensure the agenda is kept to, without ratholing
+            on any particular bug, and keeping to the time slot.
+          </p>
+        </section>
+        <section id="security-container" class="table-container">
+          <h4>Security-related</h4>
+          <p>
+            <a href="https://bugzilla.yoctoproject.org/buglist.cgi?list_id=604307&resolution=---&query_format=advanced&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ACCEPTED&bug_status=IN%20PROGRESS%20DESIGN&bug_status=IN%20PROGRESS%20DESIGN%20COMPLETE&bug_status=IN%20PROGRESS%20IMPLEMENTATION&bug_status=IN%20PROGRESS%20REVIEW&bug_status=REOPENED&bug_status=NEEDINFO&product=Security&product=Security%20-%20Recipe%20Upgrade" target="_blank">View security-related bugs in Bugzilla</a>.
+          </p>
+          <p>
+            Security issues a need to be viewed directly in Bugzilla as they are
+            only visible to users with sufficient permissions.
+          </p>
+        </section>
+        
+        <section id="unprioritised-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Unprioritised<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#unprioritised');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            Bugs without a priority, that need a priority, target milestone, and owner assigned.
+          </p>
+          <div id="unprioritised"></div>
+        </section>
+
+        <section id="high-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>High<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#high');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All open high-priority bugs.
+          </p>
+          <div id="high"></div>
+        </section>
+
+        <section id="reopened-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Reopened<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#reopened');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            Bugs that have been reopened. The owner should be reviewed and the bug
+            moved to another state.
+          </p>
+          <div id="reopened"></div>
+        </section>
+
+        <section id="abint-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Autobuilder Intermittent<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#abint');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            Bugs which are tagged as tracking intermittent failures on the
+            autobuilder. A <a href="https://valkyrie.yocto.io/pub/non-release/abint/" target="_blank">graphical
+              view</a> is also available.
+          </p>
+          <div id="abint"></div>
+        </section>
+
+        <section id="needinfo-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Need Info<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#needinfo');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All bugs that are in the NEEDINFO state, and should be reviewed to
+            identify if the information has been provided and the bug should be
+            moved to another state.
+          </p>
+          <div id="needinfo"></div>
+        </section>
+
+        <section id="inactivebugs-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Inactive Bugs<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#inactivebugs');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All open bugs that haven't been altered in two years.
+          </p>
+          <div id="inactivebugs"></div>
+        </section>
+
+        <section id="inactivefeatures-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Inactive Enhancements<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#inactivefeatures');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All open enhancements that haven't been altered in two years.
+          </p>
+          <div id="inactivefeatures"></div>
+        </section>
+
+        <section id="oldmilestone-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Wrong Milestone<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#oldmilestone');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All open bugs that are targetted for a milestone in the past: they
+            should be closed if fixed, or moved to a future milestone.
+          </p>
+          <div id="oldmilestone"></div>
+        </section>
+
+        <section id="newcomer-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Potential Newcomer<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#newcomer');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All open bugs which have been tagged as being potentially good for
+            newcomers to the project who want to make their first contribution.
+          </p>
+          <div id="newcomer"></div>
+        </section>
+
+        <section id="retest-container" class="table-container">
+          <span class="spread">
+            <span>
+              <h4>Needs Testing<span class="bug-count"></span><a class="reload-button" onclick="reloadTable('#retest');">Reload Bugs</a></h4>
+            </span>
+            <a href="#top">Back to top ⏶</a>
+          </span>
+          <p>
+            All open bugs which have been tagged as needing to be retested.
+          </p>
+          <div id="retest"></div>
+        </section>
+      </div>
     </div>
-  </nav>
 
-  <div class="row">
-    <div class="col s12 m9 l10">
-      <p>
-        The outcome of the bug triage meeting should be that all bugs have an
-        owner, a target milestone, and a priority.
-      </p>
-      <p>
-        The meeting is held every Thursday at 07:30 Pacific Time (typically
-        15:30 GMT or 16:30 CET, but be aware of daylight saving shifts). The
-        meeting is held on <a href="https://zoom.us/">Zoom</a>, join with either the <a
-        href="https://zoom.us/j/454367603?pwd=ZGxoa2ZXL3FkM3Y0bFd5aVpHVVZ6dz09">direct
-        link</a> or use the Meeting ID <strong>454-367-603</strong> and password
-        <strong>277925</strong>.
-      </p>
-      <p>
-        The call facilitator is Stephen Jolley &lt;<a
-        href="mailto:sjolley.yp.pm@gmail.com">sjolley.yp.pm@gmail.com</a>&gt;. The
-        facilitator's job is to ensure the agenda is kept to, without ratholing
-        on any particular bug, and keeping to the time slot.
-      </p>
+  </main>
+  <script src="tablesort.min.js"></script>
+  <script src="tablesort.number.js"></script>
+  <script type="text/javascript">
+    // highlight nav items
+    navigation.addEventListener("navigate", (event) => {
+      // Unhighlight any highlighted link
+      document.querySelector('a.active')?.classList.remove("active");
+      // If we’ve navigated to an anchor, highlight the corresponding link(s)
+      const url = new URL(event.destination.url);
+      if (url.hash) {
+        document.querySelector(`[href="${url.hash}"]`)?.classList.add("active");
+      }
+    })
+  </script>
+  <script type="text/javascript">
+    // Handle toggle of nav drawer
+    document.querySelector('#nav-drawer-open').addEventListener('click', (event) => {
+      const body = document.querySelector('body')
+      body.classList.toggle('show-nav')
+    })
 
-      <div class="section scrollspy" id="security-container">
-        <h4>Security-related</h4>
-        <p>
-          <a href="https://bugzilla.yoctoproject.org/buglist.cgi?list_id=604307&resolution=---&query_format=advanced&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ACCEPTED&bug_status=IN%20PROGRESS%20DESIGN&bug_status=IN%20PROGRESS%20DESIGN%20COMPLETE&bug_status=IN%20PROGRESS%20IMPLEMENTATION&bug_status=IN%20PROGRESS%20REVIEW&bug_status=REOPENED&bug_status=NEEDINFO&product=Security&product=Security%20-%20Recipe%20Upgrade" target="_blank">View security-related bugs in Bugzilla</a>.
-        </p>
-        <p>
-          Security issues a need to be viewed directly in Bugzilla as they are
-          only visible to users with sufficient permissions.
-        </p>
-      </div>
-
-      <div class="section scrollspy" id="unprioritised-container">
-        <h4>Unprioritised <a class="waves-effect btn-flat" onclick="reloadTable('#unprioritised');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          Bugs without a priority, that need a priority, target milestone, and owner assigned.
-        </p>
-        <div id="unprioritised"></div>
-      </div>
-
-      <div class="section scrollspy" id="high-container">
-        <h4>High <a class="waves-effect btn-flat" onclick="reloadTable('#high');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All open high-priority bugs.
-        </p>
-        <div id="high"></div>
-      </div>
-
-      <div class="section scrollspy" id="reopened-container">
-        <h4>Reopened <a class="waves-effect btn-flat" onclick="reloadTable('#reopened');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          Bugs that have been reopened. The owner should be reviewed and the bug
-          moved to another state.
-        </p>
-        <div id="reopened"></div>
-      </div>
-
-      <div class="section scrollspy" id="abint-container">
-        <h4>Autobuilder Intermittent <a class="waves-effect btn-flat" onclick="reloadTable('#abint');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          Bugs which are tagged as tracking intermittent failures on the
-          autobuilder. A <a
-          href="https://valkyrie.yocto.io/pub/non-release/abint/" target="_blank">graphical
-          view</a> is also available.
-        </p>
-        <div id="abint"></div>
-      </div>
-
-      <div class="section scrollspy" id="needinfo-container">
-        <h4>Need Info <a class="waves-effect btn-flat" onclick="reloadTable('#needinfo');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All bugs that are in the NEEDINFO state, and should be reviewed to
-          identify if the information has been provided and the bug should be
-          moved to another state.
-        </p>
-        <div id="needinfo"></div>
-      </div>
-
-      <div class="section scrollspy" id="inactivebugs-container">
-        <h4>Inactive Bugs <a class="waves-effect btn-flat" onclick="reloadTable('#inactivebugs');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All open bugs that haven't been altered in two years.
-        </p>
-        <div id="inactivebugs"></div>
-      </div>
-
-      <div class="section scrollspy" id="inactivefeatures-container">
-        <h4>Inactive Enhancements <a class="waves-effect btn-flat" onclick="reloadTable('#inactivefeatures');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All open enhancements that haven't been altered in two years.
-        </p>
-        <div id="inactivefeatures"></div>
-      </div>
-
-      <div class="section scrollspy" id="oldmilestone-container">
-        <h4>Wrong Milestone <a class="waves-effect btn-flat" onclick="reloadTable('#oldmilestone');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All open bugs that are targetted for a milestone in the past: they
-          should be closed if fixed, or moved to a future milestone.
-        </p>
-        <div id="oldmilestone"></div>
-      </div>
-
-      <div class="section scrollspy" id="newcomer-container">
-        <h4>Potential Newcomer <a class="waves-effect btn-flat" onclick="reloadTable('#newcomer');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All open bugs which have been tagged as being potentially good for
-          newcomers to the project who want to make their first contribution.
-        </p>
-        <div id="newcomer"></div>
-      </div>
-
-      <div class="section scrollspy" id="retest-container">
-        <h4>Needs Testing <a class="waves-effect btn-flat" onclick="reloadTable('#retest');"><i class="material-icons">refresh</i></a></h4>
-        <p>
-          All open bugs which have been tagged as needing to be retested.
-        </p>
-        <div id="retest"></div>
-      </div>
-    </div>
-
-    <div class="col hide-on-small-only m3 l2">
-      <ul class="section table-of-contents pushpin">
-        <li><a href="#security-container">Security</a></li>
-        <li><a href="#unprioritised-container">Unprioritised</a></li>
-        <li><a href="#high-container">High</a></li>
-        <li><a href="#reopened-container">Reopened</a></li>
-        <li><a href="#abint-container">AB-INT</a></li>
-        <li><a href="#needinfo-container">Need Info</a></li>
-        <li><a href="#inactivebugs-container">Old Bugs</a></li>
-        <li><a href="#inactivefeatures-container">Old Features</a></li>
-        <li><a href="#oldmilestone-container">Wrong Milestone</a></li>
-        <li><a href="#newcomer-container">Newcomer</a></li>
-        <li><a href="#retest-container">Retest</a></li>
-      </ul>
-    </div>
-  </div>
-  </div>
-  <script src="sorttable.js"></script>
+    document.querySelector('#nav-drawer-close').addEventListener('click', (event) => {
+      const body = document.querySelector('body')
+      body.classList.toggle('show-nav')
+    })
+    
+  </script>
   <script>
     const serverUrl = "https://bugzilla.yoctoproject.org";
 
@@ -200,21 +433,37 @@
       ["assigned_to", "Owner"],
     ]);
 
+    function appendBugCount(selector, bugCount) {
+      // Appends the bug count to both the section headline and
+      // the corresponding navigation item
+      const container = document.querySelector(selector).closest("section")
+      const headline =  container.querySelector('.bug-count')
+      headline.innerText = `(${bugCount})`
+
+      const anchor = `#${container.getAttribute('id')}`
+      const navLink = document.querySelector(`[href="${anchor}"] .bug-count`)
+      navLink.innerText = `(${bugCount})`
+    }
+
     function populateTable(selector, bugs) {
       if (bugs.length === 0) {
         const p = document.createElement("p");
         p.innerHTML = "<em>No bugs found</em>.";
         document.querySelector(selector).replaceChildren(p);
+        appendBugCount(selector, 0)
         return;
       }
 
       const table = document.createElement("table");
-      table.setAttribute("class", "highlight sortable")
 
       const header = table.appendChild(document.createElement("thead"));
       const tr = header.appendChild(document.createElement("tr"));
-      for (const value of fields.values()) {
-        tr.appendChild(document.createElement("th")).append(value);
+      for (const [key, value] of fields.entries()) {
+        const th = document.createElement("th")
+        tr.appendChild(th).appendChild(document.createElement("span")).append(value);
+        if (key === 'id') {
+            th.setAttribute('data-sort-method', 'number')
+        }
       }
 
       const body = table.appendChild(document.createElement("tbody"));
@@ -230,18 +479,21 @@
       }
 
       const footer = table.appendChild(document.createElement("tfoot"));
-      footer.innerHTML = `<tr><td colspan="${fields.size}">${bugs.length} bugs found.</td></tr>`;
+      footer.innerHTML = `<tr><td colspan="${fields.size}">${bugs.length} bug${bugs.length > 1 ? 's' : ''} found</td></tr>`;
 
-      sorttable.makeSortable(table);
+      appendBugCount(selector, bugs.length)
+
+      new Tablesort(table);
 
       document.querySelector(selector).replaceChildren(table);
     }
 
     async function searchBugs(selector, params) {
-      const spinner = document.createElement("div");
-      spinner.setAttribute("class", "progress")
-      spinner.innerHTML = `<div class="indeterminate"></div>`;
-      document.querySelector(selector).replaceChildren(spinner);
+      // Refresh a section
+      const table = document.querySelector(selector)
+      table.setAttribute('aria-busy', true)
+      const container = document.querySelector(selector).closest("section")
+      const reloadButton = container.querySelector('.reload-button')
 
       try {
         params.append("include_fields", Array.from(fields.keys()).join());
@@ -260,6 +512,7 @@
         console.error(`Failed to fetch bugs for ${selector}: ${error}`);
         alert("Error fetching bugs. Check the console for details.");
       }
+      table.setAttribute('aria-busy', false)
     }
 
     async function bugsByWhiteboard(table, keyword) {
@@ -373,12 +626,10 @@
 
           // The next major release (eg 6.0) is active
           parts = release.series_version.split(".");
-          next = `${parseInt(parts[0])+1}.0`
+          next = `${parseInt(parts[0]) + 1}.0`
           active.push(next);
           // And all of the next releases milestones
           active.push(...createMilestones(next));
-
-          console.log(active);
         }
       }
       return active;
@@ -441,16 +692,7 @@
     reloadTable("#inactivefeatures");
     reloadTable("#oldmilestone");
     reloadTable("#retest");
-
-    document.addEventListener('DOMContentLoaded', function () {
-      var elems = document.querySelectorAll('.scrollspy');
-      M.ScrollSpy.init(elems, { scrollOffset: 100 });
-
-      elems = document.querySelectorAll('.pushpin');
-      M.Pushpin.init(elems, { offset: document.querySelector("#nav").offsetHeight });
-    });
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 
 </html>
