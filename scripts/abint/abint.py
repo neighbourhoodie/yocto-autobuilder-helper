@@ -7,6 +7,7 @@ import logging
 import pickle
 import pprint
 import re
+import json
 
 import arrow
 import bugzilla
@@ -51,6 +52,24 @@ class Bug:
             week = started_at.floor("week")
             c[week] += 1
         return dict(c)
+    
+    # Helper to get a computed dict so we can jsonify that
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "summary": self.summary,
+            "created": self.created.isoformat(),
+            "seen": [dt.isoformat() for dt in self.seen],
+
+            # computed values
+            "count": self.count,
+            "latest": self.latest.isoformat(),
+            "since_seconds": self.since.total_seconds(),
+            "weekly": {
+                week.isoformat(): count
+                for week, count in self.weekly.items()
+            },
+        }
 
 
 def get_data():
@@ -76,7 +95,6 @@ def get_data():
     print(f"Found {len(bugs)} AB-INT bugs")
 
     comments_data = bz.get_comments([bug.id for bug in bugs])["bugs"]
-
     for bug in bugs:
         for comment in comments_data[str(bug.id)]["comments"]:
             for match in re.finditer(url_re, comment["text"]):
@@ -92,24 +110,16 @@ def get_data():
                 except requests.exceptions.HTTPError as e:
                     logging.debug(f"Couldn't find build for {builder=} {build=}")
 
+    json_str = json.dumps([bug.to_dict() for bug in bugs], indent=2,)
+
+    with open("bugs.json", "w") as f:
+        f.write(json_str)
     return bugs
 
-
-
-def last_seen_report(data):
-    import jinja2
-
-    env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader("."),
-        autoescape=jinja2.select_autoescape(),
-        extensions=["jinja2_humanize_extension.HumanizeExtension"],
-    )
-
-    template = env.get_template("abint.html.j2")
-    with open("index.html", "w") as f:
-        start = arrow.utcnow().shift(weeks=-100).floor("week")
-        f.write(template.render(bugs=data, start=start, now=arrow.now()))
-
+def to_jsonable(obj):
+    if isinstance(obj, arrow.Arrow):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 CACHE_NAME = "bugs.data"
 
@@ -132,5 +142,3 @@ if __name__ == "__main__":
         logging.debug(f"Saving data to cache {CACHE_NAME}")
         with open(CACHE_NAME, "wb") as f:
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
-
-    last_seen_report(data)

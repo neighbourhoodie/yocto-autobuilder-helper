@@ -1,0 +1,75 @@
+/* 
+
+Shared Styles for various Pico-styled Yocto web properties within this repo:
+
+- Dashboard:                  https://dashboard.yoctoproject.org/
+- BugZilla Stats:             https://dashboard.yoctoproject.org/bugzilla_stats.html
+- Bug Triage:                 https://dashboard.yoctoproject.org/bugtriage/
+- Autobuilder Issue Summary:  https://valkyrie.yocto.io/pub/non-release/abint/
+  This lives in `/scripts/abint`
+
+The repo `yocto-metrics` also uses the same/similar styles for these pages:
+
+- Current CVE status for meta-openembedded:    https://valkyrie.yocto.io/pub/non-release/patchmetrics-meta-oe/
+- Patchmetrics:                                https://valkyrie.yocto.io/pub/non-release/patchmetrics/
+
+*/
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 1em;
+}
+
+main {
+  font-size: 0.9em;
+}
+
+section {
+  max-width: 55rem;
+  margin-inline: 3rem;
+}
+
+.indented {
+  margin-inline: 3rem;
+}
+
+h1.with-logo{
+  position: relative;
+  margin-inline-start: 3rem;
+}
+
+h1.with-logo::before {
+  content: "";
+  background: url(apple-touch-icon.png);
+  width: 1em;
+  height: 1em;
+  display: block;
+  background-size: contain;
+  position: absolute;
+  left: -1.5em;
+  top: 0.05em;
+  border-radius: 10%;
+}
+
+h2 {
+  padding-top: 1em;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 1em
+}
+
+.logo {
+  height: 2.6em;
+  border-radius: 10%;
+}
+
+.chart-container {
+  /* Apache eCharts like to have a container that already has a height */
+  height: 400px;
+  width: 100%;
+}
