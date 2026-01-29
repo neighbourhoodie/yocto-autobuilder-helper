@@ -1,0 +1,38 @@
+From 731caaeb92cdd861bfc9bf328700c751add7d126 Mon Sep 17 00:00:00 2001
+From: hulkoba <jacoba@neighbourhood.ie>
+Date: Thu, 18 Apr 2024 10:31:54 +0200
+Subject: [PATCH 0/2] *** SUBJECT HERE ***
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This change does:
+- Don't create chartdata-lastyear.json files because they are not needed anymore
+- Change format for generated cve-per-branch-report so it can be interpreted by the metrics view:
+
+```
+...
+CVE counts by recipes:
+
+linux-yocto: 134
+  https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-1999-0524
+  https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-1999-0656
+...
+}
+```
+
+Ninette Adhikari (1):
+  cve-report: Reformat txt recipe list per branch
+
+hulkoba (1):
+  generate-chartdata: do not create lastyear json files
+
+ scripts/cve-generate-chartdata          | 16 +-----------
+ scripts/cve-report.py                   | 34 +++++++++++++------------
+ scripts/patchmetrics-generate-chartdata |  8 +-----
+ scripts/run-cvecheck                    |  1 -
+ 4 files changed, 20 insertions(+), 39 deletions(-)
+
+-- 
+2.34.1
+

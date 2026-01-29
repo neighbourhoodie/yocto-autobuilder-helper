@@ -1,0 +1,105 @@
+From 731caaeb92cdd861bfc9bf328700c751add7d126 Mon Sep 17 00:00:00 2001
+From: hulkoba <jacoba@neighbourhood.ie>
+Date: Thu, 21 Mar 2024 11:01:46 +0100
+Subject: [PATCH 2/2] generate-chartdata: do not create lastyear json files
+
+the two html files, index.html and index-full.html,
+got merged so we only need the json file with the complete set of data.
+---
+ scripts/cve-generate-chartdata          | 16 +---------------
+ scripts/patchmetrics-generate-chartdata |  8 +-------
+ scripts/run-cvecheck                    |  1 -
+ 3 files changed, 2 insertions(+), 23 deletions(-)
+
+diff --git a/scripts/cve-generate-chartdata b/scripts/cve-generate-chartdata
+index dbbbe82..e187f8b 100755
+--- a/scripts/cve-generate-chartdata
++++ b/scripts/cve-generate-chartdata
+@@ -6,7 +6,7 @@ import subprocess
+ import tempfile
+ from datetime import datetime, date, timedelta
+ 
+-args = argparse.ArgumentParser(description="Generate CVE count data files")
++args = argparse.ArgumentParser(description="Generate CVE count data file")
+ args.add_argument("-j", "--json", help="JSON data file to use")
+ args.add_argument("-r", "--resultsdir", help="results directory to parse")
+ args = args.parse_args()
+@@ -18,16 +18,12 @@ except FileNotFoundError:
+     # if the file does not exist, start with an empty database.
+     counts = {}
+ 
+-lastyear = {}
+-
+ #
+ # Write CVE counts by day
+ #
+ def round_to_day(val):
+     return int((datetime.fromtimestamp(int(val)).date() - date(1970, 1, 1)).total_seconds())
+ 
+-a_year_ago = (datetime.now() - timedelta(days=365) - datetime(1970, 1, 1)).total_seconds()
+-
+ for branch in os.listdir(args.resultsdir):
+     branchdir = os.path.join(args.resultsdir, branch)
+     for f in os.listdir(branchdir):
+@@ -51,15 +47,5 @@ for branch in os.listdir(args.resultsdir):
+             print("Adding count %s for branch %s from file %s (ts %s)" % (count, branch, cvereport, rounded_ts))
+             counts[rounded_ts][branch] = str(count)
+ 
+-for c in counts:
+-    if int(c) > a_year_ago:
+-        lastyear[c] = counts[c]
+-
+ with open(args.json, "w") as f:
+     json.dump(counts, f, sort_keys=True, indent="\t")
+-
+-with open(args.json.replace(".json", "-lastyear.json") , "w") as f:
+-    json.dump(lastyear, f, sort_keys=True, indent="\t")
+-
+-
+-
+diff --git a/scripts/patchmetrics-generate-chartdata b/scripts/patchmetrics-generate-chartdata
+index 2c85fb1..1b83270 100755
+--- a/scripts/patchmetrics-generate-chartdata
++++ b/scripts/patchmetrics-generate-chartdata
+@@ -6,7 +6,7 @@ import subprocess
+ import tempfile
+ from datetime import datetime, date, timedelta
+ 
+-args = argparse.ArgumentParser(description="Generate Patch Metric Chart data files")
++args = argparse.ArgumentParser(description="Generate Patch Metric Chart data file")
+ args.add_argument("-j", "--json", help="JSON data file to use")
+ args.add_argument("-o", "--outputdir", help="output directory")
+ args = args.parse_args()
+@@ -30,10 +30,7 @@ json.dump(latest, open(args.outputdir + "/patch-status-pie.json", "w"), sort_key
+ def round_to_day(val):
+     return int((datetime.fromtimestamp(int(val)).date() - date(1970, 1, 1)).total_seconds())
+ 
+-a_year_ago = (datetime.now() - timedelta(days=365) - datetime(1970, 1, 1)).total_seconds()
+-
+ newdata = []
+-lastyeardata = []
+ databydate = {}
+ for i in data:
+     rounded = round_to_day(i['date'])
+@@ -47,8 +44,5 @@ for i in databydate:
+         if todel in databydate[i]:
+             del databydate[i][todel]
+     newdata.append(databydate[i])
+-    if int(databydate[i]['date']) > a_year_ago:
+-        lastyeardata.append(databydate[i])
+ 
+ json.dump(newdata, open(args.outputdir + "/patch-status-byday.json", "w"), sort_keys=True, indent="\t")
+-json.dump(lastyeardata, open(args.outputdir + "/patch-status-byday-lastyear.json", "w"), sort_keys=True, indent="\t")
+diff --git a/scripts/run-cvecheck b/scripts/run-cvecheck
+index 373f57c..d22dc82 100755
+--- a/scripts/run-cvecheck
++++ b/scripts/run-cvecheck
+@@ -105,5 +105,4 @@ if [ "$BRANCH" = "master" ]; then
+     fi
+ 
+     cp $METRICSDIR/cve-count-byday.json $RESULTSDIR
+-    cp $METRICSDIR/cve-count-byday-lastyear.json $RESULTSDIR
+ fi
+-- 
+2.34.1
+
