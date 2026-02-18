@@ -199,10 +199,8 @@
           th.setAttribute('data-sort-method', 'number')
         }
         tr.appendChild(th).appendChild(document.createElement("span")).append(value);
-        if (key === 'count') {
-          th.setAttribute('data-sort-default', true)
-        }
         if (key === 'latest') {
+          th.setAttribute('data-sort-default', true)
           th.setAttribute('data-sort-method', 'dateTime')
         }
       }
