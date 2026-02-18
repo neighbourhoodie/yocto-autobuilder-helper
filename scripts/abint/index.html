@@ -35,6 +35,15 @@
       gap: 0.5em;
     }
 
+    /* make summary column maximally wide on larger screens */
+    @media (min-width: 640px) {
+      td:nth-child(2) {
+        width: 100%;
+        max-width: 0;
+        overflow: hidden;
+      }
+    }
+
     th[data-sort-method="none"] {
       cursor: default;
     }
