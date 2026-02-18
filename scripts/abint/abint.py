@@ -116,11 +116,6 @@ def get_data():
         f.write(json_str)
     return bugs
 
-def to_jsonable(obj):
-    if isinstance(obj, arrow.Arrow):
-        return obj.isoformat()
-    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
-
 CACHE_NAME = "bugs.data"
 
 if __name__ == "__main__":
