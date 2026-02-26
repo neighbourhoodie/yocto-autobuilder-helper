@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Yocto Project Dashboard: BugZilla Stats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="resources/yocto.echarts.with_heatmap_single-axis.min.js"></script>
+  <script src="resources/dark.js"></script>
+  <link rel="stylesheet" href="resources/pico.fluid.classless.min.css">
+  <link rel="stylesheet" href="resources/shared-styles.css">
+  <link rel="apple-touch-icon" sizes="144x144" href="resources/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="resources/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="resources/favicon-16x16.png">
+  <style>
+    .chart-container {
+      width: auto;
+      margin: 0;
+      height: 2.5em;
+    }
+    #table-container {
+      overflow-x: auto;
+      margin-inline-end: 0;
+      max-width: calc(100vw - 5rem);
+    }
+    
+    th {
+      cursor: pointer;
+    }
+
+    th span {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.5em;
+    }
+
+    /* make summary column maximally wide on larger screens */
+    @media (min-width: 640px) {
+      td:nth-child(2) {
+        width: 100%;
+        max-width: 0;
+        overflow: hidden;
+      }
+    }
+
+    th[data-sort-method="none"] {
+      cursor: default;
+    }
+
+    th[data-sort-method="none"] span:after {
+      display: none;
+    }
+
+    th span:after {
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3C!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--%3E%3Cpath d='M130.4 268.2C135.4 280.2 147 288 160 288L480 288C492.9 288 504.6 280.2 509.6 268.2C514.6 256.2 511.8 242.5 502.7 233.3L342.7 73.3C330.2 60.8 309.9 60.8 297.4 73.3L137.4 233.3C128.2 242.5 125.5 256.2 130.5 268.2zM130.4 371.7C125.4 383.7 128.2 397.4 137.3 406.6L297.3 566.6C309.8 579.1 330.1 579.1 342.6 566.6L502.6 406.6C511.8 397.4 514.5 383.7 509.5 371.7C504.5 359.7 492.9 352 480 352L160 352C147.1 352 135.4 359.8 130.4 371.8z'/%3E%3C/svg%3E");
+      color: #111;
+      opacity: 0.25;
+      width: 1em;
+      height: 1em;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      th span:after {
+        color: #EEE;
+      }
+    }
+    
+    th[aria-sort="ascending"] span:after {
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3C!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--%3E%3Cpath d='M160 288C147.1 288 135.4 280.2 130.4 268.2C125.4 256.2 128.2 242.5 137.4 233.4L297.4 73.4C309.9 60.9 330.2 60.9 342.7 73.4L502.7 233.4C511.9 242.6 514.6 256.3 509.6 268.3C504.6 280.3 492.9 288 480 288L160 288z'/%3E%3C/svg%3E");
+      opacity: 1;
+    }
+    
+    th[aria-sort="descending"] span:after {
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3C!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--%3E%3Cpath d='M160 352C147.1 352 135.4 359.8 130.4 371.8C125.4 383.8 128.2 397.5 137.4 406.6L297.4 566.6C309.9 579.1 330.2 579.1 342.7 566.6L502.7 406.6C511.9 397.4 514.6 383.7 509.6 371.7C504.6 359.7 492.9 352 480 352L160 352z'/%3E%3C/svg%3E");
+      opacity: 1;
+    }
+
+    th span {
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      vertical-align: top;
+    }
+    .no-width-limit {
+      max-width: unset;
+    }
+    @media (max-width: 1024px) {
+      section ,
+      .indented {
+        margin-inline: 0;
+      }
+      .chart-container {
+        width: 100%;
+        margin-inline: 0;
+      }
+      #table-container {
+        max-width: 95vw;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1 class="with-logo">Yocto Project Dashboard: Autobuilder Issue Summary</h1>
+    <section>
+      <a href="/">Back to the Yocto Dashboard</a>
+    </section>
+    <section>
+      <p>
+        This is a list of all <span id="bug-count"></span>open bugs which are tagged as <tt>AB-INT</tt>, that
+        is intermittent bugs that affect the reliability of the autobuilder.
+      </p>
+      <p>
+        The headings are clickable to change the sorting. The bars underneath each
+        row represent the frequency of occurances, from two years ago on the left
+        to the present on the right.  The darker the bar, the more instances.
+      </p>
+    </section>
+    <section class="no-width-limit">
+      <div id="table-container"></div>
+    </section>
+  </main>
+  <script src="resources/tablesort.min.js"></script>
+  <script src="resources/tablesort.number.js"></script>
+  <script src="resources/tablesort.date.js"></script>
+  <script src="resources/date_helper.js"></script>
+  <script type="text/javascript">
+    const fields = new Map([
+      ["id", "ID"],
+      ["summary", "Summary"],
+      ["count", "Count"],
+      ["latest", "Last Seen"],
+    ]);
+
+    Tablesort.extend('dateTime', item => {
+      // Regular expression to test against.
+      // `item` is a table value to evaluate.
+      // We don’t bother since we control the values
+      return true
+    }, (a, b) => {
+
+      // Custom sort functionality goes here.
+      // e.g var n = (a > b) ? -1 : 1;
+      return new Date(a) > new Date(b) ? -1 : 1;
+    });
+
+    const now = new Date();
+    // Calculate the day each week starts, to match the data generated
+    // by abint.py
+    const startOfWeek = d => {
+      const date = new Date(d);
+      const day = date.getUTCDay() - 1; // 0 = Sunday
+      date.setUTCDate(date.getUTCDate() - day);
+      date.setUTCHours(0,0,0,0);
+      return date;
+    };
+
+    // generate the past 104 weeks
+    const weeks = [];
+    for (let i = 103; i >= 0; i--) {
+      const week = new Date(startOfWeek(now));
+      week.setUTCDate(week.getUTCDate() - i * 7);
+      const iso = week.toISOString().substring(0, 10) + "T00:00:00+00:00";
+      weeks.push(iso);
+    }
+
+    const genericChartConfig = option = {
+      xAxis: { show: false, type: 'category', data: weeks },
+      yAxis: { show: false, type: 'category', data: ['weeks'] },
+      grid: { top: 10, bottom: 10, left: 10, right: 10 },
+      visualMap: {
+        min: 0,
+        max: 100,
+        inRange: { color: ['#0055ff00', '#0055ff'] }, // transparent blue → blue
+        show: false,
+        // unboundedRange: true
+        range: [0, 100],
+        unboundedRange: false
+      },
+      tooltip: {
+        formatter: function (params) {
+          const dateString = new Intl.DateTimeFormat("en-US", {
+            dateStyle: "full"
+          }).format(new Date(params.name))
+          return `Week of ${dateString}: ${params.data.originalValue}`;
+        }
+      },
+      series: [{
+        type: 'heatmap',
+        label: { show: false },
+        emphasis: { itemStyle: { borderColor: '#333', borderWidth: 1 } },
+      }],
+       animation: false,
+    };
+
+    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'
+
+    const dataHandlingFunction = (bugs) => {
+      const selector = '#table-container'
+      if (bugs.length === 0) {
+        const p = document.createElement("p");
+        p.innerHTML = "<em>No bugs found</em>.";
+        document.querySelector(selector).replaceChildren(p);
+        appendBugCount(selector, 0)
+        return;
+      }
+
+      const table = document.createElement("table");
+
+      const header = table.appendChild(document.createElement("thead"));
+      const tr = header.appendChild(document.createElement("tr"));
+      for (const [key, value] of fields.entries()) {
+        const th = document.createElement("th")
+        if (key === 'count' || key === 'id') {
+          th.setAttribute('data-sort-method', 'number')
+        }
+        tr.appendChild(th).appendChild(document.createElement("span")).append(value);
+        if (key === 'summary') {
+          th.setAttribute('data-sort-method', 'none')
+        }
+        if (key === 'latest') {
+          th.setAttribute('data-sort-default', true)
+          th.setAttribute('data-sort-method', 'dateTime')
+        }
+      }
+
+      const body = table.appendChild(document.createElement("tbody"));
+      for (const bug of bugs) {
+        const row = body.appendChild(document.createElement("tr"));
+        for (const field of fields.keys()) {
+          const td = row.appendChild(document.createElement("td"));
+          if (field === "id")
+            td.innerHTML = `<a href="http://bugzilla.yoctoproject.org/${bug.id}" target="_blank">${bug.id}</a>`
+          else if (field === "latest") {
+            const result = getRelativeTimeString(new Date(bug.latest), 'en')
+            td.innerText = result;
+            td.setAttribute('data-sort', bug.latest)
+          }
+          else if (field === 'summary') {
+            const summaryContainer = td.appendChild(document.createElement("div"));
+            const summary = summaryContainer.appendChild(document.createElement("div"))
+            const chartContainer = summaryContainer.appendChild(document.createElement("div"))
+            summaryContainer.classList.add('summary-container')
+            chartContainer.classList.add('chart-container')
+            summary.innerText = bug[field]
+
+            // parse data for the heatmap
+            const weekValues = [];
+            let max = 0
+            weeks.forEach((week) => {
+              const weekStartISO = new Date(week).toISOString().substring(0, 10) + "T00:00:00+00:00";
+              if (bug.weekly[weekStartISO] > max) {
+                max = bug.weekly[weekStartISO]
+              }
+              weekValues.push(bug.weekly[weekStartISO] || 0);
+            })
+            if (max === 0) {
+              // Don’t bother rendering a chart if it’ll be empty anyway
+              continue
+            }
+            // Prepare ECharts heatmap data
+            // ECharts expects [x, y, value] coordinates
+            // with y=0 because we only have a single row
+            const data = weekValues.map((v, idx) => {
+              // Calculate the opacity for each week
+              // "1 occurrence=30%, 10+ occurrences=100% with a linear progression between them should work"
+              // So 1 = 30%, 2 = 37%, 3 = 44%…, 10+ = 100%
+              const progressionInterval = (100 - 30) / 9
+              const emulatedValue = v < 10 ? 
+                v === 1 ? 30 : v ? progressionInterval * v + 30 : 0
+              : 100
+              return {
+                value: [idx, 0, emulatedValue],
+                // Pass in the original value for use in the tooltip
+                originalValue: v
+              }
+            }); 
+            const chartOptions = {
+              ...genericChartConfig,
+              visualMap: {
+                ...genericChartConfig.visualMap,
+              },
+              series: [
+                {
+                  ...genericChartConfig.series[0],
+                  data,
+                }
+              ]
+            }
+            const chart = echarts.init(chartContainer, theme);
+            chart.setOption(chartOptions);
+            window.addEventListener('resize', () => {
+              chart.resize();
+            });
+            requestAnimationFrame(() => chart.resize());
+          }
+          else
+            td.innerText = bug[field];
+
+        }
+      }
+
+      const inlineBugCount =  document.querySelector('#bug-count')
+      inlineBugCount.innerText = `${bugs.length} `
+
+      const footer = table.appendChild(document.createElement("tfoot"));
+      footer.innerHTML = `<tr><td colspan="${fields.size}">${bugs.length} bug${bugs.length > 1 ? 's' : ''} found</td></tr>`;
+
+      new Tablesort(table, {descending: true});
+
+      document.querySelector(selector).replaceChildren(table);
+    }
+
+    fetch(`bugs.json`)
+      .then(response => response.json())
+      .then(dataHandlingFunction)
+  </script>
+</body>
+</html>

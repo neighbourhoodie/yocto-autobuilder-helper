@@ -20,4 +20,4 @@ echo Generating report...
 echo Publishing report to ${RESULTSDIR}
 
 mkdir --parents ${RESULTSDIR}/
-cp --verbose *.html *.js ${RESULTSDIR}/
+cp -va index.html bugs.json resources ${RESULTSDIR}/

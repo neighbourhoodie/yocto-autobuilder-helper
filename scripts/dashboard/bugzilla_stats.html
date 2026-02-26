@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Yocto Project Dashboard: BugZilla Stats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="resources/yocto.echarts.min.js"></script>
+  <script src="resources/dark.js"></script>
+  <link rel="stylesheet" href="resources/pico.fluid.classless.min.css">
+  <link rel="stylesheet" href="resources/shared-styles.css">
+  <link rel="apple-touch-icon" sizes="144x144" href="resources/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="resources/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="resources/favicon-16x16.png">
+  <style>
+    .chart-container {
+      width: auto;
+      margin-inline: 2em;
+    }
+    @media (max-width: 1024px) {
+      .indented {
+        margin-inline: 0;
+      }
+      .chart-container {
+        width: 100%;
+        margin-inline: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1 class="with-logo">Yocto Project Dashboard: BugZilla Stats</h1>
+    <section>
+      <a href="/">Back to the Yocto Dashboard</a>
+    </section>
+    <section>
+      <p><strong>Note:</strong> Stats do not contain information about bugs filed against hardware such as the MinnowBoard MAX.</p>
+    </section>
+    <h2 class="indented">1. Yocto Weekly Open Bug Trend: Importance</h2>
+    <div id="bugzilla-importance" class="chart-container"></div>
+    <h2 class="indented">2. Yocto Weekly Open Bug Trend: Severity</h2>
+    <div id="bugzilla-severity" class="chart-container"></div>
+    <h2 class="indented">3. Yocto Weekly Open Bug Trend: Select Products</h2>
+    <div id="bugzilla-products" class="chart-container"></div>
+    <h2 class="indented">4. Yocto Weekly Open Bug Trend: Submitted/Fixed</h2>
+    <div id="bugzilla-submitted-fixed" class="chart-container"></div>
+    <h2 class="indented">5. Yocto Weekly Open Bug Trend: Weighted Defect Density</h2>
+    <div id="bugzilla-wdd" class="chart-container"></div>
+    <section>
+      <p><strong>Note:</strong> How do we calculate the data of "weighted defect density"? We define a weight for each severity. And the sum of these weights for all open bugs are the data we record in the chart. The weight we use for each severity:</p>
+      <ul>
+        <li>Critical: 10</li>
+        <li>Major: 7</li>
+        <li>Normal: 5</li>
+        <li>Minor: 3</li>
+        <li>Enhancement: 0</li>
+        <li>Janitors: 0</li>
+      </ul>
+    </section>
+    <h2 class="indented">6. Yocto Weekly Open Bug Trend: Weighted Defect Density Plus</h2>
+    <div id="bugzilla-wdd-plus" class="chart-container"></div>
+    <section>
+      <p><strong>Note:</strong> "weighted defect density plus" shows "weighted defect density" divided by total open project bugs. This is intended to indicate if the general defect density is increasing or not as the project as a whole grows.</p>
+    </section>
+  </main>
+
+
+  <script type="text/javascript">
+    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'
+    const genericChartOptions = {
+      legend: {type: 'scroll'},
+      xAxis: { type: 'category', name: 'Work week', nameLocation: 'middle' },
+      yAxis: { name: 'Bug Count', nameLocation: 'middle' },
+      grid: {
+        left: 45,
+        right: 20,
+        top: 35,
+        bottom: 100
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
+        }
+      },
+      animation: false,
+    }
+    const useLocalData = window.location.host !== 'wiki.yoctoproject.org'
+    // Load from same directory if deployed to live
+    // Load sample data from /data directory if not (useful for development)
+    const dataPrefix = useLocalData ? 'data' : ''
+
+    const defaultDataHandlingFunction = (data) => {
+      let chartData = []
+      // remove "date" entry
+      data.cols.shift()
+      chartData.push(data.cols.map(col => col.label))
+      data.rows.forEach((row) => {
+        // remove "date" entry
+        row.c.shift()
+        chartData.push(row.c.map((item) => item.v))
+      })
+      return chartData
+    }
+
+    const chartConfig = [
+      {
+        fileName: 'importance-weekly.txt',
+        elementId: 'bugzilla-importance',
+        dataHandlingFunction: defaultDataHandlingFunction,
+        chartOptions: {
+          color: [
+            '#ff0100',
+            '#ffa500',
+            '#fffd99',
+            '#80e680',
+            '#cb13cc',
+          ],
+          series: Array.from({ length: 5 }, () => ({ type: 'bar', stack: 'total' }))
+        }
+      },
+      {
+        fileName: 'severity-weekly.txt',
+        elementId: 'bugzilla-severity',
+        dataHandlingFunction: defaultDataHandlingFunction,
+        chartOptions: {
+          color: [
+            '#F00',
+            '#FFFF99',
+            '#80E680',
+            '#cc00cc',
+          ],
+          series: Array.from({ length: 4 }, () => ({ type: 'bar', stack: 'total' }))
+        }
+      },
+      {
+        fileName: 'product-open-handpicked.txt',
+        elementId: 'bugzilla-products',
+        dataHandlingFunction: defaultDataHandlingFunction,
+        chartOptions: {
+          color: [
+            '#AAAAAA',
+            '#333333',
+            '#0088CC',
+            '#c1d82f',
+            '#00567b',
+            '#00bbe1',
+            '#5b6f7a',
+            '#FFBF03',
+            '#af383e',
+            '#3f317a',
+            '#ff9934',
+            '#661705',
+            '#ee8888'
+          ],
+          series: Array.from({ length: 13 }, () => ({ type: 'bar', stack: 'total' }))
+        },
+      },
+      {
+        fileName: 'open_close.txt',
+        elementId: 'bugzilla-submitted-fixed',
+        dataHandlingFunction: defaultDataHandlingFunction,
+        chartOptions: {
+          color: [
+            'red',
+            'orange',
+            '#FFFF99',
+            '#80E680',
+            '#cc00cc',
+            'red',
+            'orange',
+            '#FFFF99',
+            '#80E680',
+            '#cc00cc'
+          ],
+          series: Array.from({ length: 10 }, () => ({ type: 'bar', stack: 'total' }))
+        }
+      },
+      {
+        fileName: 'wdd-weekly-recent.txt',
+        elementId: 'bugzilla-wdd',
+        dataHandlingFunction: defaultDataHandlingFunction,
+        chartOptions: {
+          color: [
+            '#80B2FF'
+          ],
+          series: { type: 'line' },
+          yAxis: {
+            name: 'Weighted Density',
+            nameLocation: 'middle',
+            min: 'dataMin',
+            max: 'dataMax'
+          },
+        },
+      },
+      {
+        fileName: 'wdd-weekly-recent.txt',
+        elementId: 'bugzilla-wdd-plus',
+        dataHandlingFunction: (data) => {
+          let chartData = []
+          // remove "date" entry
+          data.cols.shift()
+          chartData.push(data.cols.map(col => col.label))
+          data.rows.forEach((row) => {
+            // Needs to skip a value in the dataset,  row.c[2].v
+            chartData.push([row.c[1].v, row.c[3].v])
+          })
+          return chartData
+        },
+        chartOptions: {
+          color: [
+            '#80B2FF'
+          ],
+          series: { type: 'line' },
+          yAxis: {
+            name: 'Weighted Density Plus',
+            nameLocation: 'middle',
+            min: function (value) {
+              return Math.floor(value.min * 100) / 100;
+            },
+            max: function (value) {
+              return Math.ceil(value.max * 100) / 100;
+            }
+          },
+        },
+      }
+    ]
+
+    chartConfig.forEach((config) => {
+      fetch(`${dataPrefix}/${config.fileName}`)
+        .then(response => response.json())
+        .then(config.dataHandlingFunction)
+        .then((chartData) => {
+          const el = document.getElementById(config.elementId)
+          const chart = echarts.init(el, theme);
+          const options = {
+            ...genericChartOptions,
+            ...config.chartOptions,
+            dataset: {
+              source: chartData
+            },
+          }
+          chart.setOption(options);
+          window.addEventListener('resize', () => {
+            chart.resize();
+          });
+        })
+    })
+  </script>
+</body>
+
+</html>
