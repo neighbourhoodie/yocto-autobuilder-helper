@@ -268,8 +268,13 @@
             // ECharts expects [x, y, value] coordinates
             // with y=0 because we only have a single row
             const data = weekValues.map((v, idx) => {
-              // Emulate the old behaviour: "each report was a block with 30% opacity, overlaid on top of each other."
-              const emulatedValue = v * 30 > 100 ? 100 : v * 30
+              // Calculate the opacity for each week
+              // "1 occurrence=30%, 10+ occurrences=100% with a linear progression between them should work"
+              // So 1 = 30%, 2 = 37%, 3 = 44%…, 10+ = 100%
+              const progressionInterval = (100 - 30) / 9
+              const emulatedValue = v < 10 ? 
+                v === 1 ? 30 : v ? progressionInterval * v + 30 : 0
+              : 100
               return {
                 value: [idx, 0, emulatedValue],
                 // Pass in the original value for use in the tooltip
