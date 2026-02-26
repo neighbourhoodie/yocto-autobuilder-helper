@@ -10,6 +10,7 @@
   <link rel="apple-touch-icon" sizes="144x144" href="../resources/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="../resources/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="../resources/favicon-16x16.png">
+  <script src="vanillajs-scrollspy.min.js"></script>
   <style>
 
     body {
@@ -18,6 +19,10 @@
 
     body>main {
       padding-block-start: 0;
+    }
+
+    section {
+      margin-inline-start: 0;
     }
 
     .spread {
@@ -37,7 +42,7 @@
 
     .sidebar {
       border-left: 1px solid #ddd;
-      width: 11rem;
+      width: 12rem;
       flex-shrink: 0;
     }
 
@@ -448,6 +453,10 @@
       const body = document.querySelector('body')
       body.classList.toggle('show-nav')
     })
+
+    const menu = document.querySelector('#table-of-contents')
+    const scrollspy = VanillaScrollspy({ menu })
+    scrollspy.init()
     
   </script>
   <script>
